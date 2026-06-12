@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MemoMap | Every Place Has a Story</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="logo">
+            <i class="ri-map-pin-2-fill"></i>
+            <span>MemoMap</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#how">How It Works</a></li>
+            <li><a href="#stories">Stories</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <div class="nav-buttons">
+            <button class="login-btn" onclick="window.location.href='login.html'">Login</button>
+            <button class="signup-btn" onclick="window.location.href='signup.html'">Sign Up</button>
+        </div>
+        <button class="menu-btn" id="menuBtn">
+            <i class="ri-menu-3-line"></i>
+        </button>
+    </header>
+
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <span class="tagline">📍 Every Place Has a Story</span>
+            <h1>Turn Your <span class="gradient-text">Memories</span><br>Into A Living Map</h1>
+            <p>Pin your happiest moments, unforgettable journeys, hidden cafés, friendships, adventures and milestones on an interactive map that grows with your life.</p>
+            <div class="hero-buttons">
+                <button class="btn-primary"onclick="window.location.href='signup.html'">Start Your Journey</button>
+                <button class="btn-secondary">Explore Demo</button>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="map-box">
+                <!-- Animated World Map -->
+                <div class="globe-effect"></div>
+                <div class="city-markers">
+                    <div class="city paris">
+                        <div class="pulse-dot"></div>
+                        <span class="city-name">Paris</span>
+                        <span class="city-emoji">🗼</span>
+                    </div>
+                    <div class="city tokyo">
+                        <div class="pulse-dot"></div>
+                        <span class="city-name">Tokyo</span>
+                        <span class="city-emoji">🗻</span>
+                    </div>
+                    <div class="city nyc">
+                        <div class="pulse-dot"></div>
+                        <span class="city-name">New York</span>
+                        <span class="city-emoji">🗽</span>
+                    </div>
+                    <div class="city sydney">
+                        <div class="pulse-dot"></div>
+                        <span class="city-name">Sydney</span>
+                        <span class="city-emoji">🏄</span>
+                    </div>
+                    <div class="city london">
+                        <div class="pulse-dot"></div>
+                        <span class="city-name">London</span>
+                        <span class="city-emoji">🎡</span>
+                    </div>
+                </div>
+                <div class="travel-lines">
+                    <svg class="connecting-lines" viewBox="0 0 300 320">
+                        <path d="M60 140 Q100 100 140 80" stroke="url(#grad1)" stroke-width="1.5" stroke-dasharray="4 4" fill="none"/>
+                        <path d="M140 80 Q200 70 230 120" stroke="url(#grad1)" stroke-width="1.5" stroke-dasharray="4 4" fill="none"/>
+                        <path d="M230 120 Q250 200 200 250" stroke="url(#grad1)" stroke-width="1.5" stroke-dasharray="4 4" fill="none"/>
+                        <path d="M200 250 Q130 240 100 200" stroke="url(#grad1)" stroke-width="1.5" stroke-dasharray="4 4" fill="none"/>
+                        <path d="M100 200 Q70 170 60 140" stroke="url(#grad1)" stroke-width="1.5" stroke-dasharray="4 4" fill="none"/>
+                        <defs>
+                            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#ff6b8b;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#ffb347;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <div class="map-stats-card">
+                    <div class="stat-row">
+                        <div class="mini-stat">
+                            <i class="ri-earth-fill"></i>
+                            <span><strong>15</strong> Countries</span>
+                        </div>
+                        <div class="mini-stat">
+                            <i class="ri-map-pin-fill"></i>
+                            <span><strong>48</strong> Cities</span>
+                        </div>
+                        <div class="mini-stat">
+                            <i class="ri-camera-fill"></i>
+                            <span><strong>234</strong> Memories</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="floating-badge">
+                    <span>✈️ 12,847 km traveled</span>
+                </div>
+            </div>
+            <div class="card-stack">
+                <div class="memory-card">📷 Sunset in Paris</div>
+                <div class="memory-card">🍣 Sushi in Tokyo</div>
+                <div class="memory-card">🎭 Broadway Show</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="stats">
+        <div class="stat-item"><h2>10K+</h2><p>Memories Saved</p></div>
+        <div class="stat-item"><h2>120+</h2><p>Cities Covered</p></div>
+        <div class="stat-item"><h2>50K+</h2><p>Places Tagged</p></div>
+        <div class="stat-item"><h2>99%</h2><p>User Happiness</p></div>
+    </section>
+
+    <section class="features" id="features">
+        <div class="section-header">
+            <span>FEATURES</span>
+            <h2>Make Every Memory Count</h2>
+        </div>
+        <div class="features-grid">
+            <div class="feature"><i class="ri-map-pin-user-fill"></i><h3>Interactive Map</h3><p>Drop pins anywhere in the world</p></div>
+            <div class="feature"><i class="ri-image-fill"></i><h3>Photos & Videos</h3><p>Store beautiful memories</p></div>
+            <div class="feature"><i class="ri-book-open-fill"></i><h3>Personal Journal</h3><p>Write meaningful stories</p></div>
+            <div class="feature"><i class="ri-time-fill"></i><h3>Timeline</h3><p>Revisit your life journey</p></div>
+            <div class="feature"><i class="ri-earth-fill"></i><h3>Travel Archive</h3><p>Track all your travels</p></div>
+            <div class="feature"><i class="ri-lock-fill"></i><h3>Private & Secure</h3><p>Keep memories safe</p></div>
+        </div>
+    </section>
+
+    <section class="how-it-works" id="how">
+        <div class="section-header">
+            <span>HOW IT WORKS</span>
+            <h2>Just Three Simple Steps</h2>
+        </div>
+        <div class="steps">
+            <div class="step"><div class="step-number">1</div><h3>Choose A Place</h3><p>Select any location on the map</p></div>
+            <div class="step"><div class="step-number">2</div><h3>Add Your Memory</h3><p>Upload photos and write your story</p></div>
+            <div class="step"><div class="step-number">3</div><h3>Relive Anytime</h3><p>Visit your personal memory map</p></div>
+        </div>
+    </section>
+
+    <section class="testimonial" id="stories">
+        <div class="section-header">
+            <span>MEMORIES</span>
+            <h2>Stories That Last Forever</h2>
+        </div>
+        <div class="quote-box">
+            <p>"MemoMap helped me preserve my college life, every café visit, every trip and every beautiful friendship in one magical place."</p>
+            <h4>— Sarah Johnson</h4>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <h2>Your Journey Deserves To Be Remembered</h2>
+        <p>Start pinning your life's unforgettable moments</p>
+        <button class="btn-primary">Create Free Account</button>
+    </section>
+
+    <footer id="contact">
+        <div class="footer-logo"><i class="ri-map-pin-2-fill"></i> MemoMap</div>
+        <p>Every Place Has a Story.</p>
+        <div class="social-icons">
+            <i class="ri-instagram-line"></i>
+            <i class="ri-twitter-x-line"></i>
+            <i class="ri-linkedin-box-fill"></i>
+            <i class="ri-github-fill"></i>
+        </div>
+        <p class="copyright">© 2026 MemoMap. All Rights Reserved.</p>
+    </footer>
+    <script>
+    // Fix View All buttons
+    document.querySelectorAll('.view-all').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const text = btn.innerText.toLowerCase();
+            if (text.includes('memory')) {
+                window.location.href = 'timeline.html';
+            } else if (text.includes('this day')) {
+                window.location.href = 'nostalgia.html';
+            } else {
+                alert('✨ Coming soon!');
+            }
+        });
+    });
+</script>
+
+    <script src="./js/app.js"></script>
+</body>
+</html>

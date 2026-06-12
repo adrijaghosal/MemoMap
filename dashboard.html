@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | MemoMap</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/dashboard.css">
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <i class="ri-map-pin-2-fill"></i>
+            <span>MemoMap</span>
+        </div>
+        
+        <div class="user-profile-mini">
+            <div class="user-avatar-mini">
+                <span>🌍</span>
+            </div>
+            <div class="user-info-mini">
+                <h4 id="sidebarUserName">Explorer</h4>
+                <p>Member since 2024</p>
+            </div>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item active">
+                <i class="ri-dashboard-line"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" class="nav-item" id="mapNav">
+                <i class="ri-map-pin-line"></i>
+                <span>Memory Map</span>
+            </a>
+            <a href="#" class="nav-item" id="addMemoryNav">
+                <i class="ri-add-line"></i>
+                <span>Add Memory</span>
+            </a>
+            <a href="#" class="nav-item" id="timelineNav">
+                <i class="ri-timeline-line"></i>
+                <span>Timeline</span>
+            </a>
+            <a href="#" class="nav-item" id="collectionsNav">
+                <i class="ri-folder-line"></i>
+                <span>Collections</span>
+            </a>
+            <a href="#" class="nav-item" id="onThisDayNav">
+                <i class="ri-calendar-event-line"></i>
+                <span>On This Day</span>
+            </a>
+            <a href="#" class="nav-item" id="timeCapsuleNav">
+                <i class="ri-time-fill"></i>
+                <span>Time Capsule</span>
+            </a>
+            <a href="#" class="nav-item" id="nostalgiaNav">
+                <i class="ri-emotion-line"></i>
+                <span>Nostalgia</span>
+            </a>
+            <a href="#" class="nav-item" id="profileNav">
+                <i class="ri-user-line"></i>
+                <span>Profile</span>
+            </a>
+            <a href="#" class="nav-item" id="settingsNav">
+                <i class="ri-settings-line"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+        
+        <button class="logout-btn" id="logoutBtn">
+            <i class="ri-logout-box-r-line"></i>
+            <span>Logout</span>
+        </button>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Header -->
+        <header class="top-header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="ri-menu-line"></i>
+                </button>
+                <div class="welcome-text">
+                    <h2>Welcome back, <span id="userName">Explorer</span>! 👋</h2>
+                    <p>Your memory journey continues...</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="search-bar">
+                    <i class="ri-search-line"></i>
+                    <input type="text" placeholder="Search memories...">
+                </div>
+                <div class="notification-icon">
+                    <i class="ri-notification-3-line"></i>
+                    <span class="notification-badge">3</span>
+                </div>
+                <div class="user-avatar" id="userAvatar">
+                    <span>🌍</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Hero Stats Section -->
+        <div class="hero-stats">
+            <div class="hero-stats-card">
+                <div class="hero-stats-icon">
+                    <i class="ri-map-pin-fill"></i>
+                </div>
+                <div class="hero-stats-info">
+                    <h2 id="totalMemories">0</h2>
+                    <p>Total Memories</p>
+                </div>
+            </div>
+            <div class="hero-stats-card">
+                <div class="hero-stats-icon">
+                    <i class="ri-global-line"></i>
+                </div>
+                <div class="hero-stats-info">
+                    <h2 id="totalCities">0</h2>
+                    <p>Cities Visited</p>
+                </div>
+            </div>
+            <div class="hero-stats-card">
+                <div class="hero-stats-icon">
+                    <i class="ri-camera-line"></i>
+                </div>
+                <div class="hero-stats-info">
+                    <h2 id="totalPhotos">0</h2>
+                    <p>Photos Taken</p>
+                </div>
+            </div>
+            <div class="hero-stats-card">
+                <div class="hero-stats-icon">
+                    <i class="ri-heart-line"></i>
+                </div>
+                <div class="hero-stats-info">
+                    <h2 id="totalCountries">0</h2>
+                    <p>Countries Explored</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Memory Gallery Popup Section -->
+        <section class="memory-gallery">
+            <div class="section-header">
+                <h3><i class="ri-gallery-line"></i> Memory Gallery</h3>
+                <a href="#" class="view-all">View all memories →</a>
+            </div>
+            <div class="gallery-grid" id="galleryGrid">
+                <!-- Gallery items will be injected here -->
+            </div>
+        </section>
+
+        <!-- Travel Stats Row -->
+        <div class="travel-stats-row">
+            <div class="travel-stat-card">
+                <div class="travel-stat-icon">✈️</div>
+                <div class="travel-stat-info">
+                    <h3 id="totalDistance">0</h3>
+                    <p>Kilometers Traveled</p>
+                </div>
+            </div>
+            <div class="travel-stat-card">
+                <div class="travel-stat-icon">🏨</div>
+                <div class="travel-stat-info">
+                    <h3 id="totalNights">0</h3>
+                    <p>Nights Away</p>
+                </div>
+            </div>
+            <div class="travel-stat-card">
+                <div class="travel-stat-icon">📸</div>
+                <div class="travel-stat-info">
+                    <h3 id="totalMoments">0</h3>
+                    <p>Moments Captured</p>
+                </div>
+            </div>
+            <div class="travel-stat-card">
+                <div class="travel-stat-icon">👥</div>
+                <div class="travel-stat-info">
+                    <h3 id="totalPeople">0</h3>
+                    <p>People Met</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Memories & On This Day Row -->
+        <div class="two-columns">
+            <!-- Recent Memories -->
+            <div class="recent-memories">
+                <div class="section-header">
+                    <h3><i class="ri-time-line"></i> Recent Memories</h3>
+                    <a href="#" class="view-all">View all →</a>
+                </div>
+                <div class="memories-list" id="recentMemoriesList">
+                    <div class="loading-skeleton">Loading memories...</div>
+                </div>
+            </div>
+
+            <!-- On This Day -->
+            <div class="on-this-day">
+                <div class="section-header">
+                    <h3><i class="ri-calendar-event-line"></i> On This Day</h3>
+                    <a href="#" class="view-all">View all →</a>
+                </div>
+                <div class="memories-list" id="onThisDayList">
+                    <div class="loading-skeleton">Loading memories...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Visited Cities -->
+        <section class="top-cities">
+            <div class="section-header">
+                <h3><i class="ri-star-fill"></i> Top Visited Cities</h3>
+                <a href="#" class="view-all">View all →</a>
+            </div>
+            <div class="cities-grid" id="citiesGrid">
+                <!-- Cities will be injected here -->
+            </div>
+        </section>
+
+        <!-- Mood Tracker -->
+        <section class="mood-tracker">
+            <div class="section-header">
+                <h3><i class="ri-bar-chart-2-line"></i> Mood Journey</h3>
+                <a href="#" class="view-all">View insights →</a>
+            </div>
+            <div class="mood-bars" id="moodBars">
+                <!-- Mood bars will be injected here -->
+            </div>
+        </section>
+
+        <!-- Floating Action Button -->
+        <button class="fab" id="fabBtn">
+            <i class="ri-add-line"></i>
+        </button>
+    </main>
+    <a href="notifications.html" class="notification-icon" style="text-decoration: none;">
+    <i class="ri-notification-3-line"></i>
+    <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
+</a>
+
+    <script src="./js/dashboard.js"></script>
+</body>
+</html>

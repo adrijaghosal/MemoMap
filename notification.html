@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications | MemoMap</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/notification.css">
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <i class="ri-map-pin-2-fill"></i>
+            <span>MemoMap</span>
+        </div>
+        
+        <div class="user-profile-mini">
+            <div class="user-avatar-mini">
+                <span>🌍</span>
+            </div>
+            <div class="user-info-mini">
+                <h4 id="sidebarUserName">Explorer</h4>
+                <p>Member since 2024</p>
+            </div>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <i class="ri-dashboard-line"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="map.html" class="nav-item">
+                <i class="ri-map-pin-line"></i>
+                <span>Memory Map</span>
+            </a>
+            <a href="add-memory.html" class="nav-item">
+                <i class="ri-add-line"></i>
+                <span>Add Memory</span>
+            </a>
+            <a href="timeline.html" class="nav-item">
+                <i class="ri-timeline-line"></i>
+                <span>Timeline</span>
+            </a>
+            <a href="collections.html" class="nav-item">
+                <i class="ri-folder-line"></i>
+                <span>Collections</span>
+            </a>
+            <a href="profile.html" class="nav-item">
+                <i class="ri-user-line"></i>
+                <span>Profile</span>
+            </a>
+            <a href="nostalgia.html" class="nav-item">
+                <i class="ri-emotion-line"></i>
+                <span>Nostalgia</span>
+            </a>
+            <a href="settings.html" class="nav-item">
+                <i class="ri-settings-line"></i>
+                <span>Settings</span>
+            </a>
+            <a href="help.html" class="nav-item">
+                <i class="ri-question-line"></i>
+                <span>Help</span>
+            </a>
+            <a href="notifications.html" class="nav-item active">
+                <i class="ri-notification-3-line"></i>
+                <span>Notifications</span>
+            </a>
+        </nav>
+        
+        <button class="logout-btn" id="logoutBtn">
+            <i class="ri-logout-box-r-line"></i>
+            <span>Logout</span>
+        </button>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Header -->
+        <header class="top-header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="ri-menu-line"></i>
+                </button>
+                <div class="welcome-text">
+                    <h2>🔔 Notifications</h2>
+                    <p>Stay updated with your memory journey</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="mark-all-read" id="markAllReadBtn">
+                    <i class="ri-mail-check-line"></i> Mark all as read
+                </button>
+                <div class="user-avatar">
+                    <span>🌍</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Notification Tabs -->
+        <div class="notification-tabs">
+            <button class="tab-btn active" data-tab="all">📋 All</button>
+            <button class="tab-btn" data-tab="unread">🆕 Unread <span id="unreadCount" class="tab-badge">0</span></button>
+            <button class="tab-btn" data-tab="memories">📸 Memories</button>
+            <button class="tab-btn" data-tab="reminders">⏰ Reminders</button>
+            <button class="tab-btn" data-tab="updates">✨ Updates</button>
+        </div>
+
+        <!-- Notifications List -->
+        <div class="notifications-container" id="notificationsContainer">
+            <!-- Notifications will be injected here -->
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <i class="ri-notification-off-line"></i>
+            <h3>No notifications yet</h3>
+            <p>When you have notifications, they'll appear here</p>
+        </div>
+    </main>
+
+    <script src="./js/notification.js"></script>
+</body>
+</html>

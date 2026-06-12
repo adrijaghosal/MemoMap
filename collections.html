@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collections | MemoMap</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/collections.css">
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <i class="ri-map-pin-2-fill"></i>
+            <span>MemoMap</span>
+        </div>
+        
+        <div class="user-profile-mini">
+            <div class="user-avatar-mini">
+                <span>🌍</span>
+            </div>
+            <div class="user-info-mini">
+                <h4 id="sidebarUserName">Explorer</h4>
+                <p>Member since 2024</p>
+            </div>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <i class="ri-dashboard-line"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="map.html" class="nav-item">
+                <i class="ri-map-pin-line"></i>
+                <span>Memory Map</span>
+            </a>
+            <a href="add-memory.html" class="nav-item">
+                <i class="ri-add-line"></i>
+                <span>Add Memory</span>
+            </a>
+            <a href="timeline.html" class="nav-item">
+                <i class="ri-timeline-line"></i>
+                <span>Timeline</span>
+            </a>
+            <a href="collections.html" class="nav-item active">
+                <i class="ri-folder-line"></i>
+                <span>Collections</span>
+            </a>
+            <a href="#" class="nav-item" id="profileNav">
+                <i class="ri-user-line"></i>
+                <span>Profile</span>
+            </a>
+        </nav>
+        
+        <button class="logout-btn" id="logoutBtn">
+            <i class="ri-logout-box-r-line"></i>
+            <span>Logout</span>
+        </button>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Header -->
+        <header class="top-header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="ri-menu-line"></i>
+                </button>
+                <div class="welcome-text">
+                    <h2>📁 Memory Collections</h2>
+                    <p>Organize your memories beautifully</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="create-collection-btn" id="createCollectionBtn">
+                    <i class="ri-add-line"></i> New Collection
+                </button>
+                <div class="user-avatar" id="userAvatar">
+                    <span>🌍</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Collections Grid -->
+        <div class="collections-grid" id="collectionsGrid">
+            <!-- Collection cards will be injected here -->
+        </div>
+
+        <!-- Create Collection Modal -->
+        <div class="modal" id="createModal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="ri-folder-add-line"></i> Create New Collection</h3>
+                    <button class="modal-close" id="closeCreateModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Collection Name <span class="required">*</span></label>
+                        <input type="text" id="collectionName" placeholder="e.g., Travel Diaries, Family Moments">
+                    </div>
+                    <div class="form-group">
+                        <label>Collection Type</label>
+                        <select id="collectionType">
+                            <option value="personal">✨ Personal</option>
+                            <option value="travel">✈️ Travel</option>
+                            <option value="family">👨‍👩‍👧 Family</option>
+                            <option value="friends">👥 Friends</option>
+                            <option value="work">💼 Work</option>
+                            <option value="romance">❤️ Romance</option>
+                            <option value="other">🎯 Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Collection Icon</label>
+                        <div class="icon-picker" id="iconPicker">
+                            <span class="icon-option selected" data-icon="✈️">✈️</span>
+                            <span class="icon-option" data-icon="❤️">❤️</span>
+                            <span class="icon-option" data-icon="🎓">🎓</span>
+                            <span class="icon-option" data-icon="🏔️">🏔️</span>
+                            <span class="icon-option" data-icon="🌊">🌊</span>
+                            <span class="icon-option" data-icon="🍕">🍕</span>
+                            <span class="icon-option" data-icon="📸">📸</span>
+                            <span class="icon-option" data-icon="🎉">🎉</span>
+                            <span class="icon-option" data-icon="🏠">🏠</span>
+                            <span class="icon-option" data-icon="💼">💼</span>
+                            <span class="icon-option" data-icon="🎵">🎵</span>
+                            <span class="icon-option" data-icon="📚">📚</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Description (optional)</label>
+                        <textarea id="collectionDesc" rows="2" placeholder="What is this collection about?"></textarea>
+                    </div>
+                    
+                    <!-- Password Protection Section -->
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="lockCollectionCheckbox">
+                            <span><i class="ri-lock-line"></i> Lock this collection with password</span>
+                        </label>
+                    </div>
+                    <div class="form-group password-section" id="passwordSection" style="display: none;">
+                        <label>Set Password</label>
+                        <input type="password" id="collectionPassword" placeholder="Enter password for this collection">
+                        <small>This collection will require password to view</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-cancel" id="cancelCreateBtn">Cancel</button>
+                    <button class="btn-create" id="confirmCreateBtn">Create Collection</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Password Modal (for locked collections) -->
+        <div class="modal" id="passwordModal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content small">
+                <div class="modal-header">
+                    <h3><i class="ri-lock-line"></i> Locked Collection</h3>
+                    <button class="modal-close" id="closePasswordModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div style="text-align: center; margin-bottom: 1rem;">
+                        <i class="ri-lock-fill" style="font-size: 3rem; color: #ff6b8b;"></i>
+                        <p id="lockedCollectionName" style="margin-top: 0.5rem;">This collection is password protected</p>
+                    </div>
+                    <div class="form-group">
+                        <label>Enter Password</label>
+                        <input type="password" id="passwordInput" placeholder="Enter collection password">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-cancel" id="cancelPasswordBtn">Cancel</button>
+                    <button class="btn-create" id="unlockCollectionBtn">Unlock</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Collection Detail Modal (View memories in collection) -->
+        <div class="modal" id="collectionModal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content large">
+                <div class="modal-header">
+                    <h3 id="collectionModalTitle"><i class="ri-folder-line"></i> Collection Name</h3>
+                    <button class="modal-close" id="closeCollectionModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="collection-info" id="collectionInfo"></div>
+                    
+                    <!-- Lock Status Badge -->
+                    <div class="lock-status" id="lockStatus" style="display: none;">
+                        <i class="ri-lock-fill"></i> Password Protected
+                    </div>
+                    
+                    <div class="collection-memories" id="collectionMemories">
+                        <!-- Memories in this collection will appear here -->
+                    </div>
+                    <div class="add-to-collection-section">
+                        <select id="memorySelector">
+                            <option value="">+ Add memory to this collection</option>
+                        </select>
+                        <button class="btn-add-memory" id="addMemoryToCollectionBtn">Add</button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-remove-password" id="removePasswordBtn" style="display: none;">Remove Password</button>
+                    <button class="btn-delete-collection" id="deleteCollectionBtn">Delete Collection</button>
+                    <button class="btn-close" id="closeCollectionModalBtn">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <i class="ri-folder-line"></i>
+            <h3>No collections yet</h3>
+            <p>Create collections to organize your memories</p>
+            <button class="create-collection-btn" id="emptyStateCreateBtn">+ Create Your First Collection</button>
+        </div>
+    </main>
+<script>
+    // Fix View All button
+    const viewAllBtn = document.querySelector('.view-all');
+    if (viewAllBtn) {
+        viewAllBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+</script>
+    <script src="./js/collections.js"></script>
+</body>
+</html>

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Memory | MemoMap</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/add-memory.css">
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <i class="ri-map-pin-2-fill"></i>
+            <span>MemoMap</span>
+        </div>
+        
+        <div class="user-profile-mini">
+            <div class="user-avatar-mini">
+                <span>🌍</span>
+            </div>
+            <div class="user-info-mini">
+                <h4 id="sidebarUserName">Explorer</h4>
+                <p>Member since 2024</p>
+            </div>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <i class="ri-dashboard-line"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" class="nav-item" id="mapNav">
+                <i class="ri-map-pin-line"></i>
+                <span>Memory Map</span>
+            </a>
+            <a href="add-memory.html" class="nav-item active">
+                <i class="ri-add-line"></i>
+                <span>Add Memory</span>
+            </a>
+            <a href="#" class="nav-item" id="timelineNav">
+                <i class="ri-timeline-line"></i>
+                <span>Timeline</span>
+            </a>
+            <a href="#" class="nav-item" id="collectionsNav">
+                <i class="ri-folder-line"></i>
+                <span>Collections</span>
+            </a>
+            <a href="#" class="nav-item" id="profileNav">
+                <i class="ri-user-line"></i>
+                <span>Profile</span>
+            </a>
+        </nav>
+        
+        <button class="logout-btn" id="logoutBtn">
+            <i class="ri-logout-box-r-line"></i>
+            <span>Logout</span>
+        </button>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Header -->
+        <header class="top-header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="ri-menu-line"></i>
+                </button>
+                <div class="welcome-text">
+                    <h2>✨ Create New Memory</h2>
+                    <p>Capture the moment forever</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="user-avatar" id="userAvatar">
+                    <span>🌍</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Form Container -->
+        <div class="form-container">
+            <div class="form-card">
+                <!-- Progress Steps -->
+                <div class="progress-steps">
+                    <div class="step active" data-step="1">
+                        <div class="step-number">1</div>
+                        <div class="step-label">Basic Info</div>
+                    </div>
+                    <div class="step" data-step="2">
+                        <div class="step-number">2</div>
+                        <div class="step-label">Media & Story</div>
+                    </div>
+                    <div class="step" data-step="3">
+                        <div class="step-number">3</div>
+                        <div class="step-label">Review & Save</div>
+                    </div>
+                </div>
+
+                <!-- Step 1: Basic Info -->
+                <div class="form-step active" id="step1">
+                    <div class="form-group">
+                        <label><i class="ri-temp-hot-line"></i> Memory Title <span class="required">*</span></label>
+                        <input type="text" id="memoryTitle" placeholder="e.g., Sunset at Marine Drive, First Date, Graduation Day" maxlength="100">
+                        <div class="char-count"><span id="titleCount">0</span>/100</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="ri-map-pin-line"></i> Location <span class="required">*</span></label>
+                        <input type="text" id="memoryLocation" placeholder="e.g., Paris, France / Mumbai, India">
+                        <div class="location-suggestions" id="locationSuggestions">
+                            <span class="suggestion">🏰 Paris, France</span>
+                            <span class="suggestion">🗽 New York, USA</span>
+                            <span class="suggestion">🗻 Tokyo, Japan</span>
+                            <span class="suggestion">🏄 Sydney, Australia</span>
+                            <span class="suggestion">🏔️ Himachal, India</span>
+                            <span class="suggestion">🏝️ Bali, Indonesia</span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label><i class="ri-calendar-line"></i> Date <span class="required">*</span></label>
+                            <input type="date" id="memoryDate">
+                        </div>
+                        <div class="form-group half">
+                            <label><i class="ri-emotion-line"></i> Mood <span class="required">*</span></label>
+                            <div class="mood-selector" id="moodSelector">
+                                <div class="mood-option" data-mood="happy">😊 Happy</div>
+                                <div class="mood-option" data-mood="peaceful">😌 Peaceful</div>
+                                <div class="mood-option" data-mood="loved">❤️ Loved</div>
+                                <div class="mood-option" data-mood="excited">😎 Excited</div>
+                                <div class="mood-option" data-mood="nostalgic">📸 Nostalgic</div>
+                                <div class="mood-option" data-mood="sad">😢 Sad</div>
+                            </div>
+                            <input type="hidden" id="memoryMood" value="happy">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="ri-price-tag-line"></i> Tags</label>
+                        <div class="tags-input-container">
+                            <input type="text" id="tagInput" placeholder="Add tags (press Enter)">
+                            <div class="tags-list" id="tagsList"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="ri-group-line"></i> With Whom</label>
+                        <input type="text" id="memoryWith" placeholder="e.g., Sarah, Mike, Family, Friends">
+                    </div>
+
+                    <div class="form-navigation">
+                        <button class="btn-next" id="nextStep1">Next →</button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Media & Story -->
+                <div class="form-step" id="step2">
+                    <div class="form-group">
+                        <label><i class="ri-image-line"></i> Photos</label>
+                        <div class="photo-upload-area" id="photoUploadArea">
+                            <i class="ri-upload-cloud-2-line"></i>
+                            <p>Click or drag photos here</p>
+                            <span>Up to 10 photos (JPEG, PNG)</span>
+                            <input type="file" id="photoInput" accept="image/*" multiple style="display: none;">
+                        </div>
+                        <div class="photo-preview-grid" id="photoPreviewGrid"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="ri-mic-line"></i> Voice Note</label>
+                        <div class="voice-recorder">
+                            <button type="button" class="record-btn" id="recordBtn">
+                                <i class="ri-mic-line"></i> Record Voice
+                            </button>
+                            <div class="recording-status" id="recordingStatus" style="display: none;">
+                                <div class="recording-wave">
+                                    <span></span><span></span><span></span><span></span><span></span>
+                                </div>
+                                <span>Recording...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="ri-book-open-line"></i> Your Story / Journal</label>
+                        <textarea id="memoryStory" rows="5" placeholder="Write about this memory... what happened? how did you feel? what made it special?"></textarea>
+                        <div class="char-count"><span id="storyCount">0</span>/5000</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="ri-music-line"></i> Song/Music</label>
+                        <input type="text" id="memorySong" placeholder="Song name that reminds you of this moment">
+                    </div>
+
+                    <div class="form-navigation">
+                        <button class="btn-prev">← Back</button>
+                        <button class="btn-next" id="nextStep2">Next →</button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Review & Save -->
+                <div class="form-step" id="step3">
+                    <div class="review-section">
+                        <h4><i class="ri-eye-line"></i> Review Your Memory</h4>
+                        <div class="review-card" id="reviewContent">
+                            <!-- Review content will be injected here -->
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="checkbox">
+                            <input type="checkbox" id="timeCapsuleCheckbox">
+                            <span>🔒 Lock this memory as Time Capsule</span>
+                        </label>
+                        <div class="time-capsule-options" id="timeCapsuleOptions" style="display: none;">
+                            <p>Unlock after:</p>
+                            <div class="capsule-options">
+                                <label><input type="radio" name="capsuleTime" value="1"> 1 Year</label>
+                                <label><input type="radio" name="capsuleTime" value="5"> 5 Years</label>
+                                <label><input type="radio" name="capsuleTime" value="10"> 10 Years</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="checkbox">
+                            <input type="checkbox" id="publicCheckbox">
+                            <span>🌍 Make this memory public (share with community)</span>
+                        </label>
+                    </div>
+
+                    <div class="form-navigation">
+                        <button class="btn-prev">← Back</button>
+                        <button class="btn-save" id="saveMemoryBtn">✨ Save Memory</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="./js/add-memory.js"></script>
+</body>
+</html>

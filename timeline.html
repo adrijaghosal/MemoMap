@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timeline | MemoMap</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/timeline.css">
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <i class="ri-map-pin-2-fill"></i>
+            <span>MemoMap</span>
+        </div>
+        
+        <div class="user-profile-mini">
+            <div class="user-avatar-mini">
+                <span>🌍</span>
+            </div>
+            <div class="user-info-mini">
+                <h4 id="sidebarUserName">Explorer</h4>
+                <p>Member since 2024</p>
+            </div>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <i class="ri-dashboard-line"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="map.html" class="nav-item">
+                <i class="ri-map-pin-line"></i>
+                <span>Memory Map</span>
+            </a>
+            <a href="add-memory.html" class="nav-item">
+                <i class="ri-add-line"></i>
+                <span>Add Memory</span>
+            </a>
+            <a href="timeline.html" class="nav-item active">
+                <i class="ri-timeline-line"></i>
+                <span>Timeline</span>
+            </a>
+            <a href="#" class="nav-item" id="collectionsNav">
+                <i class="ri-folder-line"></i>
+                <span>Collections</span>
+            </a>
+            <a href="#" class="nav-item" id="profileNav">
+                <i class="ri-user-line"></i>
+                <span>Profile</span>
+            </a>
+        </nav>
+        
+        <button class="logout-btn" id="logoutBtn">
+            <i class="ri-logout-box-r-line"></i>
+            <span>Logout</span>
+        </button>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Header -->
+        <header class="top-header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="ri-menu-line"></i>
+                </button>
+                <div class="welcome-text">
+                    <h2>📅 Life Timeline</h2>
+                    <p>Scroll through your beautiful journey</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="user-avatar" id="userAvatar">
+                    <span>🌍</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Welcome Popup / Modal -->
+        <div class="welcome-popup" id="welcomePopup">
+            <div class="popup-overlay"></div>
+            <div class="popup-content">
+                <button class="popup-close" id="closePopup">&times;</button>
+                <div class="popup-icon">🎉</div>
+                <h3>Welcome to Your Timeline!</h3>
+                <p id="popupMessage">You have <strong>0 memories</strong> from the past years.</p>
+                <div class="popup-buttons">
+                    <button class="popup-btn primary" id="viewLatestBtn">📸 View Latest Memory</button>
+                    <button class="popup-btn secondary" id="exploreBtn">✨ Explore Timeline</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Year Selector -->
+        <div class="year-selector" id="yearSelector">
+            <button class="year-nav prev" id="prevYear"><i class="ri-arrow-left-s-line"></i></button>
+            <div class="years-container" id="yearsContainer">
+                <!-- Years will be injected here -->
+            </div>
+            <button class="year-nav next" id="nextYear"><i class="ri-arrow-right-s-line"></i></button>
+        </div>
+
+        <!-- Current Year Badge -->
+        <div class="current-year-badge" id="currentYearBadge">
+            <span class="year-label">Current Year</span>
+            <span class="year-value" id="currentYearValue">2024</span>
+        </div>
+
+        <!-- Horizontal Timeline Slider -->
+        <div class="timeline-slider-container">
+            <div class="timeline-track" id="timelineTrack">
+                <!-- Memory cards will be injected here -->
+            </div>
+        </div>
+
+        <!-- Memory Detail Modal (opens on click) -->
+        <div class="memory-modal" id="memoryModal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <button class="modal-close" id="closeModal">&times;</button>
+                <div class="modal-media" id="modalMedia">
+                    <img id="modalImage" src="" alt="Memory">
+                    <div class="modal-video-placeholder" id="modalVideoPlaceholder" style="display: none;">
+                        <i class="ri-video-line"></i>
+                        <span>Video Preview</span>
+                    </div>
+                </div>
+                <div class="modal-details">
+                    <h2 id="modalTitle">Memory Title</h2>
+                    <div class="modal-location">
+                        <i class="ri-map-pin-line"></i> <span id="modalLocation"></span>
+                    </div>
+                    <div class="modal-date">
+                        <i class="ri-calendar-line"></i> <span id="modalDate"></span>
+                    </div>
+                    <div class="modal-mood">
+                        <i class="ri-emotion-line"></i> <span id="modalMood"></span>
+                    </div>
+                    <div class="modal-story" id="modalStory"></div>
+                    <div class="modal-tags" id="modalTags"></div>
+                    <div class="modal-actions">
+                        <button class="action-btn edit-btn" id="editMemoryBtn">
+                            <i class="ri-edit-line"></i> Edit
+                        </button>
+                        <button class="action-btn delete-btn" id="deleteMemoryBtn">
+                            <i class="ri-delete-bin-line"></i> Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <i class="ri-time-line"></i>
+            <h3>No memories yet</h3>
+            <p>Start adding memories to see your beautiful timeline</p>
+            <a href="add-memory.html" class="add-memory-link">+ Add Your First Memory</a>
+        </div>
+    </main>
+<script>
+    // Fix View All button
+    const viewAllBtn = document.querySelector('.view-all');
+    if (viewAllBtn) {
+        viewAllBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const yearFilter = document.getElementById('yearFilter');
+            if (yearFilter) {
+                yearFilter.value = 'all';
+                yearFilter.dispatchEvent(new Event('change'));
+            }
+        });
+    }
+</script>
+    <script src="./js/timeline.js"></script>
+</body>
+</html>

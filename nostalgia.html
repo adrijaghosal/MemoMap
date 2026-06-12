@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nostalgia | MemoMap</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/nostalgia.css">
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <i class="ri-map-pin-2-fill"></i>
+            <span>MemoMap</span>
+        </div>
+        
+        <div class="user-profile-mini">
+            <div class="user-avatar-mini">
+                <span>🌍</span>
+            </div>
+            <div class="user-info-mini">
+                <h4 id="sidebarUserName">Explorer</h4>
+                <p>Member since 2024</p>
+            </div>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <i class="ri-dashboard-line"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="map.html" class="nav-item">
+                <i class="ri-map-pin-line"></i>
+                <span>Memory Map</span>
+            </a>
+            <a href="add-memory.html" class="nav-item">
+                <i class="ri-add-line"></i>
+                <span>Add Memory</span>
+            </a>
+            <a href="timeline.html" class="nav-item">
+                <i class="ri-timeline-line"></i>
+                <span>Timeline</span>
+            </a>
+            <a href="collections.html" class="nav-item">
+                <i class="ri-folder-line"></i>
+                <span>Collections</span>
+            </a>
+            <a href="profile.html" class="nav-item">
+                <i class="ri-user-line"></i>
+                <span>Profile</span>
+            </a>
+            <a href="nostalgia.html" class="nav-item active">
+                <i class="ri-emotion-line"></i>
+                <span>Nostalgia</span>
+            </a>
+            <a href="settings.html" class="nav-item">
+                <i class="ri-settings-line"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+        
+        <button class="logout-btn" id="logoutBtn">
+            <i class="ri-logout-box-r-line"></i>
+            <span>Logout</span>
+        </button>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Header -->
+        <header class="top-header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="ri-menu-line"></i>
+                </button>
+                <div class="welcome-text">
+                    <h2>🎞️ Nostalgia Corner</h2>
+                    <p>Rediscover your forgotten memories</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="user-avatar">
+                    <span>🌍</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Hero Section with Surprise Button -->
+        <div class="nostalgia-hero">
+            <div class="hero-content">
+                <div class="hero-icon">🎁</div>
+                <h2>Feeling Nostalgic?</h2>
+                <p>Let us surprise you with a random memory from your past</p>
+                <button class="surprise-btn" id="surpriseBtn">
+                    <i class="ri-shuffle-line"></i> Surprise Me!
+                </button>
+            </div>
+        </div>
+
+        <!-- Random Memory Card (appears after clicking Surprise) -->
+        <div class="random-memory-card" id="randomMemoryCard" style="display: none;">
+            <div class="random-memory-header">
+                <span class="random-badge">🎲 Random Memory</span>
+                <button class="close-random" id="closeRandomBtn">&times;</button>
+            </div>
+            <div class="random-memory-content" id="randomMemoryContent">
+                <!-- Random memory will be injected here -->
+            </div>
+        </div>
+
+        <!-- Two Column Layout -->
+        <div class="nostalgia-two-columns">
+            
+            <!-- Left Column: On This Day -->
+            <div class="nostalgia-card">
+                <div class="card-header">
+                    <h3><i class="ri-calendar-event-line"></i> On This Day</h3>
+                    <span class="date-badge" id="todayDate"></span>
+                </div>
+                <div class="on-this-day-list" id="onThisDayList">
+                    <div class="loading">Loading memories...</div>
+                </div>
+            </div>
+
+            <!-- Right Column: Time Capsules -->
+            <div class="nostalgia-card">
+                <div class="card-header">
+                    <h3><i class="ri-time-fill"></i> Time Capsules</h3>
+                    <span class="capsule-count" id="capsuleCount">0 locked</span>
+                </div>
+                <div class="time-capsule-list" id="timeCapsuleList">
+                    <div class="loading">Loading time capsules...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recently Rediscovered Section -->
+        <div class="nostalgia-card full-width">
+            <div class="card-header">
+                <h3><i class="ri-history-line"></i> Recently Rediscovered</h3>
+                <button class="view-all-btn" id="viewAllRediscovered">View All →</button>
+            </div>
+            <div class="rediscovered-grid" id="rediscoveredGrid">
+                <div class="loading">Loading recently viewed...</div>
+            </div>
+        </div>
+
+        <!-- Memory of the Month -->
+        <div class="nostalgia-card full-width">
+            <div class="card-header">
+                <h3><i class="ri-star-fill"></i> Memory of the Month</h3>
+                <span class="month-badge" id="monthBadge"></span>
+            </div>
+            <div class="memory-of-month" id="memoryOfMonth">
+                <div class="loading">Loading...</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Memory Detail Modal (quick view) -->
+    <div class="modal" id="memoryModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Memory Title</h3>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Memory details will be injected -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn-view-full" id="viewFullMemoryBtn">View Full Memory →</button>
+            </div>
+        </div>
+    </div>
+<script>
+    // Fix View All buttons
+    document.querySelectorAll('.view-all-btn, .view-all').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const text = btn.innerText.toLowerCase();
+            if (text.includes('rediscovered')) {
+                window.location.href = 'timeline.html';
+            } else {
+                alert('✨ All items are shown above!');
+            }
+        });
+    });
+</script>
+    <script src="./js/nostalgia.js"></script>
+</body>
+</html>

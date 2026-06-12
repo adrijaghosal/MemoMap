@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile | MemoMap</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/profile.css">
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <i class="ri-map-pin-2-fill"></i>
+            <span>MemoMap</span>
+        </div>
+        
+        <div class="user-profile-mini">
+            <div class="user-avatar-mini">
+                <span>🌍</span>
+            </div>
+            <div class="user-info-mini">
+                <h4 id="sidebarUserName">Explorer</h4>
+                <p>Member since 2024</p>
+            </div>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <i class="ri-dashboard-line"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="map.html" class="nav-item">
+                <i class="ri-map-pin-line"></i>
+                <span>Memory Map</span>
+            </a>
+            <a href="add-memory.html" class="nav-item">
+                <i class="ri-add-line"></i>
+                <span>Add Memory</span>
+            </a>
+            <a href="timeline.html" class="nav-item">
+                <i class="ri-timeline-line"></i>
+                <span>Timeline</span>
+            </a>
+            <a href="collections.html" class="nav-item">
+                <i class="ri-folder-line"></i>
+                <span>Collections</span>
+            </a>
+            <a href="profile.html" class="nav-item active">
+                <i class="ri-user-line"></i>
+                <span>Profile</span>
+            </a>
+        </nav>
+        
+        <button class="logout-btn" id="logoutBtn">
+            <i class="ri-logout-box-r-line"></i>
+            <span>Logout</span>
+        </button>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Header -->
+        <header class="top-header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="ri-menu-line"></i>
+                </button>
+                <div class="welcome-text">
+                    <h2>👤 My Profile</h2>
+                    <p>Your memory journey stats & achievements</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="edit-profile-btn" id="editProfileBtn">
+                    <i class="ri-edit-line"></i> Edit Profile
+                </button>
+                <div class="user-avatar" id="userAvatar">
+                    <span>🌍</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="profile-avatar-section">
+                <div class="profile-avatar" id="profileAvatar">
+                    <img id="profileAvatarImg" src="" alt="Avatar" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:none;">
+                    <span id="profileAvatarEmoji">🌍</span>
+                    <button class="change-avatar-btn" id="changeAvatarBtn">
+                        <i class="ri-camera-line"></i>
+                    </button>
+                </div>
+                <h1 id="profileName">Explorer</h1>
+                <p class="profile-email" id="profileEmail">explorer@memonap.com</p>
+                <p class="profile-join-date">Joined <span id="joinDate">January 2024</span></p>
+            </div>
+        </div>
+
+        <!-- Journey Stats - Beautiful Cards -->
+        <div class="journey-stats">
+            <div class="journey-card">
+                <div class="journey-icon">🗓️</div>
+                <div class="journey-info">
+                    <h3 id="totalDays">0</h3>
+                    <p>Days of Memories</p>
+                </div>
+                <div class="journey-trend up">↑ 12%</div>
+            </div>
+            <div class="journey-card">
+                <div class="journey-icon">📍</div>
+                <div class="journey-info">
+                    <h3 id="totalPins">0</h3>
+                    <p>Memories Pinned</p>
+                </div>
+                <div class="journey-trend up">↑ 8%</div>
+            </div>
+            <div class="journey-card">
+                <div class="journey-icon">📸</div>
+                <div class="journey-info">
+                    <h3 id="totalMoments">0</h3>
+                    <p>Moments Captured</p>
+                </div>
+                <div class="journey-trend up">↑ 15%</div>
+            </div>
+            <div class="journey-card">
+                <div class="journey-icon">⭐</div>
+                <div class="journey-info">
+                    <h3 id="totalRating">0</h3>
+                    <p>Happiness Score</p>
+                </div>
+                <div class="journey-trend">🔥 +5</div>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="ri-map-pin-fill"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="totalMemories">0</h3>
+                    <p>Total Memories</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="ri-global-line"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="totalCities">0</h3>
+                    <p>Cities Visited</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="ri-camera-line"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="totalPhotos">0</h3>
+                    <p>Photos Taken</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="ri-heart-line"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="totalMoods">0</h3>
+                    <p>Different Moods</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Two Column Layout -->
+        <div class="profile-two-columns">
+            <!-- Left Column -->
+            <div class="left-column">
+                <!-- Mood Distribution -->
+                <div class="info-card">
+                    <h3><i class="ri-bar-chart-2-line"></i> Mood Distribution</h3>
+                    <div class="mood-chart" id="moodChart">
+                        <!-- Mood bars will be injected -->
+                    </div>
+                </div>
+
+                <!-- Top Tags -->
+                <div class="info-card">
+                    <h3><i class="ri-price-tag-line"></i> Top Tags</h3>
+                    <div class="tags-cloud" id="tagsCloud">
+                        <!-- Tags will be injected -->
+                    </div>
+                </div>
+
+                <!-- Travel Stats -->
+                <div class="info-card">
+                    <h3><i class="ri-flight-takeoff-line"></i> Travel Stats</h3>
+                    <div class="travel-stats">
+                        <div class="travel-stat">
+                            <span class="travel-label">🌍 Countries</span>
+                            <span class="travel-value" id="countryCount">0</span>
+                        </div>
+                        <div class="travel-stat">
+                            <span class="travel-label">✈️ Flights Taken</span>
+                            <span class="travel-value" id="flightCount">0</span>
+                        </div>
+                        <div class="travel-stat">
+                            <span class="travel-label">🏨 Hotels Stayed</span>
+                            <span class="travel-value" id="hotelCount">0</span>
+                        </div>
+                        <div class="travel-stat">
+                            <span class="travel-label">📸 Memories per Month</span>
+                            <span class="travel-value" id="memoriesPerMonth">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="right-column">
+                <!-- Achievements / Badges -->
+                <div class="info-card">
+                    <h3><i class="ri-award-line"></i> Achievements</h3>
+                    <div class="achievements-grid" id="achievementsGrid">
+                        <!-- Achievements will be injected -->
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="info-card">
+                    <h3><i class="ri-time-line"></i> Recent Activity</h3>
+                    <div class="activity-list" id="activityList">
+                        <!-- Recent activities will be injected -->
+                    </div>
+                </div>
+
+                <!-- Favorite Places -->
+                <div class="info-card">
+                    <h3><i class="ri-star-fill"></i> Favorite Places</h3>
+                    <div class="favorite-places" id="favoritePlaces">
+                        <!-- Favorite places will be injected -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Profile Modal -->
+        <div class="modal" id="editProfileModal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="ri-edit-line"></i> Edit Profile</h3>
+                    <button class="modal-close" id="closeEditModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="editName" placeholder="Your name">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="editEmail" placeholder="Your email">
+                    </div>
+                    <div class="form-group">
+                        <label>Bio</label>
+                        <textarea id="editBio" rows="3" placeholder="Tell us about yourself..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Favorite Quote</label>
+                        <input type="text" id="editQuote" placeholder="Your favorite quote">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-cancel" id="cancelEditBtn">Cancel</button>
+                    <button class="btn-save" id="saveProfileBtn">Save Changes</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Avatar Selection Modal -->
+        <div class="modal" id="avatarModal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="ri-camera-line"></i> Choose Avatar</h3>
+                    <button class="modal-close" id="closeAvatarModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="avatar-tabs">
+                        <button class="avatar-tab active" data-tab="emoji">😊 Emojis</button>
+                        <button class="avatar-tab" data-tab="upload">📷 Upload Photo</button>
+                    </div>
+                    
+                    <!-- Emoji Selection -->
+                    <div class="avatar-tab-content active" id="emojiTab">
+                        <div class="avatar-options" id="avatarOptions">
+                            <div class="avatar-option" data-avatar="🌍">🌍</div>
+                            <div class="avatar-option" data-avatar="🗺️">🗺️</div>
+                            <div class="avatar-option" data-avatar="📸">📸</div>
+                            <div class="avatar-option" data-avatar="🎒">🎒</div>
+                            <div class="avatar-option" data-avatar="✈️">✈️</div>
+                            <div class="avatar-option" data-avatar="🏔️">🏔️</div>
+                            <div class="avatar-option" data-avatar="🌊">🌊</div>
+                            <div class="avatar-option" data-avatar="🎓">🎓</div>
+                            <div class="avatar-option" data-avatar="❤️">❤️</div>
+                            <div class="avatar-option" data-avatar="⭐">⭐</div>
+                            <div class="avatar-option" data-avatar="🌸">🌸</div>
+                            <div class="avatar-option" data-avatar="🎵">🎵</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Photo Upload -->
+                    <div class="avatar-tab-content" id="uploadTab">
+                        <div class="photo-upload-area" id="photoUploadArea">
+                            <i class="ri-upload-cloud-2-line"></i>
+                            <p>Click or drag photo here</p>
+                            <span>JPG, PNG up to 2MB</span>
+                            <input type="file" id="photoUploadInput" accept="image/*" style="display: none;">
+                        </div>
+                        <div class="photo-preview" id="photoPreview" style="display: none;">
+                            <img id="previewImage" src="" alt="Preview">
+                            <button class="remove-photo-btn" id="removePhotoBtn">Remove</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-cancel" id="cancelAvatarBtn">Cancel</button>
+                    <button class="btn-save" id="saveAvatarBtn">Save Avatar</button>
+                </div>
+            </div>
+        </div>
+    </main>
+<script>
+    // Fix View All buttons
+    document.querySelectorAll('.view-all').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const parentCard = btn.closest('.info-card');
+            if (parentCard && parentCard.innerText.includes('Achievements')) {
+                alert('🏆 Keep creating memories to unlock more achievements!');
+            } else if (parentCard && parentCard.innerText.includes('Activity')) {
+                window.location.href = 'timeline.html';
+            } else {
+                alert('✨ All items are displayed above!');
+            }
+        });
+    });
+</script>
+    <script src="./js/profile.js"></script>
+</body>
+</html>

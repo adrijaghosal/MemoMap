@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings | MemoMap</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/settings.css">
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <i class="ri-map-pin-2-fill"></i>
+            <span>MemoMap</span>
+        </div>
+        
+        <div class="user-profile-mini">
+            <div class="user-avatar-mini">
+                <span>🌍</span>
+            </div>
+            <div class="user-info-mini">
+                <h4 id="sidebarUserName">Explorer</h4>
+                <p>Member since 2024</p>
+            </div>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <i class="ri-dashboard-line"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="map.html" class="nav-item">
+                <i class="ri-map-pin-line"></i>
+                <span>Memory Map</span>
+            </a>
+            <a href="add-memory.html" class="nav-item">
+                <i class="ri-add-line"></i>
+                <span>Add Memory</span>
+            </a>
+            <a href="timeline.html" class="nav-item">
+                <i class="ri-timeline-line"></i>
+                <span>Timeline</span>
+            </a>
+            <a href="collections.html" class="nav-item">
+                <i class="ri-folder-line"></i>
+                <span>Collections</span>
+            </a>
+            <a href="profile.html" class="nav-item">
+                <i class="ri-user-line"></i>
+                <span>Profile</span>
+            </a>
+            <a href="settings.html" class="nav-item active">
+                <i class="ri-settings-line"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+        
+        <button class="logout-btn" id="logoutBtn">
+            <i class="ri-logout-box-r-line"></i>
+            <span>Logout</span>
+        </button>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Header -->
+        <header class="top-header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="ri-menu-line"></i>
+                </button>
+                <div class="welcome-text">
+                    <h2>⚙️ Settings</h2>
+                    <p>Manage your account preferences</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="user-avatar">
+                    <span>🌍</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Settings Container -->
+        <div class="settings-container">
+            
+            <!-- Theme Section -->
+            <div class="settings-section">
+                <h3><i class="ri-palette-line"></i> Appearance</h3>
+                <div class="settings-card">
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-label">Theme Mode</span>
+                            <span class="setting-desc">Choose your preferred theme</span>
+                        </div>
+                        <div class="theme-options">
+                            <button class="theme-btn active" data-theme="light">
+                                <i class="ri-sun-line"></i> Light
+                            </button>
+                            <button class="theme-btn" data-theme="dark">
+                                <i class="ri-moon-line"></i> Dark
+                            </button>
+                            <button class="theme-btn" data-theme="auto">
+                                <i class="ri-smartphone-line"></i> Auto
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notifications Section -->
+            <div class="settings-section">
+                <h3><i class="ri-notification-3-line"></i> Notifications</h3>
+                <div class="settings-card">
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-label">Push Notifications</span>
+                            <span class="setting-desc">Get daily memory reminders</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="pushNotifications">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-label">Email Digest</span>
+                            <span class="setting-desc">Weekly summary of your memories</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="emailDigest">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-label">On This Day Reminders</span>
+                            <span class="setting-desc">Get notified about past memories</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="onThisDayReminders" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Privacy Section -->
+            <div class="settings-section">
+                <h3><i class="ri-lock-line"></i> Privacy & Security</h3>
+                <div class="settings-card">
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-label">Default Memory Privacy</span>
+                            <span class="setting-desc">Who can see your memories by default</span>
+                        </div>
+                        <select class="setting-select" id="privacySelect">
+                            <option value="private">🔒 Private (Only me)</option>
+                            <option value="friends">👥 Friends only</option>
+                            <option value="public">🌍 Public (Everyone)</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-label">Show Location on Map</span>
+                            <span class="setting-desc">Display exact location or approximate area</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="showExactLocation" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-label">Two-Factor Authentication</span>
+                            <span class="setting-desc">Add an extra layer of security</span>
+                        </div>
+                        <button class="secondary-btn" id="enable2faBtn">Enable 2FA</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Management Section -->
+            <div class="settings-section">
+                <h3><i class="ri-database-2-line"></i> Data Management</h3>
+                <div class="settings-card">
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-label">Auto Backup</span>
+                            <span class="setting-desc">Automatically backup your memories</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="autoBackup" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-label">Export All Memories</span>
+                            <span class="setting-desc">Download your data as JSON</span>
+                        </div>
+                        <button class="secondary-btn" id="exportDataBtn">
+                            <i class="ri-download-line"></i> Export
+                        </button>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-label">Clear All Data</span>
+                            <span class="setting-desc warning">This action cannot be undone</span>
+                        </div>
+                        <button class="danger-btn" id="clearDataBtn">
+                            <i class="ri-delete-bin-line"></i> Clear All
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account Section -->
+            <div class="settings-section">
+                <h3><i class="ri-user-settings-line"></i> Account</h3>
+                <div class="settings-card">
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-label">Change Password</span>
+                            <span class="setting-desc">Update your account password</span>
+                        </div>
+                        <button class="secondary-btn" id="changePasswordBtn">
+                            <i class="ri-lock-password-line"></i> Change
+                        </button>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-label">Language</span>
+                            <span class="setting-desc">Choose your preferred language</span>
+                        </div>
+                        <select class="setting-select" id="languageSelect">
+                            <option value="en">🇺🇸 English</option>
+                            <option value="es">🇪🇸 Español</option>
+                            <option value="fr">🇫🇷 Français</option>
+                            <option value="hi">🇮🇳 हिंदी</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-label">Delete Account</span>
+                            <span class="setting-desc warning">Permanently delete your account and all data</span>
+                        </div>
+                        <button class="danger-btn" id="deleteAccountBtn">
+                            <i class="ri-user-unfollow-line"></i> Delete Account
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- About Section -->
+            <div class="settings-section">
+                <h3><i class="ri-information-line"></i> About</h3>
+                <div class="settings-card">
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-label">Version</span>
+                            <span class="setting-desc">Current app version</span>
+                        </div>
+                        <span class="version-badge">v2.0.0</span>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-label">Terms of Service</span>
+                            <span class="setting-desc">Read our terms and conditions</span>
+                        </div>
+                        <button class="link-btn" id="termsBtn">View →</button>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-label">Privacy Policy</span>
+                            <span class="setting-desc">How we handle your data</span>
+                        </div>
+                        <button class="link-btn" id="privacyBtn">View →</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Change Password Modal -->
+    <div class="modal" id="passwordModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="ri-lock-password-line"></i> Change Password</h3>
+                <button class="modal-close" id="closePasswordModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Current Password</label>
+                    <input type="password" id="currentPassword" placeholder="Enter current password">
+                </div>
+                <div class="form-group">
+                    <label>New Password</label>
+                    <input type="password" id="newPassword" placeholder="Enter new password">
+                </div>
+                <div class="form-group">
+                    <label>Confirm New Password</label>
+                    <input type="password" id="confirmPassword" placeholder="Confirm new password">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" id="cancelPasswordBtn">Cancel</button>
+                <button class="btn-save" id="savePasswordBtn">Update Password</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Account Modal -->
+    <div class="modal" id="deleteAccountModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="ri-error-warning-line"></i> Delete Account</h3>
+                <button class="modal-close" id="closeDeleteAccountModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete your account?</p>
+                <p style="color: #e74c3c; margin-top: 0.5rem;">This action is permanent and cannot be undone. All your memories and data will be lost.</p>
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label>Type <strong>DELETE</strong> to confirm</label>
+                    <input type="text" id="deleteConfirmInput" placeholder="DELETE">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" id="cancelDeleteAccountBtn">Cancel</button>
+                <button class="btn-delete" id="confirmDeleteAccountBtn">Permanently Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Clear Data Modal -->
+    <div class="modal" id="clearDataModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="ri-delete-bin-line"></i> Clear All Data</h3>
+                <button class="modal-close" id="closeClearDataModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to clear all your memories?</p>
+                <p style="color: #e74c3c;">This action cannot be undone. All your memories, photos, and collections will be deleted.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" id="cancelClearDataBtn">Cancel</button>
+                <button class="btn-delete" id="confirmClearDataBtn">Clear All Data</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="./js/settings.js"></script>
+</body>
+</html>

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help & Support | MemoMap</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/help.css">
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <i class="ri-map-pin-2-fill"></i>
+            <span>MemoMap</span>
+        </div>
+        
+        <div class="user-profile-mini">
+            <div class="user-avatar-mini">
+                <span>🌍</span>
+            </div>
+            <div class="user-info-mini">
+                <h4 id="sidebarUserName">Explorer</h4>
+                <p>Member since 2024</p>
+            </div>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <i class="ri-dashboard-line"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="map.html" class="nav-item">
+                <i class="ri-map-pin-line"></i>
+                <span>Memory Map</span>
+            </a>
+            <a href="add-memory.html" class="nav-item">
+                <i class="ri-add-line"></i>
+                <span>Add Memory</span>
+            </a>
+            <a href="timeline.html" class="nav-item">
+                <i class="ri-timeline-line"></i>
+                <span>Timeline</span>
+            </a>
+            <a href="collections.html" class="nav-item">
+                <i class="ri-folder-line"></i>
+                <span>Collections</span>
+            </a>
+            <a href="profile.html" class="nav-item">
+                <i class="ri-user-line"></i>
+                <span>Profile</span>
+            </a>
+            <a href="nostalgia.html" class="nav-item">
+                <i class="ri-emotion-line"></i>
+                <span>Nostalgia</span>
+            </a>
+            <a href="settings.html" class="nav-item">
+                <i class="ri-settings-line"></i>
+                <span>Settings</span>
+            </a>
+            <a href="help.html" class="nav-item active">
+                <i class="ri-question-line"></i>
+                <span>Help</span>
+            </a>
+        </nav>
+        
+        <button class="logout-btn" id="logoutBtn">
+            <i class="ri-logout-box-r-line"></i>
+            <span>Logout</span>
+        </button>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Header -->
+        <header class="top-header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="ri-menu-line"></i>
+                </button>
+                <div class="welcome-text">
+                    <h2>❓ Help & Support</h2>
+                    <p>Find answers to your questions</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="user-avatar">
+                    <span>🌍</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Search Bar -->
+        <div class="search-section">
+            <div class="search-container">
+                <i class="ri-search-line"></i>
+                <input type="text" id="searchInput" placeholder="Search for help topics...">
+            </div>
+        </div>
+
+        <!-- Help Categories -->
+        <div class="help-categories">
+            <button class="category-btn active" data-category="all">📚 All Topics</button>
+            <button class="category-btn" data-category="getting-started">🚀 Getting Started</button>
+            <button class="category-btn" data-category="memories">📸 Memories</button>
+            <button class="category-btn" data-category="account">👤 Account</button>
+            <button class="category-btn" data-category="troubleshooting">🔧 Troubleshooting</button>
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="faq-section">
+            <div class="faq-item" data-category="getting-started">
+                <div class="faq-question">
+                    <span>🚀 How do I create my first memory?</span>
+                    <i class="ri-arrow-down-s-line"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Creating your first memory is easy! Click on the <strong>"Add Memory"</strong> button in the sidebar. Fill in the title, location, date, choose your mood, add photos, and write your story. Click <strong>"Save Memory"</strong> and your memory will appear on your dashboard and map!</p>
+                    <div class="faq-tip">
+                        <i class="ri-lightbulb-line"></i> Tip: Add photos to make your memories more vivid!
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="getting-started">
+                <div class="faq-question">
+                    <span>🗺️ How does the Memory Map work?</span>
+                    <i class="ri-arrow-down-s-line"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>The Memory Map automatically plots all your memories on an interactive world map based on their locations. You can click on any pin to view memory details, zoom in/out, and filter memories by mood. Each mood has a different colored pin!</p>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="memories">
+                <div class="faq-question">
+                    <span>📸 Can I add multiple photos to a memory?</span>
+                    <i class="ri-arrow-down-s-line"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Yes! You can add up to 10 photos per memory. Simply click the upload area and select multiple images, or drag and drop them directly. All photos will be saved with your memory and displayed in a beautiful gallery.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="memories">
+                <div class="faq-question">
+                    <span>🎙️ How do I add a voice note to my memory?</span>
+                    <i class="ri-arrow-down-s-line"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>When adding or editing a memory, click the <strong>"Record Voice"</strong> button. Allow microphone access when prompted, then click again to stop recording. Your voice note will be saved and can be played back anytime!</p>
+                    <div class="faq-tip">
+                        <i class="ri-lightbulb-line"></i> Tip: Record your thoughts and feelings in the moment for a more emotional experience years later!
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="memories">
+                <div class="faq-question">
+                    <span>🔒 What is a Time Capsule?</span>
+                    <i class="ri-arrow-down-s-line"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>A Time Capsule is a special memory that you can lock for 1, 5, or 10 years. Until the unlock date, the memory is hidden and can only be viewed when the time comes. It's perfect for writing letters to your future self!</p>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="account">
+                <div class="faq-question">
+                    <span>👤 How do I change my profile picture?</span>
+                    <i class="ri-arrow-down-s-line"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Go to your <strong>Profile</strong> page and click on the camera icon on your avatar. You can either choose from our emoji collection or upload your own photo. Click "Save" to update your profile picture!</p>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="account">
+                <div class="faq-question">
+                    <span>🔐 How do I change my password?</span>
+                    <i class="ri-arrow-down-s-line"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Go to <strong>Settings</strong> → <strong>Account</strong> → <strong>Change Password</strong>. Enter your current password and your new password, then confirm. Click "Update Password" to save changes.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="account">
+                <div class="faq-question">
+                    <span>🗑️ How do I delete my account?</span>
+                    <i class="ri-arrow-down-s-line"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Go to <strong>Settings</strong> → <strong>Account</strong> → <strong>Delete Account</strong>. You'll need to type "DELETE" to confirm. Warning: This action is permanent and cannot be undone!</p>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="troubleshooting">
+                <div class="faq-question">
+                    <span>🔧 My photos aren't uploading. What should I do?</span>
+                    <i class="ri-arrow-down-s-line"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Make sure your images are under 5MB and in JPEG or PNG format. If you're still having issues, try refreshing the page or using a different browser. Chrome and Firefox work best with MemoMap.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="troubleshooting">
+                <div class="faq-question">
+                    <span>🔧 The map isn't loading properly.</span>
+                    <i class="ri-arrow-down-s-line"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Try refreshing the page or clearing your browser cache. If the issue persists, check your internet connection. The map requires an active internet connection to load tiles.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="troubleshooting">
+                <div class="faq-question">
+                    <span>🔧 I forgot my password. How do I reset it?</span>
+                    <i class="ri-arrow-down-s-line"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>On the login page, click <strong>"Forgot Password?"</strong>. Enter your email address and we'll send you a reset link. Follow the instructions to create a new password.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Support -->
+        <div class="contact-section">
+            <div class="contact-card">
+                <i class="ri-customer-service-line"></i>
+                <h3>Still have questions?</h3>
+                <p>Our support team is here to help you</p>
+                <div class="contact-buttons">
+                    <button class="contact-btn email" id="emailSupportBtn">
+                        <i class="ri-mail-line"></i> Email Support
+                    </button>
+                    <button class="contact-btn chat" id="liveChatBtn">
+                        <i class="ri-chat-3-line"></i> Live Chat
+                    </button>
+                </div>
+                <div class="response-time">
+                    <i class="ri-time-line"></i> Response time: Usually within 24 hours
+                </div>
+            </div>
+        </div>
+
+        <!-- Feedback Section -->
+        <div class="feedback-section">
+            <h3><i class="ri-feedback-line"></i> Was this helpful?</h3>
+            <div class="feedback-buttons">
+                <button class="feedback-btn" data-feedback="yes">
+                    <i class="ri-thumb-up-line"></i> Yes, helpful
+                </button>
+                <button class="feedback-btn" data-feedback="no">
+                    <i class="ri-thumb-down-line"></i> No, need more
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Live Chat Modal -->
+    <div class="modal" id="chatModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="ri-chat-3-line"></i> Live Chat Support</h3>
+                <button class="modal-close" id="closeChatModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="chat-message bot">
+                        <span class="chat-avatar">🤖</span>
+                        <p>Hi there! 👋 How can I help you today?</p>
+                    </div>
+                </div>
+                <div class="chat-input-container">
+                    <input type="text" id="chatInput" placeholder="Type your message...">
+                    <button id="sendChatBtn"><i class="ri-send-plane-fill"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="./js/help.js"></script>
+</body>
+</html>
