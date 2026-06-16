@@ -10,6 +10,20 @@
 </head>
 <body>
 
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="floating-icon icon-1">📍</div>
+        <div class="floating-icon icon-2">🗺️</div>
+        <div class="floating-icon icon-3">📸</div>
+        <div class="floating-icon icon-4">✨</div>
+        <div class="floating-icon icon-5">❤️</div>
+        <div class="floating-icon icon-6">🌟</div>
+        <div class="pulse-circle circle-1"></div>
+        <div class="pulse-circle circle-2"></div>
+        <div class="floating-shape shape-1"></div>
+        <div class="floating-shape shape-2"></div>
+    </div>
+
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-logo">
@@ -48,9 +62,33 @@
                 <i class="ri-folder-line"></i>
                 <span>Collections</span>
             </a>
+            <a href="nostalgia.html" class="nav-item">
+                <i class="ri-emotion-line"></i>
+                <span>Nostalgia</span>
+            </a>
+            <a href="diary.html" class="nav-item">
+                <i class="ri-book-open-line"></i>
+                <span>Digital Diary</span>
+            </a>
             <a href="profile.html" class="nav-item active">
                 <i class="ri-user-line"></i>
                 <span>Profile</span>
+            </a>
+            
+            <div class="nav-divider"></div>
+            
+            <a href="notifications.html" class="nav-item">
+                <i class="ri-notification-3-line"></i>
+                <span>Notifications</span>
+                <span class="nav-badge" id="sidebarNotificationBadge">0</span>
+            </a>
+            <a href="help.html" class="nav-item">
+                <i class="ri-question-line"></i>
+                <span>Help & Support</span>
+            </a>
+            <a href="settings.html" class="nav-item">
+                <i class="ri-settings-line"></i>
+                <span>Settings</span>
             </a>
         </nav>
         
@@ -246,109 +284,104 @@
                 </div>
             </div>
         </div>
-
-        <!-- Edit Profile Modal -->
-        <div class="modal" id="editProfileModal">
-            <div class="modal-overlay"></div>
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3><i class="ri-edit-line"></i> Edit Profile</h3>
-                    <button class="modal-close" id="closeEditModal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label>Full Name</label>
-                        <input type="text" id="editName" placeholder="Your name">
-                    </div>
-                    <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" id="editEmail" placeholder="Your email">
-                    </div>
-                    <div class="form-group">
-                        <label>Bio</label>
-                        <textarea id="editBio" rows="3" placeholder="Tell us about yourself..."></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Favorite Quote</label>
-                        <input type="text" id="editQuote" placeholder="Your favorite quote">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn-cancel" id="cancelEditBtn">Cancel</button>
-                    <button class="btn-save" id="saveProfileBtn">Save Changes</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Avatar Selection Modal -->
-        <div class="modal" id="avatarModal">
-            <div class="modal-overlay"></div>
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3><i class="ri-camera-line"></i> Choose Avatar</h3>
-                    <button class="modal-close" id="closeAvatarModal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div class="avatar-tabs">
-                        <button class="avatar-tab active" data-tab="emoji">😊 Emojis</button>
-                        <button class="avatar-tab" data-tab="upload">📷 Upload Photo</button>
-                    </div>
-                    
-                    <!-- Emoji Selection -->
-                    <div class="avatar-tab-content active" id="emojiTab">
-                        <div class="avatar-options" id="avatarOptions">
-                            <div class="avatar-option" data-avatar="🌍">🌍</div>
-                            <div class="avatar-option" data-avatar="🗺️">🗺️</div>
-                            <div class="avatar-option" data-avatar="📸">📸</div>
-                            <div class="avatar-option" data-avatar="🎒">🎒</div>
-                            <div class="avatar-option" data-avatar="✈️">✈️</div>
-                            <div class="avatar-option" data-avatar="🏔️">🏔️</div>
-                            <div class="avatar-option" data-avatar="🌊">🌊</div>
-                            <div class="avatar-option" data-avatar="🎓">🎓</div>
-                            <div class="avatar-option" data-avatar="❤️">❤️</div>
-                            <div class="avatar-option" data-avatar="⭐">⭐</div>
-                            <div class="avatar-option" data-avatar="🌸">🌸</div>
-                            <div class="avatar-option" data-avatar="🎵">🎵</div>
-                        </div>
-                    </div>
-                    
-                    <!-- Photo Upload -->
-                    <div class="avatar-tab-content" id="uploadTab">
-                        <div class="photo-upload-area" id="photoUploadArea">
-                            <i class="ri-upload-cloud-2-line"></i>
-                            <p>Click or drag photo here</p>
-                            <span>JPG, PNG up to 2MB</span>
-                            <input type="file" id="photoUploadInput" accept="image/*" style="display: none;">
-                        </div>
-                        <div class="photo-preview" id="photoPreview" style="display: none;">
-                            <img id="previewImage" src="" alt="Preview">
-                            <button class="remove-photo-btn" id="removePhotoBtn">Remove</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn-cancel" id="cancelAvatarBtn">Cancel</button>
-                    <button class="btn-save" id="saveAvatarBtn">Save Avatar</button>
-                </div>
-            </div>
-        </div>
     </main>
-<script>
-    // Fix View All buttons
-    document.querySelectorAll('.view-all').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const parentCard = btn.closest('.info-card');
-            if (parentCard && parentCard.innerText.includes('Achievements')) {
-                alert('🏆 Keep creating memories to unlock more achievements!');
-            } else if (parentCard && parentCard.innerText.includes('Activity')) {
-                window.location.href = 'timeline.html';
-            } else {
-                alert('✨ All items are displayed above!');
-            }
-        });
-    });
-</script>
+
+    <!-- Edit Profile Modal -->
+    <div class="modal" id="editProfileModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="ri-edit-line"></i> Edit Profile</h3>
+                <button class="modal-close" id="closeEditModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="editName" placeholder="Your name">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="editEmail" placeholder="Your email">
+                </div>
+                <div class="form-group">
+                    <label>Bio</label>
+                    <textarea id="editBio" rows="3" placeholder="Tell us about yourself..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Favorite Quote</label>
+                    <input type="text" id="editQuote" placeholder="Your favorite quote">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" id="cancelEditBtn">Cancel</button>
+                <button class="btn-save" id="saveProfileBtn">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Avatar Selection Modal -->
+    <div class="modal" id="avatarModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="ri-camera-line"></i> Choose Avatar</h3>
+                <button class="modal-close" id="closeAvatarModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="avatar-tabs">
+                    <button class="avatar-tab active" data-tab="emoji">😊 Emojis</button>
+                    <button class="avatar-tab" data-tab="upload">📷 Upload Photo</button>
+                </div>
+                
+                <!-- Emoji Selection -->
+                <div class="avatar-tab-content active" id="emojiTab">
+                    <div class="avatar-options" id="avatarOptions">
+                        <div class="avatar-option" data-avatar="🌍">🌍</div>
+                        <div class="avatar-option" data-avatar="🗺️">🗺️</div>
+                        <div class="avatar-option" data-avatar="📸">📸</div>
+                        <div class="avatar-option" data-avatar="🎒">🎒</div>
+                        <div class="avatar-option" data-avatar="✈️">✈️</div>
+                        <div class="avatar-option" data-avatar="🏔️">🏔️</div>
+                        <div class="avatar-option" data-avatar="🌊">🌊</div>
+                        <div class="avatar-option" data-avatar="🎓">🎓</div>
+                        <div class="avatar-option" data-avatar="❤️">❤️</div>
+                        <div class="avatar-option" data-avatar="⭐">⭐</div>
+                        <div class="avatar-option" data-avatar="🌸">🌸</div>
+                        <div class="avatar-option" data-avatar="🎵">🎵</div>
+                    </div>
+                </div>
+                
+                <!-- Photo Upload -->
+                <div class="avatar-tab-content" id="uploadTab">
+                    <div class="photo-upload-area" id="photoUploadArea">
+                        <i class="ri-upload-cloud-2-line"></i>
+                        <p>Click or drag photo here</p>
+                        <span>JPG, PNG up to 2MB</span>
+                        <input type="file" id="photoUploadInput" accept="image/*" style="display: none;">
+                    </div>
+                    <div class="photo-preview" id="photoPreview" style="display: none;">
+                        <img id="previewImage" src="" alt="Preview">
+                        <button class="remove-photo-btn" id="removePhotoBtn">Remove</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" id="cancelAvatarBtn">Cancel</button>
+                <button class="btn-save" id="saveAvatarBtn">Save Avatar</button>
+            </div>
+        </div>
+    </div>
+<!-- Theme Loader - Must be loaded before page scripts -->
+<script src="./js/theme-loader.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    
+    <!-- Firebase Config & Auth -->
+    <script src="./js/firebase-config.js"></script>
+    <script src="./js/auth.js"></script>
+    
+    <!-- Profile Script -->
     <script src="./js/profile.js"></script>
 </body>
 </html>

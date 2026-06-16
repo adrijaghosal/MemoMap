@@ -1,8 +1,6 @@
-// Demo credentials (for testing)
-const DEMO_USER = {
-    email: "demo@memonap.com",
-    password: "demo123"
-};
+// ============================================
+// MEMOMAP - LOGIN PAGE SCRIPT
+// ============================================
 
 // Get DOM elements
 const emailInput = document.getElementById('email');
@@ -11,22 +9,19 @@ const loginBtn = document.getElementById('loginBtn');
 const googleBtn = document.getElementById('googleBtn');
 const rememberCheckbox = document.getElementById('rememberMe');
 const togglePassword = document.getElementById('togglePassword');
+const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
+const authMessageDiv = document.getElementById('authMessage');
 
-// Create message container if not exists
-let messageDiv = document.querySelector('.error-message');
-if (!messageDiv) {
-    messageDiv = document.createElement('div');
-    messageDiv.className = 'error-message';
-    const authForm = document.querySelector('.auth-form');
-    authForm.insertBefore(messageDiv, authForm.firstChild);
-}
-
-let successDiv = document.querySelector('.success-message');
-if (!successDiv) {
-    successDiv = document.createElement('div');
-    successDiv.className = 'success-message';
-    const authForm = document.querySelector('.auth-form');
-    authForm.insertBefore(successDiv, authForm.firstChild);
+// Message helper
+function showMessage(message, isError = true) {
+    if (authMessageDiv) {
+        authMessageDiv.textContent = message;
+        authMessageDiv.className = `message ${isError ? 'message-error' : 'message-success'}`;
+        authMessageDiv.style.display = 'block';
+        setTimeout(() => {
+            authMessageDiv.style.display = 'none';
+        }, 4000);
+    }
 }
 
 // Toggle password visibility
@@ -39,26 +34,7 @@ if (togglePassword) {
     });
 }
 
-// Show message function
-function showMessage(message, isError = true) {
-    if (isError) {
-        messageDiv.textContent = message;
-        messageDiv.style.display = 'block';
-        successDiv.style.display = 'none';
-        setTimeout(() => {
-            messageDiv.style.display = 'none';
-        }, 3000);
-    } else {
-        successDiv.textContent = message;
-        successDiv.style.display = 'block';
-        messageDiv.style.display = 'none';
-        setTimeout(() => {
-            successDiv.style.display = 'none';
-        }, 2000);
-    }
-}
-
-// Save to localStorage if remember me checked
+// Save credentials if "Remember me" is checked
 function saveCredentials(email, password) {
     if (rememberCheckbox && rememberCheckbox.checked) {
         localStorage.setItem('rememberedEmail', email);
@@ -73,85 +49,151 @@ function saveCredentials(email, password) {
 function loadSavedCredentials() {
     const savedEmail = localStorage.getItem('rememberedEmail');
     const savedPassword = localStorage.getItem('rememberedPassword');
-    if (savedEmail && savedPassword) {
+    if (savedEmail && savedPassword && emailInput && passwordInput) {
         emailInput.value = savedEmail;
         passwordInput.value = atob(savedPassword);
         if (rememberCheckbox) rememberCheckbox.checked = true;
     }
 }
 
-// Handle login
-function handleLogin() {
-    const email = emailInput.value.trim();
-    const password = passwordInput.value;
+// Handle login with Firebase
+async function handleLogin() {
+    const email = emailInput?.value.trim();
+    const password = passwordInput?.value;
 
     if (!email || !password) {
-        showMessage('Please enter both email and password');
+        showMessage('Please enter both email and password', true);
         return;
     }
 
     if (!email.includes('@') || !email.includes('.')) {
-        showMessage('Please enter a valid email address');
+        showMessage('Please enter a valid email address', true);
         return;
     }
 
     if (password.length < 6) {
-        showMessage('Password must be at least 6 characters');
+        showMessage('Password must be at least 6 characters', true);
         return;
     }
 
-    loginBtn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i> Signing in...';
-    loginBtn.disabled = true;
+    // Show loading state
+    if (loginBtn) {
+        loginBtn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i> Signing in...';
+        loginBtn.disabled = true;
+    }
 
-    setTimeout(() => {
-        if (email === DEMO_USER.email && password === DEMO_USER.password) {
+    try {
+        // Call Firebase signIn function from auth.js
+        const result = await signIn(email, password);
+        
+        if (result) {
             saveCredentials(email, password);
             showMessage('Login successful! Redirecting...', false);
-            sessionStorage.setItem('isLoggedIn', 'true');
-            sessionStorage.setItem('userEmail', email);
             
             setTimeout(() => {
                 window.location.href = 'dashboard.html';
             }, 1500);
         } else {
-            showMessage('Invalid email or password. Try: demo@memonap.com / demo123');
+            // Reset button
+            if (loginBtn) {
+                loginBtn.innerHTML = '<span>Sign In</span><i class="ri-arrow-right-line"></i>';
+                loginBtn.disabled = false;
+            }
+        }
+    } catch (error) {
+        showMessage(error.message || 'Login failed. Please try again.', true);
+        if (loginBtn) {
             loginBtn.innerHTML = '<span>Sign In</span><i class="ri-arrow-right-line"></i>';
             loginBtn.disabled = false;
         }
-    }, 1000);
+    }
 }
 
-// Google sign in handler
-function handleGoogleLogin() {
-    googleBtn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i> Connecting...';
-    googleBtn.disabled = true;
+// Handle Google Sign In
+async function handleGoogleLogin() {
+    if (googleBtn) {
+        googleBtn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i> Connecting...';
+        googleBtn.disabled = true;
+    }
 
-    setTimeout(() => {
-        showMessage('Google Sign In coming soon! Firebase integration in progress.', false);
-        googleBtn.innerHTML = '<i class="ri-google-fill"></i><span>Sign in with Google</span>';
-        googleBtn.disabled = false;
-        emailInput.value = DEMO_USER.email;
-        passwordInput.value = DEMO_USER.password;
-    }, 1000);
+    try {
+        const result = await signInWithGoogle();
+        
+        if (result) {
+            showMessage('Google sign in successful! Redirecting...', false);
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1500);
+        } else {
+            if (googleBtn) {
+                googleBtn.innerHTML = '<i class="ri-google-fill"></i><span>Sign in with Google</span>';
+                googleBtn.disabled = false;
+            }
+        }
+    } catch (error) {
+        showMessage(error.message || 'Google sign in failed. Please try again.', true);
+        if (googleBtn) {
+            googleBtn.innerHTML = '<i class="ri-google-fill"></i><span>Sign in with Google</span>';
+            googleBtn.disabled = false;
+        }
+    }
+}
+
+// Handle Forgot Password
+async function handleForgotPassword() {
+    const email = emailInput?.value.trim();
+    
+    if (!email) {
+        showMessage('Please enter your email address to reset password', true);
+        return;
+    }
+    
+    if (!email.includes('@') || !email.includes('.')) {
+        showMessage('Please enter a valid email address', true);
+        return;
+    }
+    
+    try {
+        const result = await resetPassword(email);
+        if (result) {
+            showMessage('Password reset email sent! Check your inbox.', false);
+        }
+    } catch (error) {
+        showMessage(error.message || 'Failed to send reset email. Please try again.', true);
+    }
+}
+
+// Enter key support
+if (passwordInput) {
+    passwordInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            handleLogin();
+        }
+    });
+}
+
+if (emailInput) {
+    emailInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            if (passwordInput) passwordInput.focus();
+        }
+    });
 }
 
 // Event listeners
-loginBtn.addEventListener('click', handleLogin);
-googleBtn.addEventListener('click', handleGoogleLogin);
+if (loginBtn) loginBtn.addEventListener('click', handleLogin);
+if (googleBtn) googleBtn.addEventListener('click', handleGoogleLogin);
+if (forgotPasswordBtn) forgotPasswordBtn.addEventListener('click', handleForgotPassword);
 
-passwordInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        handleLogin();
-    }
-});
-
-emailInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        passwordInput.focus();
-    }
-});
-
+// Load saved credentials on page load
 loadSavedCredentials();
 
-console.log('%c🔐 MemoMap Login Page Loaded', 'color: #ff6b8b; font-size: 14px; font-weight: bold;');
-console.log('%c📝 Demo Credentials: demo@memonap.com / demo123', 'color: #888; font-size: 12px;');
+// Check if already logged in
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        // User is already logged in, redirect to dashboard
+        window.location.href = 'dashboard.html';
+    }
+});
+
+console.log('%c🔐 MemoMap Login Page Loaded with Firebase', 'color: #ff6b8b; font-size: 14px; font-weight: bold;');

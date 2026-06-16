@@ -35,24 +35,7 @@ document.querySelectorAll('.nav-links a').forEach(link => {
     });
 });
 
-// Button Alerts
-document.querySelectorAll('.login-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        alert('🔐 Login page coming soon!');
-    });
-});
 
-document.querySelectorAll('.signup-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        alert('📝 Sign up page coming soon!');
-    });
-});
-
-document.querySelectorAll('.btn-primary, .btn-secondary').forEach(btn => {
-    btn.addEventListener('click', () => {
-        alert('🗺️ Start your memory journey!');
-    });
-});
 
 // Stats Counter Animation
 const statNumbers = document.querySelectorAll('.stat-item h2');

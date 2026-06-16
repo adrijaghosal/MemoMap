@@ -58,6 +58,9 @@
                 <p>Sign in to continue your memory journey</p>
             </div>
 
+            <!-- Message Container -->
+            <div id="authMessage" class="message" style="display: none;"></div>
+
             <div class="auth-form">
                 <div class="input-group">
                     <i class="ri-mail-line"></i>
@@ -75,7 +78,7 @@
                         <input type="checkbox" id="rememberMe">
                         <span>Remember me</span>
                     </label>
-                    <a href="#" class="forgot-link">Forgot password?</a>
+                    <a href="#" class="forgot-link" id="forgotPasswordBtn">Forgot password?</a>
                 </div>
 
                 <button class="login-btn" id="loginBtn">
@@ -99,6 +102,15 @@
         </div>
     </div>
 
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    
+    <!-- Firebase Config & Auth -->
+    <script src="./js/firebase-config.js"></script>
+    <script src="./js/auth.js"></script>
+    
+    <!-- Login Page Script -->
     <script src="./js/login.js"></script>
 </body>
 </html>

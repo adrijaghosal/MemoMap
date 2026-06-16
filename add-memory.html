@@ -10,6 +10,20 @@
 </head>
 <body>
 
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="floating-icon icon-1">📍</div>
+        <div class="floating-icon icon-2">🗺️</div>
+        <div class="floating-icon icon-3">📸</div>
+        <div class="floating-icon icon-4">✨</div>
+        <div class="floating-icon icon-5">❤️</div>
+        <div class="floating-icon icon-6">🌟</div>
+        <div class="pulse-circle circle-1"></div>
+        <div class="pulse-circle circle-2"></div>
+        <div class="floating-shape shape-1"></div>
+        <div class="floating-shape shape-2"></div>
+    </div>
+
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-logo">
@@ -32,7 +46,7 @@
                 <i class="ri-dashboard-line"></i>
                 <span>Dashboard</span>
             </a>
-            <a href="#" class="nav-item" id="mapNav">
+            <a href="map.html" class="nav-item">
                 <i class="ri-map-pin-line"></i>
                 <span>Memory Map</span>
             </a>
@@ -40,17 +54,41 @@
                 <i class="ri-add-line"></i>
                 <span>Add Memory</span>
             </a>
-            <a href="#" class="nav-item" id="timelineNav">
+            <a href="timeline.html" class="nav-item">
                 <i class="ri-timeline-line"></i>
                 <span>Timeline</span>
             </a>
-            <a href="#" class="nav-item" id="collectionsNav">
+            <a href="collections.html" class="nav-item">
                 <i class="ri-folder-line"></i>
                 <span>Collections</span>
             </a>
-            <a href="#" class="nav-item" id="profileNav">
+            <a href="nostalgia.html" class="nav-item">
+                <i class="ri-emotion-line"></i>
+                <span>Nostalgia</span>
+            </a>
+            <a href="diary.html" class="nav-item">
+                <i class="ri-book-open-line"></i>
+                <span>Digital Diary</span>
+            </a>
+            <a href="profile.html" class="nav-item">
                 <i class="ri-user-line"></i>
                 <span>Profile</span>
+            </a>
+            
+            <div class="nav-divider"></div>
+            
+            <a href="notifications.html" class="nav-item">
+                <i class="ri-notification-3-line"></i>
+                <span>Notifications</span>
+                <span class="nav-badge" id="sidebarNotificationBadge">0</span>
+            </a>
+            <a href="help.html" class="nav-item">
+                <i class="ri-question-line"></i>
+                <span>Help & Support</span>
+            </a>
+            <a href="settings.html" class="nav-item">
+                <i class="ri-settings-line"></i>
+                <span>Settings</span>
             </a>
         </nav>
         
@@ -69,8 +107,8 @@
                     <i class="ri-menu-line"></i>
                 </button>
                 <div class="welcome-text">
-                    <h2>✨ Create New Memory</h2>
-                    <p>Capture the moment forever</p>
+                    <h2>📝 Add New Memory</h2>
+                    <p>Capture your special moment forever</p>
                 </div>
             </div>
             <div class="header-right">
@@ -109,14 +147,9 @@
 
                     <div class="form-group">
                         <label><i class="ri-map-pin-line"></i> Location <span class="required">*</span></label>
-                        <input type="text" id="memoryLocation" placeholder="e.g., Paris, France / Mumbai, India">
-                        <div class="location-suggestions" id="locationSuggestions">
-                            <span class="suggestion">🏰 Paris, France</span>
-                            <span class="suggestion">🗽 New York, USA</span>
-                            <span class="suggestion">🗻 Tokyo, Japan</span>
-                            <span class="suggestion">🏄 Sydney, Australia</span>
-                            <span class="suggestion">🏔️ Himachal, India</span>
-                            <span class="suggestion">🏝️ Bali, Indonesia</span>
+                        <div class="location-input-container">
+                            <input type="text" id="memoryLocation" placeholder="Start typing a city, country, or landmark..." autocomplete="off">
+                            <div class="location-suggestions-dropdown" id="locationSuggestions" style="display: none;"></div>
                         </div>
                     </div>
 
@@ -202,7 +235,7 @@
                     </div>
                 </div>
 
-                <!-- Step 3: Review & Save -->
+                <!-- Step 3: Review & Save (Public Option moved here) -->
                 <div class="form-step" id="step3">
                     <div class="review-section">
                         <h4><i class="ri-eye-line"></i> Review Your Memory</h4>
@@ -222,15 +255,27 @@
                                 <label><input type="radio" name="capsuleTime" value="1"> 1 Year</label>
                                 <label><input type="radio" name="capsuleTime" value="5"> 5 Years</label>
                                 <label><input type="radio" name="capsuleTime" value="10"> 10 Years</label>
+                                <label class="custom-year-label">
+                                    <input type="radio" name="capsuleTime" value="custom" id="customYearRadio">
+                                    <span>Custom:</span>
+                                    <input type="number" id="customYearInput" placeholder="Years" min="1" max="50" disabled style="width: 70px; padding: 4px 8px; margin-left: 5px;">
+                                </label>
+                            </div>
+                            <div class="custom-year-message" id="customYearMessage" style="display: none; margin-top: 10px; font-size: 0.75rem; color: #ff6b8b;">
+                                <i class="ri-information-line"></i> Your memory will unlock after <span id="customYearDisplay">0</span> year(s)
                             </div>
                         </div>
                     </div>
 
+                    <!-- PUBLIC OPTION - ONLY ON STEP 3 -->
                     <div class="form-group">
                         <label class="checkbox">
                             <input type="checkbox" id="publicCheckbox">
                             <span>🌍 Make this memory public (share with community)</span>
                         </label>
+                        <p style="font-size: 0.7rem; color: #888; margin-top: 5px; margin-left: 25px;">
+                            <i class="ri-information-line"></i> Public memories can be seen by other MemoMap users
+                        </p>
                     </div>
 
                     <div class="form-navigation">
@@ -241,7 +286,17 @@
             </div>
         </div>
     </main>
-
+<!-- Theme Loader - Must be loaded before page scripts -->
+<script src="./js/theme-loader.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    
+    <!-- Firebase Config & Auth -->
+    <script src="./js/firebase-config.js"></script>
+    <script src="./js/auth.js"></script>
+    
+    <!-- Add Memory Script -->
     <script src="./js/add-memory.js"></script>
 </body>
 </html>

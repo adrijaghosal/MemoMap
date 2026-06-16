@@ -6,9 +6,23 @@
     <title>Notifications | MemoMap</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet">
-    <link rel="stylesheet" href="./css/notification.css">
+    <link rel="stylesheet" href="./css/notifications.css">
 </head>
 <body>
+
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="floating-icon icon-1">📍</div>
+        <div class="floating-icon icon-2">🗺️</div>
+        <div class="floating-icon icon-3">📸</div>
+        <div class="floating-icon icon-4">✨</div>
+        <div class="floating-icon icon-5">❤️</div>
+        <div class="floating-icon icon-6">🌟</div>
+        <div class="pulse-circle circle-1"></div>
+        <div class="pulse-circle circle-2"></div>
+        <div class="floating-shape shape-1"></div>
+        <div class="floating-shape shape-2"></div>
+    </div>
 
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
@@ -48,25 +62,33 @@
                 <i class="ri-folder-line"></i>
                 <span>Collections</span>
             </a>
-            <a href="profile.html" class="nav-item">
-                <i class="ri-user-line"></i>
-                <span>Profile</span>
-            </a>
             <a href="nostalgia.html" class="nav-item">
                 <i class="ri-emotion-line"></i>
                 <span>Nostalgia</span>
             </a>
-            <a href="settings.html" class="nav-item">
-                <i class="ri-settings-line"></i>
-                <span>Settings</span>
+            <a href="diary.html" class="nav-item">
+                <i class="ri-book-open-line"></i>
+                <span>Digital Diary</span>
             </a>
-            <a href="help.html" class="nav-item">
-                <i class="ri-question-line"></i>
-                <span>Help</span>
+            <a href="profile.html" class="nav-item">
+                <i class="ri-user-line"></i>
+                <span>Profile</span>
             </a>
+            
+            <div class="nav-divider"></div>
+            
             <a href="notifications.html" class="nav-item active">
                 <i class="ri-notification-3-line"></i>
                 <span>Notifications</span>
+                <span class="nav-badge" id="sidebarNotificationBadge">0</span>
+            </a>
+            <a href="help.html" class="nav-item">
+                <i class="ri-question-line"></i>
+                <span>Help & Support</span>
+            </a>
+            <a href="settings.html" class="nav-item">
+                <i class="ri-settings-line"></i>
+                <span>Settings</span>
             </a>
         </nav>
         
@@ -93,9 +115,9 @@
                 <button class="mark-all-read" id="markAllReadBtn">
                     <i class="ri-mail-check-line"></i> Mark all as read
                 </button>
-                <div class="user-avatar">
+                <a href="profile.html" class="user-avatar" style="text-decoration: none;">
                     <span>🌍</span>
-                </div>
+                </a>
             </div>
         </header>
 
@@ -115,12 +137,29 @@
 
         <!-- Empty State -->
         <div class="empty-state" id="emptyState" style="display: none;">
-            <i class="ri-notification-off-line"></i>
-            <h3>No notifications yet</h3>
-            <p>When you have notifications, they'll appear here</p>
+            <div class="empty-content">
+                <i class="ri-notification-off-line"></i>
+                <h3>No notifications yet</h3>
+                <p>When you have notifications, they'll appear here</p>
+            </div>
         </div>
     </main>
 
-    <script src="./js/notification.js"></script>
+    <!-- Notification Sound (hidden) -->
+    <audio id="notificationSound" preload="auto">
+        <source src="data:audio/wav;base64,UklGRlwAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YVoAAACAgICAgICAf39/f39/gH+Af4B/gH+Af4B/gH+Af4B/gH+Af4B/gH+Af4B/gH+Af4B/gH+Af4B/gH+Af4B/gH+Af4B/gH+Af4B/gH+Afw==" type="audio/wav">
+    </audio>
+<!-- Theme Loader - Must be loaded before page scripts -->
+<script src="./js/theme-loader.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    
+    <!-- Firebase Config & Auth -->
+    <script src="./js/firebase-config.js"></script>
+    <script src="./js/auth.js"></script>
+    
+    <!-- Notifications Script -->
+    <script src="./js/notifications.js"></script>
 </body>
 </html>

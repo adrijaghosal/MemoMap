@@ -65,33 +65,33 @@ function formatDate(dateString) {
 
 // ===== Load Data =====
 function loadData() {
-    const storedCollections = localStorage.getItem('memonap_collections');
-    if (storedCollections) {
-        collections = JSON.parse(storedCollections);
-    } else {
-        collections = [];
-    }
+    const userEmail = sessionStorage.getItem('userEmail');
+    const userId = userEmail || 'guest';
     
-    const storedMemories = localStorage.getItem('memonap_memories');
-    if (storedMemories) {
-        allMemories = JSON.parse(storedMemories);
-    } else {
-        allMemories = [];
-    }
+    const collectionsKey = `memonap_collections_${userId}`;
+    const memoriesKey = `memonap_memories_${userId}`;
+    
+    const storedCollections = localStorage.getItem(collectionsKey);
+    const storedMemories = localStorage.getItem(memoriesKey);
+    
+    collections = storedCollections ? JSON.parse(storedCollections) : [];
+    allMemories = storedMemories ? JSON.parse(storedMemories) : [];
     
     renderCollections();
 }
 
 // ===== Save Collections =====
 function saveCollections() {
-    localStorage.setItem('memonap_collections', JSON.stringify(collections));
+    const userEmail = sessionStorage.getItem('userEmail');
+    const userId = userEmail || 'guest';
+    localStorage.setItem(`memonap_collections_${userId}`, JSON.stringify(collections));
 }
 
-// ===== Render Collections Grid with Hover Slideshow =====
+// ===== Render Collections Grid =====
 function renderCollections() {
     if (collections.length === 0) {
         collectionsGrid.style.display = 'none';
-        emptyState.style.display = 'block';
+        emptyState.style.display = 'flex';
         return;
     }
     
@@ -101,25 +101,7 @@ function renderCollections() {
     collectionsGrid.innerHTML = collections.map(collection => {
         const memoryCount = collection.memoryIds ? collection.memoryIds.length : 0;
         const memoryIds = collection.memoryIds || [];
-        const previewImages = memoryIds.slice(0, 4);
-        
-        // Get images for slideshow
-        let slideshowHtml = '';
-        if (previewImages.length > 0) {
-            slideshowHtml = `
-                <div class="hover-slideshow">
-                    ${previewImages.map(mid => {
-                        const memory = allMemories.find(m => m.id === mid);
-                        if (memory && memory.photos && memory.photos.length > 0) {
-                            return `<img class="slide-image" src="${memory.photos[0].data}" alt="Memory preview">`;
-                        }
-                        return `<div class="slide-image" style="background: linear-gradient(135deg, #ffe4ec, #ffd4e0); display: flex; align-items: center; justify-content: center;"><i class="ri-image-line" style="font-size: 2rem; color: #ff6b8b;"></i></div>`;
-                    }).join('')}
-                </div>
-            `;
-        } else {
-            slideshowHtml = `<div class="hover-slideshow"><div class="slide-image" style="background: linear-gradient(135deg, #ffe4ec, #ffd4e0); display: flex; align-items: center; justify-content: center;"><i class="ri-folder-image-line" style="font-size: 2rem; color: #ff6b8b;"></i></div></div>`;
-        }
+        const previewMemories = memoryIds.slice(0, 3);
         
         const typeLabels = {
             personal: '✨ Personal', travel: '✈️ Travel', family: '👨‍👩‍👧 Family',
@@ -128,11 +110,14 @@ function renderCollections() {
         
         return `
             <div class="collection-card" data-id="${collection.id}">
-                ${collection.isLocked ? `<div class="lock-badge"><i class="ri-lock-fill"></i> Locked</div>` : ''}
+                ${collection.isLocked ? `
+                    <div class="lock-badge">
+                        <i class="ri-lock-fill"></i> Locked
+                    </div>
+                ` : ''}
                 <div class="collection-cover">
-                    ${slideshowHtml}
-                    <div class="collection-icon-overlay">${collection.icon || '📁'}</div>
-                    <div class="collection-count">${memoryCount} memories</div>
+                    <div class="cover-icon">${collection.icon || '📁'}</div>
+                    <div class="collection-count-badge">${memoryCount} memory${memoryCount !== 1 ? 's' : ''}</div>
                 </div>
                 <div class="collection-info">
                     <div class="collection-name">
@@ -141,7 +126,10 @@ function renderCollections() {
                     </div>
                     <div class="collection-desc">${escapeHtml(collection.description || 'No description')}</div>
                     <div class="collection-preview">
-                        ${previewImages.slice(0, 3).map(() => `<div class="preview-img">📸</div>`).join('')}
+                        ${previewMemories.map(mid => {
+                            const memory = allMemories.find(m => m.id === mid);
+                            return `<div class="preview-img">📸</div>`;
+                        }).join('')}
                         ${memoryCount > 3 ? `<div class="preview-img">+${memoryCount - 3}</div>` : ''}
                     </div>
                 </div>
@@ -329,7 +317,7 @@ function renderCollectionMemories(collection) {
         item.addEventListener('click', (e) => {
             if (!e.target.closest('.remove-from-collection')) {
                 const memoryId = parseInt(item.dataset.id);
-                viewMemory(memoryId);
+                window.location.href = `memory-detail.html?id=${memoryId}`;
             }
         });
     });
@@ -400,14 +388,6 @@ function closePasswordModalFunc() {
     pendingCollectionId = null;
 }
 
-// ===== View Memory =====
-function viewMemory(id) {
-    const memory = allMemories.find(m => m.id === id);
-    if (memory) {
-        alert(`📌 ${memory.title}\n📍 ${memory.location}\n📅 ${formatDate(memory.date)}\n\n${memory.story || 'No story added'}`);
-    }
-}
-
 // ===== Icon Picker =====
 iconOptions.forEach(icon => {
     icon.addEventListener('click', () => {
@@ -447,52 +427,49 @@ document.querySelectorAll('.modal-overlay').forEach(overlay => {
     });
 });
 
-menuToggle?.addEventListener('click', () => sidebar.classList.toggle('open'));
-logoutBtn?.addEventListener('click', () => {
+menuToggle?.addEventListener('click', () => {
+    sidebar.classList.toggle('open');
+});
+
+logoutBtn?.addEventListener('click', async () => {
     sessionStorage.clear();
+    if (typeof firebase !== 'undefined' && firebase.auth) {
+        await firebase.auth().signOut();
+    }
     window.location.href = 'login.html';
+});
+
+document.addEventListener('click', (e) => {
+    if (window.innerWidth <= 900) {
+        if (sidebar && menuToggle && !sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+            sidebar.classList.remove('open');
+        }
+    }
 });
 
 // ===== Check Auth =====
 function checkAuth() {
     const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+    const userName = sessionStorage.getItem('userName');
+    
     if (!isLoggedIn || isLoggedIn !== 'true') {
         window.location.href = 'login.html';
         return false;
     }
-    const userName = sessionStorage.getItem('userName');
+    
     if (userName) {
         document.getElementById('sidebarUserName').textContent = userName;
     }
+    
     return true;
 }
 
-// ===== Add Sample Collections =====
-function addSampleCollections() {
-    const existing = localStorage.getItem('memonap_collections');
-    if (!existing || JSON.parse(existing).length === 0) {
-        const sampleCollections = [
-            { id: 101, name: "Travel Adventures", type: "travel", description: "All my amazing trips around the world", icon: "✈️", memoryIds: [], isLocked: false, password: null, createdAt: new Date().toISOString() },
-            { id: 102, name: "Family Moments", type: "family", description: "Precious times with family", icon: "❤️", memoryIds: [], isLocked: true, password: "1234", createdAt: new Date().toISOString() },
-            { id: 103, name: "Food & Cafes", type: "other", description: "Best food memories", icon: "🍕", memoryIds: [], isLocked: false, password: null, createdAt: new Date().toISOString() }
-        ];
-        localStorage.setItem('memonap_collections', JSON.stringify(sampleCollections));
-    }
+// ===== Initialize =====
+function init() {
+    checkAuth();
+    loadData();
 }
-// Add to collections.js - View All collections
-function setupViewAllButtons() {
-    const viewAllBtn = document.querySelector('.view-all');
-    if (viewAllBtn) {
-        viewAllBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            // Already on collections page, just scroll to top
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-    }
-}
-// Initialize
-addSampleCollections();
-checkAuth();
-loadData();
 
-console.log('%c📁 Collections Page Loaded with Lock & Hover Features!', 'color: #ff6b8b; font-size: 14px; font-weight: bold;');
+init();
+
+console.log('%c📁 Collections Page Loaded', 'color: #ff6b8b; font-size: 14px; font-weight: bold');

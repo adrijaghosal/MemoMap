@@ -76,12 +76,12 @@ const moodNames = {
 
 let allMemories = [];
 let userProfile = {
-    name: 'Sarah Johnson',
-    email: 'sarah@memonap.com',
+    name: 'Explorer',
+    email: 'explorer@memonap.com',
     avatar: '🌍',
     avatarType: 'emoji',
-    bio: 'Travel enthusiast & memory collector ✨',
-    quote: 'Collect moments, not things',
+    bio: 'Memory collector and travel enthusiast',
+    quote: 'Every place has a story...',
     joinDate: 'January 2024'
 };
 
@@ -89,35 +89,32 @@ let selectedAvatarType = 'emoji';
 let selectedAvatarValue = '🌍';
 let uploadedPhotoData = null;
 
-// ===== COMPLETE SAMPLE MEMORIES DATA =====
-const sampleMemories = [
-    { id: 1, title: "Eiffel Tower Visit", location: "Paris, France", date: "2024-06-15", mood: "happy", photos: [], tags: ["travel", "landmark", "france"], story: "Amazing experience watching the tower sparkle at night!" },
-    { id: 2, title: "Sunset at Marine Drive", location: "Mumbai, India", date: "2024-07-20", mood: "peaceful", photos: [], tags: ["sunset", "beach", "mumbai"], story: "Beautiful evening with friends" },
-    { id: 3, title: "First Date", location: "Delhi, India", date: "2024-08-10", mood: "loved", photos: [], tags: ["romance", "date", "delhi"], story: "Magical evening" },
-    { id: 4, title: "Mountain Trek", location: "Himachal, India", date: "2024-09-05", mood: "excited", photos: [], tags: ["adventure", "mountains", "trekking"], story: "Reached the summit!" },
-    { id: 5, title: "Beach Day in Goa", location: "Goa, India", date: "2024-09-20", mood: "happy", photos: [], tags: ["beach", "vacation", "goa"], story: "Perfect weather" },
-    { id: 6, title: "Tokyo Adventure", location: "Tokyo, Japan", date: "2024-10-01", mood: "excited", photos: [], tags: ["travel", "japan", "tokyo"], story: "Incredible sushi!" },
-    { id: 7, title: "Bali Sunset", location: "Bali, Indonesia", date: "2024-10-15", mood: "peaceful", photos: [], tags: ["sunset", "island", "bali"], story: "Magical sunset view" },
-    { id: 8, title: "Old School Memories", location: "Home", date: "2019-06-10", mood: "nostalgic", photos: [], tags: ["childhood", "school", "memories"], story: "Found old photo album" },
-    { id: 9, title: "Family Dinner", location: "Home", date: "2023-12-25", mood: "loved", photos: [], tags: ["family", "christmas", "dinner"], story: "All together" },
-    { id: 10, title: "New York City", location: "New York, USA", date: "2024-11-05", mood: "excited", photos: [], tags: ["travel", "nyc", "usa"], story: "Times Square was amazing!" }
-];
-
 // ===== Load Data =====
 function loadData() {
-    const stored = localStorage.getItem('memonap_memories');
-    if (stored && JSON.parse(stored).length > 0) {
-        allMemories = JSON.parse(stored);
-    } else {
-        allMemories = sampleMemories;
-        localStorage.setItem('memonap_memories', JSON.stringify(allMemories));
+    const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+    const userEmail = sessionStorage.getItem('userEmail');
+    const userName = sessionStorage.getItem('userName');
+    
+    if (!isLoggedIn || isLoggedIn !== 'true') {
+        window.location.href = 'login.html';
+        return;
     }
     
-    const storedProfile = localStorage.getItem('memonap_profile');
+    if (userName) {
+        document.getElementById('sidebarUserName').textContent = userName;
+    }
+    
+    // Load memories
+    const userId = userEmail || 'guest';
+    const memoriesKey = `memonap_memories_${userId}`;
+    const storedMemories = localStorage.getItem(memoriesKey);
+    allMemories = storedMemories ? JSON.parse(storedMemories) : [];
+    
+    // Load profile
+    const profileKey = `memonap_profile_${userId}`;
+    const storedProfile = localStorage.getItem(profileKey);
     if (storedProfile) {
         userProfile = JSON.parse(storedProfile);
-    } else {
-        localStorage.setItem('memonap_profile', JSON.stringify(userProfile));
     }
     
     updateProfileUI();
@@ -129,7 +126,7 @@ function updateProfileUI() {
     profileName.textContent = userProfile.name;
     profileEmail.textContent = userProfile.email;
     sidebarUserName.textContent = userProfile.name;
-    document.getElementById('joinDate').textContent = userProfile.joinDate;
+    document.getElementById('joinDate').textContent = userProfile.joinDate || 'January 2024';
     
     if (userProfile.avatarType === 'image' && userProfile.avatar) {
         profileAvatarEmoji.style.display = 'none';
@@ -162,7 +159,7 @@ function updateStats() {
     totalCitiesSpan.textContent = uniqueCities.size;
     
     const photoCount = allMemories.filter(m => m.photos && m.photos.length > 0).length;
-    totalPhotosSpan.textContent = photoCount + 32;
+    totalPhotosSpan.textContent = photoCount;
     
     const uniqueMoods = new Set(allMemories.map(m => m.mood));
     totalMoodsSpan.textContent = uniqueMoods.size;
@@ -170,6 +167,14 @@ function updateStats() {
 
 // ===== Update Journey Stats =====
 function updateJourneyStats() {
+    if (allMemories.length === 0) {
+        totalDaysSpan.textContent = '0';
+        totalPinsSpan.textContent = '0';
+        totalMomentsSpan.textContent = '0';
+        totalRatingSpan.textContent = '0';
+        return;
+    }
+    
     const dates = allMemories.map(m => new Date(m.date));
     const oldest = new Date(Math.min(...dates));
     const newest = new Date(Math.max(...dates));
@@ -179,16 +184,16 @@ function updateJourneyStats() {
     totalPinsSpan.textContent = allMemories.length;
     
     const photoCount = allMemories.filter(m => m.photos && m.photos.length > 0).length;
-    totalMomentsSpan.textContent = photoCount + allMemories.length + 32;
+    totalMomentsSpan.textContent = photoCount + allMemories.length;
     
     const happyCount = allMemories.filter(m => m.mood === 'happy').length;
     const peacefulCount = allMemories.filter(m => m.mood === 'peaceful').length;
     const lovedCount = allMemories.filter(m => m.mood === 'loved').length;
-    const score = Math.round(((happyCount + peacefulCount + lovedCount) / allMemories.length) * 100);
+    const score = allMemories.length > 0 ? Math.round(((happyCount + peacefulCount + lovedCount) / allMemories.length) * 100) : 85;
     totalRatingSpan.textContent = score;
 }
 
-// ===== Update Mood Chart (FULLY POPULATED) =====
+// ===== Update Mood Chart =====
 function updateMoodChart() {
     const moodCounts = {
         happy: 0, peaceful: 0, loved: 0,
@@ -201,17 +206,7 @@ function updateMoodChart() {
         }
     });
     
-    // Ensure no empty bars - add sample if needed
-    if (Object.values(moodCounts).every(v => v === 0)) {
-        moodCounts.happy = 12;
-        moodCounts.peaceful = 8;
-        moodCounts.loved = 6;
-        moodCounts.excited = 10;
-        moodCounts.nostalgic = 4;
-        moodCounts.sad = 2;
-    }
-    
-    const total = Object.values(moodCounts).reduce((a, b) => a + b, 0);
+    const total = allMemories.length || 1;
     const moodOrder = ['happy', 'peaceful', 'loved', 'excited', 'nostalgic', 'sad'];
     
     const chartHtml = moodOrder.map(mood => {
@@ -231,10 +226,9 @@ function updateMoodChart() {
     document.getElementById('moodChart').innerHTML = chartHtml;
 }
 
-// ===== Update Tags Cloud (FULLY POPULATED) =====
+// ===== Update Tags Cloud =====
 function updateTagsCloud() {
     const tagCounts = {};
-    
     allMemories.forEach(m => {
         if (m.tags && m.tags.length) {
             m.tags.forEach(tag => {
@@ -243,21 +237,7 @@ function updateTagsCloud() {
         }
     });
     
-    // Add default tags if empty
-    if (Object.keys(tagCounts).length === 0) {
-        tagCounts.travel = 12;
-        tagCounts.adventure = 8;
-        tagCounts.sunset = 6;
-        tagCounts.beach = 5;
-        tagCounts.family = 4;
-        tagCounts.friends = 7;
-        tagCounts.food = 3;
-        tagCounts.mountains = 5;
-        tagCounts.city = 6;
-        tagCounts.nature = 4;
-    }
-    
-    const sortedTags = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]).slice(0, 12);
+    const sortedTags = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]).slice(0, 15);
     
     const tagsHtml = sortedTags.map(([tag, count]) => `
         <span class="tag-item" style="font-size: ${0.7 + Math.min(count * 0.05, 0.5)}rem;">
@@ -265,10 +245,10 @@ function updateTagsCloud() {
         </span>
     `).join('');
     
-    document.getElementById('tagsCloud').innerHTML = tagsHtml;
+    document.getElementById('tagsCloud').innerHTML = tagsHtml || '<p style="color:#888;">No tags yet</p>';
 }
 
-// ===== Update Travel Stats (FULLY POPULATED) =====
+// ===== Update Travel Stats =====
 function updateTravelStats() {
     const countries = new Set();
     
@@ -281,41 +261,36 @@ function updateTravelStats() {
         else if (location.includes('mumbai') || location.includes('delhi') || location.includes('india')) countries.add('India');
         else if (location.includes('bali') || location.includes('indonesia')) countries.add('Indonesia');
         else if (location.includes('sydney') || location.includes('australia')) countries.add('Australia');
-        else if (location.includes('goa')) countries.add('India');
-        else if (location.includes('himachal')) countries.add('India');
-        else if (location.trim()) countries.add(location.split(',')[0].trim());
+        else countries.add(location.split(',')[0].trim());
     });
     
-    if (countries.size === 0) {
-        countries.add('India');
-        countries.add('France');
-        countries.add('Japan');
-        countries.add('USA');
-        countries.add('Indonesia');
+    countryCountSpan.textContent = countries.size || 0;
+    flightCountSpan.textContent = Math.floor(allMemories.length * 1.2) || 0;
+    hotelCountSpan.textContent = Math.floor(allMemories.length * 0.8) || 0;
+    
+    if (allMemories.length > 0) {
+        const oldest = new Date(Math.min(...allMemories.map(m => new Date(m.date))));
+        const newest = new Date(Math.max(...allMemories.map(m => new Date(m.date))));
+        const monthsDiff = (newest.getFullYear() - oldest.getFullYear()) * 12 + (newest.getMonth() - oldest.getMonth()) + 1;
+        memoriesPerMonthSpan.textContent = (allMemories.length / Math.max(monthsDiff, 1)).toFixed(1);
+    } else {
+        memoriesPerMonthSpan.textContent = '0';
     }
-    
-    countryCountSpan.textContent = countries.size;
-    flightCountSpan.textContent = Math.floor(allMemories.length * 1.2) + 12;
-    hotelCountSpan.textContent = Math.floor(allMemories.length * 0.8) + 10;
-    
-    const oldest = new Date(Math.min(...allMemories.map(m => new Date(m.date))));
-    const newest = new Date(Math.max(...allMemories.map(m => new Date(m.date))));
-    const monthsDiff = (newest.getFullYear() - oldest.getFullYear()) * 12 + (newest.getMonth() - oldest.getMonth()) + 1;
-    memoriesPerMonthSpan.textContent = (allMemories.length / Math.max(monthsDiff, 1)).toFixed(1);
 }
 
-// ===== Update Achievements (FULLY POPULATED) =====
+// ===== Update Achievements =====
 function updateAchievements() {
     const uniqueCities = new Set(allMemories.map(m => m.location.split(',')[0].trim()));
     const uniqueYears = new Set(allMemories.map(m => new Date(m.date).getFullYear()));
     const happyCount = allMemories.filter(m => m.mood === 'happy').length;
     const lovedCount = allMemories.filter(m => m.mood === 'loved').length;
     const photoCount = allMemories.filter(m => m.photos && m.photos.length > 0).length;
+    const totalMemories = allMemories.length;
     
     const achievements = [
-        { icon: "📸", name: "First Memory", desc: "Added your first memory", unlocked: allMemories.length >= 1, progress: 100 },
-        { icon: "🏆", name: "Memory Collector", desc: "10 memories saved", unlocked: allMemories.length >= 10, progress: Math.min(100, (allMemories.length / 10) * 100) },
-        { icon: "🌟", name: "Memory Master", desc: "50 memories saved", unlocked: allMemories.length >= 50, progress: Math.min(100, (allMemories.length / 50) * 100) },
+        { icon: "📸", name: "First Memory", desc: "Added your first memory", unlocked: totalMemories >= 1, progress: Math.min(100, (totalMemories / 1) * 100) },
+        { icon: "🏆", name: "Memory Collector", desc: "10 memories saved", unlocked: totalMemories >= 10, progress: Math.min(100, (totalMemories / 10) * 100) },
+        { icon: "🌟", name: "Memory Master", desc: "50 memories saved", unlocked: totalMemories >= 50, progress: Math.min(100, (totalMemories / 50) * 100) },
         { icon: "🌍", name: "World Explorer", desc: "Visited 5+ cities", unlocked: uniqueCities.size >= 5, progress: Math.min(100, (uniqueCities.size / 5) * 100) },
         { icon: "🗺️", name: "Globetrotter", desc: "Visited 10+ cities", unlocked: uniqueCities.size >= 10, progress: Math.min(100, (uniqueCities.size / 10) * 100) },
         { icon: "😊", name: "Happy Soul", desc: "10 happy memories", unlocked: happyCount >= 10, progress: Math.min(100, (happyCount / 10) * 100) },
@@ -330,52 +305,62 @@ function updateAchievements() {
             <div class="achievement-icon">${ach.icon}</div>
             <div class="achievement-name">${ach.name}</div>
             <div class="achievement-desc">${ach.desc}</div>
-            ${!ach.unlocked ? `<div class="achievement-progress"><div class="progress-bar" style="width: ${ach.progress}%"></div><span>${Math.floor(ach.progress)}%</span></div>` : '<div class="achievement-unlocked">✅ Unlocked!</div>'}
+            ${!ach.unlocked ? `<div class="achievement-progress" style="font-size:0.6rem; color:#888; margin-top:4px;">${Math.floor(ach.progress)}%</div>` : '<div style="font-size:0.6rem; color:#27ae60; margin-top:4px;">✅ Unlocked!</div>'}
         </div>
     `).join('');
     
     document.getElementById('achievementsGrid').innerHTML = achievementsHtml;
 }
 
-// ===== Update Recent Activity (FULLY POPULATED) =====
+// ===== Update Recent Activity =====
 function updateRecentActivity() {
-    const recentMemories = [...allMemories].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 6);
+    const sorted = [...allMemories].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
     
-    const activityHtml = recentMemories.map(m => `
+    const activityHtml = sorted.map(m => `
         <div class="activity-item">
             <div class="activity-icon">
                 <i class="ri-map-pin-fill"></i>
             </div>
             <div class="activity-details">
-                <div class="activity-title">Added "${m.title}"</div>
-                <div class="activity-time">${new Date(m.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</div>
+                <div class="activity-title">Added "${escapeHtml(m.title)}"</div>
+                <div class="activity-time">${new Date(m.date).toLocaleDateString()}</div>
             </div>
         </div>
     `).join('');
     
-    document.getElementById('activityList').innerHTML = activityHtml;
+    document.getElementById('activityList').innerHTML = activityHtml || '<p style="color:#888; text-align:center;">No activity yet</p>';
 }
 
-// ===== Update Favorite Places (FULLY POPULATED) =====
+// ===== Update Favorite Places =====
 function updateFavoritePlaces() {
     const placeCounts = {};
-    
     allMemories.forEach(m => {
         const place = m.location.split(',')[0].trim();
         placeCounts[place] = (placeCounts[place] || 0) + 1;
     });
     
-    const sortedPlaces = Object.entries(placeCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+    const sorted = Object.entries(placeCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
     
-    const placesHtml = sortedPlaces.map(([place, count], index) => `
+    const placesHtml = sorted.map(([place, count], index) => `
         <div class="favorite-place">
             <div class="place-rank">#${index + 1}</div>
-            <div class="place-name">${place}</div>
+            <div class="place-name">${escapeHtml(place)}</div>
             <div class="place-count">${count} memory${count > 1 ? 's' : ''}</div>
         </div>
     `).join('');
     
-    document.getElementById('favoritePlaces').innerHTML = placesHtml;
+    document.getElementById('favoritePlaces').innerHTML = placesHtml || '<p style="color:#888; text-align:center;">No places yet</p>';
+}
+
+// ===== Escape HTML =====
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    });
 }
 
 // ===== Edit Profile Functions =====
@@ -397,7 +382,9 @@ function saveProfile() {
     userProfile.bio = editBio.value;
     userProfile.quote = editQuote.value;
     
-    localStorage.setItem('memonap_profile', JSON.stringify(userProfile));
+    const userId = sessionStorage.getItem('userEmail') || 'guest';
+    localStorage.setItem(`memonap_profile_${userId}`, JSON.stringify(userProfile));
+    
     updateProfileUI();
     closeEditModalFunc();
     alert('Profile updated successfully!');
@@ -463,7 +450,9 @@ function saveAvatar() {
         userProfile.avatarType = 'image';
     }
     
-    localStorage.setItem('memonap_profile', JSON.stringify(userProfile));
+    const userId = sessionStorage.getItem('userEmail') || 'guest';
+    localStorage.setItem(`memonap_profile_${userId}`, JSON.stringify(userProfile));
+    
     updateProfileUI();
     closeAvatarModalFunc();
     alert('Avatar updated successfully!');
@@ -547,7 +536,6 @@ if (closeAvatarModal) closeAvatarModal.addEventListener('click', closeAvatarModa
 if (cancelAvatarBtn) cancelAvatarBtn.addEventListener('click', closeAvatarModalFunc);
 if (saveAvatarBtn) saveAvatarBtn.addEventListener('click', saveAvatar);
 
-// Close modals when clicking overlay
 document.querySelectorAll('.modal-overlay').forEach(overlay => {
     overlay.addEventListener('click', () => {
         closeEditModalFunc();
@@ -563,13 +551,17 @@ if (menuToggle) {
 }
 
 if (logoutBtn) {
-    logoutBtn.addEventListener('click', () => {
+    logoutBtn.addEventListener('click', async () => {
         sessionStorage.clear();
+        if (typeof firebase !== 'undefined' && firebase.auth) {
+            try {
+                await firebase.auth().signOut();
+            } catch(e) {}
+        }
         window.location.href = 'login.html';
     });
 }
 
-// Close sidebar when clicking outside on mobile
 document.addEventListener('click', (e) => {
     if (window.innerWidth <= 900) {
         if (sidebar && menuToggle && !sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
@@ -585,30 +577,9 @@ function checkAuth() {
         window.location.href = 'login.html';
     }
 }
-// Add to profile.js - View All achievements/activities
-function setupViewAllButtons() {
-    // View all achievements
-    const achievementsSection = document.querySelector('.achievements-grid');
-    const viewAllAchievements = document.querySelector('.info-card:first-child .view-all');
-    if (viewAllAchievements) {
-        viewAllAchievements.addEventListener('click', (e) => {
-            e.preventDefault();
-            alert('🏆 All achievements are shown above! Keep adding memories to unlock more.');
-        });
-    }
-    
-    // View all activities
-    const viewAllActivities = document.querySelector('.info-card:nth-child(2) .view-all');
-    if (viewAllActivities) {
-        viewAllActivities.addEventListener('click', (e) => {
-            e.preventDefault();
-            window.location.href = 'timeline.html';
-        });
-    }
-}
 
-// Initialize
+// ===== Initialize =====
 checkAuth();
 loadData();
 
-console.log('%c👤 Profile Page Loaded - All Sections Populated!', 'color: #ff6b8b; font-size: 14px; font-weight: bold;');
+console.log('%c👤 Profile Page Loaded', 'color: #ff6b8b; font-size: 14px; font-weight: bold');

@@ -2,289 +2,316 @@
 const menuToggle = document.getElementById('menuToggle');
 const sidebar = document.getElementById('sidebar');
 const logoutBtn = document.getElementById('logoutBtn');
+const yearFilter = document.getElementById('yearFilter');
 const timelineTrack = document.getElementById('timelineTrack');
 const emptyState = document.getElementById('emptyState');
-const yearsContainer = document.getElementById('yearsContainer');
-const prevYearBtn = document.getElementById('prevYear');
-const nextYearBtn = document.getElementById('nextYear');
-const currentYearValue = document.getElementById('currentYearValue');
+const totalYearsSpan = document.getElementById('totalYears');
+const totalMemoriesSpan = document.getElementById('totalMemories');
+const totalPhotosSpan = document.getElementById('totalPhotos');
+const totalCitiesSpan = document.getElementById('totalCities');
 
-// Popup elements
-const welcomePopup = document.getElementById('welcomePopup');
-const closePopup = document.getElementById('closePopup');
-const popupMessage = document.getElementById('popupMessage');
-const viewLatestBtn = document.getElementById('viewLatestBtn');
-const exploreBtn = document.getElementById('exploreBtn');
-
-// Modal elements
+// Modal Elements
 const memoryModal = document.getElementById('memoryModal');
 const closeModal = document.getElementById('closeModal');
-const modalOverlay = document.querySelector('.modal-overlay');
-
-// Mood emojis
-const moodEmoji = {
-    happy: '😊', peaceful: '😌', loved: '❤️', excited: '😎', nostalgic: '📸', sad: '😢'
-};
+const viewFullMemoryBtn = document.getElementById('viewFullMemoryBtn');
 
 let allMemories = [];
-let currentYear = new Date().getFullYear();
-let selectedMemoryId = null;
+let currentUserId = null;
+let currentMemoryId = null;
+
+// Mood Emojis
+const moodEmoji = {
+    happy: '😊', peaceful: '😌', loved: '❤️',
+    excited: '😎', nostalgic: '📸', sad: '😢'
+};
 
 // ===== Helper Functions =====
 function escapeHtml(str) {
     if (!str) return '';
-    return str.replace(/[&<>]/g, function(m) {
-        if (m === '&') return '&amp;';
-        if (m === '<') return '&lt;';
-        if (m === '>') return '&gt;';
-        return m;
+    return String(str).replace(/[&<>"']/g, function (m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
     });
 }
 
 function formatDate(dateString) {
-    const date = new Date(dateString);
+    if (!dateString) return 'Unknown date';
+    const date = new Date(dateString + 'T00:00:00'); // force local time parse
     return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
-// ===== Load Memories =====
-function loadMemories() {
-    const stored = localStorage.getItem('memonap_memories');
-    if (stored && JSON.parse(stored).length > 0) {
-        allMemories = JSON.parse(stored);
-        emptyState.style.display = 'none';
-        renderYearSelector();
-        renderTimeline();
-        checkAndShowPopup();
-    } else {
-        allMemories = [];
-        emptyState.style.display = 'block';
-        timelineTrack.innerHTML = '';
-    }
+function formatShortDate(dateString) {
+    if (!dateString) return '';
+    const date = new Date(dateString + 'T00:00:00');
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
-// ===== Render Year Selector =====
-function renderYearSelector() {
-    const years = [...new Set(allMemories.map(m => new Date(m.date).getFullYear()))];
+function getYear(dateString) {
+    if (!dateString) return 'Unknown';
+    return new Date(dateString + 'T00:00:00').getFullYear();
+}
+
+// ===== Load User Data =====
+function loadUserData() {
+    const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+    const userEmail = sessionStorage.getItem('userEmail');
+    const userName = sessionStorage.getItem('userName');
+
+    // Redirect if not logged in
+    if (!isLoggedIn || isLoggedIn !== 'true') {
+        window.location.href = 'login.html';
+        return [];
+    }
+
+    const nameEl = document.getElementById('sidebarUserName');
+    if (nameEl && userName) nameEl.textContent = userName;
+
+    currentUserId = userEmail || 'guest';
+    const memoriesKey = `memonap_memories_${currentUserId}`;
+
+    let stored = null;
+    try {
+        stored = localStorage.getItem(memoriesKey);
+    } catch (e) {
+        console.error('localStorage read error:', e);
+    }
+
+    // Parse & validate each memory has the required fields
+    let parsed = [];
+    if (stored) {
+        try {
+            parsed = JSON.parse(stored);
+            if (!Array.isArray(parsed)) parsed = [];
+        } catch (e) {
+            console.error('Failed to parse memories:', e);
+            parsed = [];
+        }
+    }
+
+    // Filter out any corrupt entries missing required fields
+    allMemories = parsed.filter(m =>
+        m && m.id && m.title && m.date && m.location && m.mood
+    );
+
+    // Re-save cleaned data (removes corrupt entries silently)
+    if (allMemories.length !== parsed.length) {
+        try {
+            localStorage.setItem(memoriesKey, JSON.stringify(allMemories));
+        } catch (e) {}
+    }
+
+    console.log(`📊 Loaded ${allMemories.length} valid memories for: ${currentUserId}`);
+    return allMemories;
+}
+
+// ===== Update Stats =====
+function updateStats() {
+    totalMemoriesSpan.textContent = allMemories.length;
+
+    const uniqueYears = new Set(allMemories.map(m => getYear(m.date)));
+    totalYearsSpan.textContent = uniqueYears.size;
+
+    // Count memories that have at least one photo
+    const photoCount = allMemories.filter(m => m.photos && m.photos.length > 0).length;
+    totalPhotosSpan.textContent = photoCount;
+
+    const uniqueCities = new Set(
+        allMemories
+            .map(m => m.location ? m.location.split(',')[0].trim() : null)
+            .filter(Boolean)
+    );
+    totalCitiesSpan.textContent = uniqueCities.size;
+}
+
+// ===== Group Memories by Year =====
+function groupMemoriesByYear(memories) {
+    const grouped = {};
+    memories.forEach(memory => {
+        const year = getYear(memory.date);
+        if (!grouped[year]) grouped[year] = [];
+        grouped[year].push(memory);
+    });
+    return grouped;
+}
+
+// ===== Update Year Filter =====
+function updateYearFilter(memories) {
+    const years = [...new Set(memories.map(m => getYear(m.date)))];
     years.sort((a, b) => b - a);
-    
-    if (years.length === 0) return;
-    
-    yearsContainer.innerHTML = years.map(year => `
-        <div class="year-chip ${year === currentYear ? 'active' : ''}" data-year="${year}">
-            ${year}
-        </div>
-    `).join('');
-    
-    currentYearValue.textContent = currentYear;
-    
-    document.querySelectorAll('.year-chip').forEach(chip => {
-        chip.addEventListener('click', () => {
-            document.querySelectorAll('.year-chip').forEach(c => c.classList.remove('active'));
-            chip.classList.add('active');
-            currentYear = parseInt(chip.dataset.year);
-            currentYearValue.textContent = currentYear;
-            renderTimeline();
-        });
+
+    yearFilter.innerHTML = '<option value="all">All Years</option>';
+    years.forEach(year => {
+        const opt = document.createElement('option');
+        opt.value = year;
+        opt.textContent = year;
+        yearFilter.appendChild(opt);
     });
 }
 
-// ===== Render Horizontal Timeline =====
+// ===== Render Timeline =====
 function renderTimeline() {
-    const filteredMemories = allMemories.filter(m => new Date(m.date).getFullYear() === currentYear);
-    filteredMemories.sort((a, b) => new Date(b.date) - new Date(a.date));
-    
-    if (filteredMemories.length === 0) {
-        timelineTrack.innerHTML = `<div style="text-align: center; width: 100%; padding: 2rem; color: #888;">No memories in ${currentYear}</div>`;
+    if (allMemories.length === 0) {
+        if (timelineTrack) timelineTrack.style.display = 'none';
+        if (emptyState) emptyState.style.display = 'block';
         return;
     }
-    
-    timelineTrack.innerHTML = filteredMemories.map(memory => `
-        <div class="memory-slide" data-id="${memory.id}">
-            <div class="memory-slide-media">
-                ${memory.photos && memory.photos.length > 0 ? 
-                    `<img src="${memory.photos[0].data}" alt="${escapeHtml(memory.title)}">` :
-                    `<i class="ri-image-line"></i>`
-                }
-                ${memory.video ? `<div class="video-badge"><i class="ri-video-line"></i> Video</div>` : ''}
+
+    if (timelineTrack) timelineTrack.style.display = 'flex';
+    if (emptyState) emptyState.style.display = 'none';
+
+    const grouped = groupMemoriesByYear(allMemories);
+    const sortedYears = Object.keys(grouped).sort((a, b) => b - a);
+    const selectedYear = yearFilter.value;
+
+    const yearsToShow = selectedYear !== 'all'
+        ? sortedYears.filter(y => String(y) === String(selectedYear))
+        : sortedYears;
+
+    if (yearsToShow.length === 0) {
+        timelineTrack.innerHTML = '<p style="padding:2rem;color:#aaa;">No memories for this year.</p>';
+        return;
+    }
+
+    timelineTrack.innerHTML = yearsToShow.map(year => {
+        const yearMemories = [...grouped[year]].sort((a, b) => new Date(b.date) - new Date(a.date));
+        const monthCount = new Set(yearMemories.map(m => new Date(m.date + 'T00:00:00').getMonth())).size;
+
+        return `
+            <div class="year-section" data-year="${year}">
+                <div class="year-header">
+                    <h3>${year}</h3>
+                    <p>${yearMemories.length} ${yearMemories.length === 1 ? 'memory' : 'memories'} &bull; ${monthCount} ${monthCount === 1 ? 'month' : 'months'}</p>
+                </div>
+                <div class="year-memories">
+                    ${yearMemories.map(memory => `
+                        <div class="timeline-memory-card" data-id="${memory.id}">
+                            <div class="memory-card-image">
+                                ${memory.photos && memory.photos.length > 0
+                                    ? `<img src="${memory.photos[0].data}" alt="${escapeHtml(memory.title)}" loading="lazy">`
+                                    : '<i class="ri-image-line"></i>'
+                                }
+                            </div>
+                            <div class="memory-card-details">
+                                <div class="memory-card-title">
+                                    ${escapeHtml(memory.title)}
+                                    ${memory.timeCapsule
+                                        ? '<span class="time-capsule-badge"><i class="ri-time-fill"></i> Capsule</span>'
+                                        : ''
+                                    }
+                                </div>
+                                <div class="memory-card-location">
+                                    <i class="ri-map-pin-line"></i> ${escapeHtml(memory.location)}
+                                </div>
+                                <div class="memory-card-date">
+                                    <i class="ri-calendar-line"></i> ${formatShortDate(memory.date)}
+                                </div>
+                                <div class="memory-card-mood">
+                                    ${moodEmoji[memory.mood] || '📝'} ${escapeHtml(memory.mood)}
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
             </div>
-            <div class="memory-slide-content">
-                <div class="memory-slide-title">${escapeHtml(memory.title)}</div>
-                <div class="memory-slide-location">
-                    <i class="ri-map-pin-line"></i> ${escapeHtml(memory.location)}
-                </div>
-                <div class="memory-slide-date">
-                    <i class="ri-calendar-line"></i> ${formatDate(memory.date)}
-                </div>
-                <div class="memory-slide-mood">
-                    ${moodEmoji[memory.mood] || '📝'} ${memory.mood}
-                </div>
-            </div>
-        </div>
-    `).join('');
-    
-    document.querySelectorAll('.memory-slide').forEach(slide => {
-        slide.addEventListener('click', () => {
-            const id = parseInt(slide.dataset.id);
+        `;
+    }).join('');
+
+    // Attach click events to cards
+    document.querySelectorAll('.timeline-memory-card').forEach(card => {
+        card.addEventListener('click', () => {
+            const id = Number(card.dataset.id);
             openMemoryModal(id);
         });
     });
 }
 
-// ===== Check and Show Welcome Popup =====
-function checkAndShowPopup() {
-    const hasSeenPopup = sessionStorage.getItem('hasSeenTimelinePopup');
-    if (!hasSeenPopup) {
-        const latestMemory = getLatestMemory();
-        if (latestMemory) {
-            popupMessage.innerHTML = `You have <strong>${allMemories.length} memories</strong> from the past years.<br>Your latest memory: <strong>"${escapeHtml(latestMemory.title)}"</strong>`;
-        } else {
-            popupMessage.innerHTML = `You have <strong>${allMemories.length} memories</strong> to explore!`;
-        }
-        welcomePopup.classList.add('active');
-        sessionStorage.setItem('hasSeenTimelinePopup', 'true');
-    }
-}
-
-// ===== Get Latest Memory =====
-function getLatestMemory() {
-    if (allMemories.length === 0) return null;
-    const sorted = [...allMemories].sort((a, b) => new Date(b.date) - new Date(a.date));
-    return sorted[0];
-}
-
 // ===== Open Memory Modal =====
 function openMemoryModal(id) {
-    const memory = allMemories.find(m => m.id === id);
+    const memory = allMemories.find(m => Number(m.id) === id);
     if (!memory) return;
-    
-    selectedMemoryId = id;
-    
+
+    currentMemoryId = id;
+
     document.getElementById('modalTitle').textContent = memory.title;
-    document.getElementById('modalLocation').textContent = memory.location;
-    document.getElementById('modalDate').textContent = formatDate(memory.date);
-    document.getElementById('modalMood').innerHTML = `${moodEmoji[memory.mood] || '📝'} ${memory.mood}`;
-    document.getElementById('modalStory').innerHTML = memory.story ? `<p>${escapeHtml(memory.story)}</p>` : '<p><em>No story added yet.</em></p>';
-    
-    const modalImage = document.getElementById('modalImage');
-    if (memory.photos && memory.photos.length > 0) {
-        modalImage.src = memory.photos[0].data;
-        modalImage.style.display = 'block';
-    } else {
-        modalImage.style.display = 'none';
-    }
-    
-    const tagsContainer = document.getElementById('modalTags');
-    if (memory.tags && memory.tags.length > 0) {
-        tagsContainer.innerHTML = memory.tags.map(tag => `<span class="modal-tag">#${escapeHtml(tag)}</span>`).join('');
-    } else {
-        tagsContainer.innerHTML = '';
-    }
-    
+
+    document.getElementById('modalBody').innerHTML = `
+        <div class="modal-memory-img">
+            ${memory.photos && memory.photos.length > 0
+                ? `<img src="${memory.photos[0].data}" alt="${escapeHtml(memory.title)}">`
+                : '<i class="ri-image-line" style="font-size:3rem;color:#ff6b8b;opacity:0.4;"></i>'
+            }
+        </div>
+        <div class="modal-memory-title">${escapeHtml(memory.title)}</div>
+        <div class="modal-memory-location"><i class="ri-map-pin-line"></i> ${escapeHtml(memory.location)}</div>
+        <div class="modal-memory-date"><i class="ri-calendar-line"></i> ${formatDate(memory.date)}</div>
+        <div class="modal-memory-mood">
+            <i class="ri-emotion-line"></i> ${moodEmoji[memory.mood] || '📝'} ${escapeHtml(memory.mood)}
+        </div>
+        ${memory.story
+            ? `<div class="modal-memory-story">${escapeHtml(memory.story)}</div>`
+            : ''
+        }
+        ${memory.timeCapsule
+            ? `<div class="modal-memory-story" style="background:#fef3c7;">
+                <i class="ri-time-fill"></i> 🔒 Time Capsule — unlocks after ${memory.capsuleTime || 1} year(s)
+               </div>`
+            : ''
+        }
+    `;
+
     memoryModal.classList.add('active');
 }
 
-// ===== Close Modal =====
 function closeMemoryModal() {
     memoryModal.classList.remove('active');
-    selectedMemoryId = null;
+    currentMemoryId = null;
 }
 
-// ===== Delete Memory =====
-function deleteMemory() {
-    if (selectedMemoryId && confirm('Are you sure you want to delete this memory? This action cannot be undone.')) {
-        allMemories = allMemories.filter(m => m.id !== selectedMemoryId);
-        localStorage.setItem('memonap_memories', JSON.stringify(allMemories));
-        closeMemoryModal();
-        loadMemories();
+function viewFullMemory() {
+    if (currentMemoryId) {
+        window.location.href = `memory-detail.html?id=${currentMemoryId}`;
     }
 }
 
-// ===== Edit Memory =====
-function editMemory() {
-    if (selectedMemoryId) {
-        localStorage.setItem('editMemoryId', selectedMemoryId);
-        window.location.href = 'add-memory.html';
-    }
+// ===== Sidebar =====
+function toggleSidebar() {
+    sidebar.classList.toggle('open');
 }
 
-// ===== Year Navigation =====
-function scrollYears(direction) {
-    yearsContainer.scrollBy({ left: direction * 100, behavior: 'smooth' });
+async function handleLogout() {
+    sessionStorage.clear();
+    if (typeof firebase !== 'undefined' && firebase.auth) {
+        try { await firebase.auth().signOut(); } catch (e) {}
+    }
+    window.location.href = 'login.html';
 }
 
 // ===== Event Listeners =====
-prevYearBtn?.addEventListener('click', () => scrollYears(-100));
-nextYearBtn?.addEventListener('click', () => scrollYears(100));
+if (yearFilter) yearFilter.addEventListener('change', renderTimeline);
+if (closeModal) closeModal.addEventListener('click', closeMemoryModal);
+if (viewFullMemoryBtn) viewFullMemoryBtn.addEventListener('click', viewFullMemory);
+if (memoryModal) {
+    memoryModal.querySelector('.modal-overlay')?.addEventListener('click', closeMemoryModal);
+}
+if (menuToggle) menuToggle.addEventListener('click', toggleSidebar);
+if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
 
-closePopup?.addEventListener('click', () => welcomePopup.classList.remove('active'));
-document.querySelector('.popup-overlay')?.addEventListener('click', () => welcomePopup.classList.remove('active'));
-
-viewLatestBtn?.addEventListener('click', () => {
-    const latest = getLatestMemory();
-    if (latest) {
-        welcomePopup.classList.remove('active');
-        openMemoryModal(latest.id);
+// Close sidebar on outside click (mobile)
+document.addEventListener('click', (e) => {
+    if (window.innerWidth <= 900) {
+        if (sidebar && menuToggle && !sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+            sidebar.classList.remove('open');
+        }
     }
 });
 
-exploreBtn?.addEventListener('click', () => {
-    welcomePopup.classList.remove('active');
-});
-
-closeModal?.addEventListener('click', closeMemoryModal);
-modalOverlay?.addEventListener('click', closeMemoryModal);
-
-document.getElementById('editMemoryBtn')?.addEventListener('click', editMemory);
-document.getElementById('deleteMemoryBtn')?.addEventListener('click', deleteMemory);
-
-menuToggle?.addEventListener('click', () => sidebar.classList.toggle('open'));
-logoutBtn?.addEventListener('click', () => {
-    sessionStorage.clear();
-    window.location.href = 'login.html';
-});
-
-// ===== Check Auth =====
-function checkAuth() {
-    const isLoggedIn = sessionStorage.getItem('isLoggedIn');
-    if (!isLoggedIn || isLoggedIn !== 'true') {
-        window.location.href = 'login.html';
-        return false;
-    }
-    const userName = sessionStorage.getItem('userName');
-    if (userName) {
-        document.getElementById('sidebarUserName').textContent = userName;
-    }
-    return true;
+// ===== Initialize =====
+function init() {
+    loadUserData();
+    updateStats();
+    updateYearFilter(allMemories);
+    renderTimeline();
 }
 
-// ===== Sample Data =====
-function addSampleData() {
-    const existing = localStorage.getItem('memonap_memories');
-    if (!existing || JSON.parse(existing).length === 0) {
-        const sample = [
-            { id: 1, title: "🎓 Graduation Day", location: "Mumbai, India", date: "2024-05-15", mood: "happy", photos: [], story: "Finally graduated after 4 years of hard work!", tags: ["graduation", "celebration"] },
-            { id: 2, title: "🏔️ Himalayan Trek", location: "Himachal, India", date: "2024-08-20", mood: "excited", photos: [], story: "The view from the top was breathtaking!", tags: ["adventure", "mountains"] },
-            { id: 3, title: "🍕 First Date", location: "Delhi, India", date: "2024-10-10", mood: "loved", photos: [], story: "Best pizza and best company!", tags: ["romance", "date"] },
-            { id: 4, title: "🌊 Beach Sunset", location: "Goa, India", date: "2023-12-25", mood: "peaceful", photos: [], story: "The most beautiful sunset I've ever seen", tags: ["beach", "sunset"] }
-        ];
-        localStorage.setItem('memonap_memories', JSON.stringify(sample));
-    }
-}
-// Add to timeline.js - View All years
-function setupViewAllButtons() {
-    const viewAllBtn = document.querySelector('.view-all');
-    if (viewAllBtn) {
-        viewAllBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            yearFilter.value = 'all';
-            yearFilter.dispatchEvent(new Event('change'));
-        });
-    }
-}
+init();
 
-// Initialize
-addSampleData();
-checkAuth();
-loadMemories();
-
-console.log('%c📅 Timeline Page Loaded', 'color: #ff6b8b; font-size: 14px; font-weight: bold;');
+console.log('%c📅 Timeline loaded — showing real user data only', 'color: #ff6b8b; font-size: 13px; font-weight: bold');

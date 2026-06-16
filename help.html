@@ -10,6 +10,20 @@
 </head>
 <body>
 
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="floating-icon icon-1">📍</div>
+        <div class="floating-icon icon-2">🗺️</div>
+        <div class="floating-icon icon-3">📸</div>
+        <div class="floating-icon icon-4">✨</div>
+        <div class="floating-icon icon-5">❤️</div>
+        <div class="floating-icon icon-6">🌟</div>
+        <div class="pulse-circle circle-1"></div>
+        <div class="pulse-circle circle-2"></div>
+        <div class="floating-shape shape-1"></div>
+        <div class="floating-shape shape-2"></div>
+    </div>
+
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-logo">
@@ -48,21 +62,33 @@
                 <i class="ri-folder-line"></i>
                 <span>Collections</span>
             </a>
-            <a href="profile.html" class="nav-item">
-                <i class="ri-user-line"></i>
-                <span>Profile</span>
-            </a>
             <a href="nostalgia.html" class="nav-item">
                 <i class="ri-emotion-line"></i>
                 <span>Nostalgia</span>
             </a>
-            <a href="settings.html" class="nav-item">
-                <i class="ri-settings-line"></i>
-                <span>Settings</span>
+            <a href="diary.html" class="nav-item">
+                <i class="ri-book-open-line"></i>
+                <span>Digital Diary</span>
+            </a>
+            <a href="profile.html" class="nav-item">
+                <i class="ri-user-line"></i>
+                <span>Profile</span>
+            </a>
+            
+            <div class="nav-divider"></div>
+            
+            <a href="notifications.html" class="nav-item">
+                <i class="ri-notification-3-line"></i>
+                <span>Notifications</span>
+                <span class="nav-badge" id="sidebarNotificationBadge">0</span>
             </a>
             <a href="help.html" class="nav-item active">
                 <i class="ri-question-line"></i>
-                <span>Help</span>
+                <span>Help & Support</span>
+            </a>
+            <a href="settings.html" class="nav-item">
+                <i class="ri-settings-line"></i>
+                <span>Settings</span>
             </a>
         </nav>
         
@@ -86,9 +112,9 @@
                 </div>
             </div>
             <div class="header-right">
-                <div class="user-avatar">
+                <a href="profile.html" class="user-avatar" style="text-decoration: none;">
                     <span>🌍</span>
-                </div>
+                </a>
             </div>
         </header>
 
@@ -111,6 +137,7 @@
 
         <!-- FAQ Section -->
         <div class="faq-section">
+            <!-- FAQ items (same as before) -->
             <div class="faq-item" data-category="getting-started">
                 <div class="faq-question">
                     <span>🚀 How do I create my first memory?</span>
@@ -163,7 +190,7 @@
                     <i class="ri-arrow-down-s-line"></i>
                 </div>
                 <div class="faq-answer">
-                    <p>A Time Capsule is a special memory that you can lock for 1, 5, or 10 years. Until the unlock date, the memory is hidden and can only be viewed when the time comes. It's perfect for writing letters to your future self!</p>
+                    <p>A Time Capsule is a special memory that you can lock for 1, 5, or 10 years (or custom years). Until the unlock date, the memory is hidden and can only be viewed when the time comes. It's perfect for writing letters to your future self!</p>
                 </div>
             </div>
 
@@ -228,22 +255,27 @@
             </div>
         </div>
 
-        <!-- Contact Support -->
+        <!-- Contact Support - Perfect Alignment -->
         <div class="contact-section">
             <div class="contact-card">
-                <i class="ri-customer-service-line"></i>
+                <div class="contact-icon-wrapper">
+                    <i class="ri-customer-service-line"></i>
+                </div>
                 <h3>Still have questions?</h3>
                 <p>Our support team is here to help you</p>
                 <div class="contact-buttons">
                     <button class="contact-btn email" id="emailSupportBtn">
-                        <i class="ri-mail-line"></i> Email Support
+                        <span class="btn-icon"><i class="ri-mail-line"></i></span>
+                        <span class="btn-text">Email Support</span>
                     </button>
                     <button class="contact-btn chat" id="liveChatBtn">
-                        <i class="ri-chat-3-line"></i> Live Chat
+                        <span class="btn-icon"><i class="ri-chat-3-line"></i></span>
+                        <span class="btn-text">Live Chat</span>
                     </button>
                 </div>
                 <div class="response-time">
-                    <i class="ri-time-line"></i> Response time: Usually within 24 hours
+                    <span class="resp-icon"><i class="ri-time-line"></i></span>
+                    <span class="resp-text">Response time: Usually within 24 hours</span>
                 </div>
             </div>
         </div>
@@ -284,7 +316,17 @@
             </div>
         </div>
     </div>
-
+<!-- Theme Loader - Must be loaded before page scripts -->
+<script src="./js/theme-loader.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    
+    <!-- Firebase Config & Auth -->
+    <script src="./js/firebase-config.js"></script>
+    <script src="./js/auth.js"></script>
+    
+    <!-- Help Script -->
     <script src="./js/help.js"></script>
 </body>
 </html>

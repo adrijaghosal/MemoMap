@@ -1,3 +1,7 @@
+// ============================================
+// MEMOMAP - SIGNUP PAGE SCRIPT
+// ============================================
+
 // Get DOM elements
 const fullnameInput = document.getElementById('fullname');
 const emailInput = document.getElementById('email');
@@ -9,22 +13,18 @@ const termsCheckbox = document.getElementById('termsCheckbox');
 const togglePassword = document.getElementById('togglePassword');
 const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
 const passwordStrengthDiv = document.getElementById('passwordStrength');
+const authMessageDiv = document.getElementById('authMessage');
 
-// Create message containers
-let messageDiv = document.querySelector('.error-message');
-if (!messageDiv) {
-    messageDiv = document.createElement('div');
-    messageDiv.className = 'error-message';
-    const authForm = document.querySelector('.auth-form');
-    authForm.insertBefore(messageDiv, authForm.firstChild);
-}
-
-let successDiv = document.querySelector('.success-message');
-if (!successDiv) {
-    successDiv = document.createElement('div');
-    successDiv.className = 'success-message';
-    const authForm = document.querySelector('.auth-form');
-    authForm.insertBefore(successDiv, authForm.firstChild);
+// Message helper
+function showMessage(message, isError = true) {
+    if (authMessageDiv) {
+        authMessageDiv.textContent = message;
+        authMessageDiv.className = `message ${isError ? 'message-error' : 'message-success'}`;
+        authMessageDiv.style.display = 'block';
+        setTimeout(() => {
+            authMessageDiv.style.display = 'none';
+        }, 4000);
+    }
 }
 
 // Toggle password visibility
@@ -46,27 +46,10 @@ if (toggleConfirmPassword) {
     });
 }
 
-// Show message function
-function showMessage(message, isError = true) {
-    if (isError) {
-        messageDiv.textContent = message;
-        messageDiv.style.display = 'block';
-        successDiv.style.display = 'none';
-        setTimeout(() => {
-            messageDiv.style.display = 'none';
-        }, 3000);
-    } else {
-        successDiv.textContent = message;
-        successDiv.style.display = 'block';
-        messageDiv.style.display = 'none';
-        setTimeout(() => {
-            successDiv.style.display = 'none';
-        }, 2000);
-    }
-}
-
 // Password strength checker
 function checkPasswordStrength(password) {
+    if (!passwordStrengthDiv) return;
+    
     let strength = 0;
     
     if (password.length >= 6) strength++;
@@ -80,31 +63,33 @@ function checkPasswordStrength(password) {
     const strengthText = passwordStrengthDiv.querySelector('.strength-text');
     
     if (password.length === 0) {
-        strengthText.textContent = 'Enter a password';
+        if (strengthText) strengthText.textContent = 'Enter a password';
         return 0;
     }
     
     if (strength <= 2) {
         passwordStrengthDiv.classList.add('weak');
-        strengthText.textContent = 'Weak password';
+        if (strengthText) strengthText.textContent = 'Weak password';
     } else if (strength === 3) {
         passwordStrengthDiv.classList.add('fair');
-        strengthText.textContent = 'Fair password';
+        if (strengthText) strengthText.textContent = 'Fair password';
     } else if (strength === 4) {
         passwordStrengthDiv.classList.add('good');
-        strengthText.textContent = 'Good password';
+        if (strengthText) strengthText.textContent = 'Good password';
     } else {
         passwordStrengthDiv.classList.add('strong');
-        strengthText.textContent = 'Strong password!';
+        if (strengthText) strengthText.textContent = 'Strong password!';
     }
     
     return strength;
 }
 
 // Real-time password strength check
-passwordInput.addEventListener('input', () => {
-    checkPasswordStrength(passwordInput.value);
-});
+if (passwordInput) {
+    passwordInput.addEventListener('input', () => {
+        checkPasswordStrength(passwordInput.value);
+    });
+}
 
 // Validate email
 function isValidEmail(email) {
@@ -112,112 +97,124 @@ function isValidEmail(email) {
     return emailRegex.test(email);
 }
 
-// Handle signup
-function handleSignup() {
-    const fullname = fullnameInput.value.trim();
-    const email = emailInput.value.trim();
-    const password = passwordInput.value;
-    const confirmPassword = confirmPasswordInput.value;
+// Handle signup with Firebase
+async function handleSignup() {
+    const fullname = fullnameInput?.value.trim();
+    const email = emailInput?.value.trim();
+    const password = passwordInput?.value;
+    const confirmPassword = confirmPasswordInput?.value;
     
-    // Validation
     if (!fullname || !email || !password || !confirmPassword) {
-        showMessage('Please fill in all fields');
+        showMessage('Please fill in all fields', true);
         return;
     }
     
     if (fullname.length < 2) {
-        showMessage('Please enter your full name');
+        showMessage('Please enter your full name', true);
         return;
     }
     
     if (!isValidEmail(email)) {
-        showMessage('Please enter a valid email address');
+        showMessage('Please enter a valid email address', true);
         return;
     }
     
     if (password.length < 6) {
-        showMessage('Password must be at least 6 characters');
+        showMessage('Password must be at least 6 characters', true);
         return;
     }
     
     if (password !== confirmPassword) {
-        showMessage('Passwords do not match');
+        showMessage('Passwords do not match', true);
         return;
     }
     
-    if (!termsCheckbox.checked) {
-        showMessage('Please agree to the Terms of Service and Privacy Policy');
+    if (termsCheckbox && !termsCheckbox.checked) {
+        showMessage('Please agree to the Terms of Service and Privacy Policy', true);
         return;
     }
     
-    // Show loading state
-    signupBtn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i> Creating account...';
-    signupBtn.disabled = true;
+    if (signupBtn) {
+        signupBtn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i> Creating account...';
+        signupBtn.disabled = true;
+    }
     
-    // Simulate API call (replace with Firebase Auth later)
-    setTimeout(() => {
-        // Check if email already exists (demo)
-        const existingUsers = JSON.parse(localStorage.getItem('memonap_users') || '[]');
+    try {
+        // Call Firebase signUp function from auth.js
+        const result = await signUp(email, password, fullname);
         
-        if (existingUsers.some(user => user.email === email)) {
-            showMessage('Email already registered. Please login instead.');
+        if (result) {
+            showMessage('Account created successfully! Redirecting...', false);
+            
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1500);
+        } else {
+            if (signupBtn) {
+                signupBtn.innerHTML = '<span>Create Account</span><i class="ri-arrow-right-line"></i>';
+                signupBtn.disabled = false;
+            }
+        }
+    } catch (error) {
+        showMessage(error.message || 'Signup failed. Please try again.', true);
+        if (signupBtn) {
             signupBtn.innerHTML = '<span>Create Account</span><i class="ri-arrow-right-line"></i>';
             signupBtn.disabled = false;
-            return;
         }
-        
-        // Save user to localStorage (demo)
-        const newUser = {
-            fullname: fullname,
-            email: email,
-            createdAt: new Date().toISOString()
-        };
-        existingUsers.push(newUser);
-        localStorage.setItem('memonap_users', JSON.stringify(existingUsers));
-        
-        // Store login session
-        sessionStorage.setItem('isLoggedIn', 'true');
-        sessionStorage.setItem('userEmail', email);
-        sessionStorage.setItem('userName', fullname);
-        
-        showMessage('Account created successfully! Redirecting...', false);
-        
-        setTimeout(() => {
-            window.location.href = 'dashboard.html';
-        }, 1500);
-    }, 1000);
+    }
 }
 
-// Google sign up handler
-function handleGoogleSignup() {
-    googleBtn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i> Connecting...';
-    googleBtn.disabled = true;
+// Handle Google Sign Up
+async function handleGoogleSignup() {
+    if (googleBtn) {
+        googleBtn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i> Connecting...';
+        googleBtn.disabled = true;
+    }
     
-    setTimeout(() => {
-        showMessage('Google Sign Up coming soon! Firebase integration in progress.', false);
-        googleBtn.innerHTML = '<i class="ri-google-fill"></i><span>Sign up with Google</span>';
-        googleBtn.disabled = false;
-    }, 1000);
+    try {
+        const result = await signInWithGoogle();
+        
+        if (result) {
+            showMessage('Account created successfully with Google! Redirecting...', false);
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1500);
+        } else {
+            if (googleBtn) {
+                googleBtn.innerHTML = '<i class="ri-google-fill"></i><span>Sign up with Google</span>';
+                googleBtn.disabled = false;
+            }
+        }
+    } catch (error) {
+        showMessage(error.message || 'Google sign up failed. Please try again.', true);
+        if (googleBtn) {
+            googleBtn.innerHTML = '<i class="ri-google-fill"></i><span>Sign up with Google</span>';
+            googleBtn.disabled = false;
+        }
+    }
 }
-
-// Event listeners
-signupBtn.addEventListener('click', handleSignup);
-googleBtn.addEventListener('click', handleGoogleSignup);
 
 // Enter key support
 const inputs = [fullnameInput, emailInput, passwordInput, confirmPasswordInput];
 inputs.forEach(input => {
-    input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            handleSignup();
-        }
-    });
+    if (input) {
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleSignup();
+            }
+        });
+    }
 });
 
-// Check if already logged in
-if (sessionStorage.getItem('isLoggedIn') === 'true') {
-    window.location.href = 'dashboard.html';
-}
+// Event listeners
+if (signupBtn) signupBtn.addEventListener('click', handleSignup);
+if (googleBtn) googleBtn.addEventListener('click', handleGoogleSignup);
 
-console.log('%c📝 MemoMap Sign Up Page Loaded', 'color: #ff6b8b; font-size: 14px; font-weight: bold;');
-console.log('%c✨ Create your account and start preserving memories!', 'color: #888; font-size: 12px;');
+// Check if already logged in
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        window.location.href = 'dashboard.html';
+    }
+});
+
+console.log('%c📝 MemoMap Sign Up Page Loaded with Firebase', 'color: #ff6b8b; font-size: 14px; font-weight: bold;');

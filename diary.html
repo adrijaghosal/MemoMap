@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Diary | MemoMap</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/diary.css">
+</head>
+<body>
+
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="floating-icon icon-1">📖</div>
+        <div class="floating-icon icon-2">✍️</div>
+        <div class="floating-icon icon-3">📸</div>
+        <div class="floating-icon icon-4">✨</div>
+        <div class="floating-icon icon-5">❤️</div>
+        <div class="floating-icon icon-6">🌟</div>
+        <div class="pulse-circle circle-1"></div>
+        <div class="pulse-circle circle-2"></div>
+        <div class="floating-shape shape-1"></div>
+        <div class="floating-shape shape-2"></div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <i class="ri-map-pin-2-fill"></i>
+            <span>MemoMap</span>
+        </div>
+        
+        <div class="user-profile-mini">
+            <div class="user-avatar-mini">
+                <span>🌍</span>
+            </div>
+            <div class="user-info-mini">
+                <h4 id="sidebarUserName">Explorer</h4>
+                <p>Member since 2024</p>
+            </div>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <i class="ri-dashboard-line"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="map.html" class="nav-item">
+                <i class="ri-map-pin-line"></i>
+                <span>Memory Map</span>
+            </a>
+            <a href="add-memory.html" class="nav-item">
+                <i class="ri-add-line"></i>
+                <span>Add Memory</span>
+            </a>
+            <a href="timeline.html" class="nav-item">
+                <i class="ri-timeline-line"></i>
+                <span>Timeline</span>
+            </a>
+            <a href="collections.html" class="nav-item">
+                <i class="ri-folder-line"></i>
+                <span>Collections</span>
+            </a>
+            <a href="nostalgia.html" class="nav-item">
+                <i class="ri-emotion-line"></i>
+                <span>Nostalgia</span>
+            </a>
+            <a href="diary.html" class="nav-item active">
+                <i class="ri-book-open-line"></i>
+                <span>Digital Diary</span>
+            </a>
+            <a href="profile.html" class="nav-item">
+                <i class="ri-user-line"></i>
+                <span>Profile</span>
+            </a>
+            
+            <div class="nav-divider"></div>
+            
+            <a href="notifications.html" class="nav-item">
+                <i class="ri-notification-3-line"></i>
+                <span>Notifications</span>
+                <span class="nav-badge" id="sidebarNotificationBadge">0</span>
+            </a>
+            <a href="help.html" class="nav-item">
+                <i class="ri-question-line"></i>
+                <span>Help & Support</span>
+            </a>
+            <a href="settings.html" class="nav-item">
+                <i class="ri-settings-line"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+        
+        <button class="logout-btn" id="logoutBtn">
+            <i class="ri-logout-box-r-line"></i>
+            <span>Logout</span>
+        </button>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Header -->
+        <header class="top-header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="ri-menu-line"></i>
+                </button>
+                <div class="welcome-text">
+                    <h2>📖 My Digital Diary</h2>
+                    <p>Your personal space for thoughts, feelings & memories</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="new-entry-btn" id="newDiaryEntryBtn">
+                    <i class="ri-add-line"></i> New Entry
+                </button>
+                <a href="profile.html" class="user-avatar" style="text-decoration: none;">
+                    <span>🌍</span>
+                </a>
+            </div>
+        </header>
+
+        <!-- Diary Stats -->
+        <div class="diary-stats">
+            <div class="stat-card">
+                <div class="stat-icon">📖</div>
+                <div class="stat-info">
+                    <h3 id="totalEntries">0</h3>
+                    <p>Total Entries</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🔒</div>
+                <div class="stat-info">
+                    <h3 id="lockedEntries">0</h3>
+                    <p>Locked Entries</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">✍️</div>
+                <div class="stat-info">
+                    <h3 id="totalWords">0</h3>
+                    <p>Words Written</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📅</div>
+                <div class="stat-info">
+                    <h3 id="entryDays">0</h3>
+                    <p>Days of Writing</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Diary Entries Grid -->
+        <div class="diary-grid" id="diaryEntriesGrid"></div>
+
+        <!-- Empty State - Fully Centered -->
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <div class="empty-content">
+                <i class="ri-book-open-line"></i>
+                <h3>Your diary is empty</h3>
+                <p>Start writing your thoughts, feelings, and memories</p>
+                <button class="new-entry-btn" id="emptyStateCreateBtn">
+                    <i class="ri-add-line" style="color: #ff6b8b;"></i> Write Your First Entry
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Create/Edit Diary Entry Modal -->
+    <div class="modal" id="diaryModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content diary-modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle"><i class="ri-edit-line"></i> New Diary Entry</h3>
+                <button class="modal-close" id="closeDiaryModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Entry Title <span class="required">*</span></label>
+                    <input type="text" id="entryTitle" placeholder="Give your entry a title...">
+                </div>
+                <div class="form-group">
+                    <label>Your Thoughts <span class="required">*</span></label>
+                    <textarea id="entryContent" rows="8" placeholder="Write your thoughts, feelings, memories, or anything you want to remember..."></textarea>
+                    <div class="char-count"><span id="contentCount">0</span> characters</div>
+                </div>
+                <div class="form-group">
+                    <label><i class="ri-emotion-line"></i> Mood</label>
+                    <div class="mood-selector" id="diaryMoodSelector">
+                        <div class="mood-option" data-mood="happy">😊 Happy</div>
+                        <div class="mood-option" data-mood="peaceful">😌 Peaceful</div>
+                        <div class="mood-option" data-mood="loved">❤️ Loved</div>
+                        <div class="mood-option" data-mood="excited">😎 Excited</div>
+                        <div class="mood-option" data-mood="nostalgic">📸 Nostalgic</div>
+                        <div class="mood-option" data-mood="sad">😢 Sad</div>
+                    </div>
+                    <input type="hidden" id="entryMood" value="happy">
+                </div>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="entryLocked">
+                        <span><i class="ri-lock-line"></i> Lock this entry with a password</span>
+                    </label>
+                </div>
+                <div class="form-group password-section" id="entryPasswordSection" style="display: none;">
+                    <label>Set Password</label>
+                    <input type="password" id="entryPassword" placeholder="Enter a password for this entry">
+                    <small>You'll need this password to view this entry later</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" id="cancelDiaryBtn">Cancel</button>
+                <button class="btn-save" id="saveDiaryEntryBtn">💾 Save Entry</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Locked Entry Modal -->
+    <div class="modal" id="lockedModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content small">
+            <div class="modal-header">
+                <h3><i class="ri-lock-fill"></i> Locked Entry</h3>
+                <button class="modal-close" id="closeLockedModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <i class="ri-lock-fill" style="font-size: 3rem; color: #fbbf24; margin-bottom: 0.5rem; display: block;"></i>
+                    <p style="color: #888;">This entry is password protected</p>
+                    <p style="color: #aaa; font-size: 0.8rem; margin-top: 0.3rem;">Enter the password to unlock and read</p>
+                </div>
+                <div class="form-group">
+                    <label>Enter Password</label>
+                    <input type="password" id="lockedEntryPassword" placeholder="Enter entry password">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" id="cancelLockedBtn">Cancel</button>
+                <button class="btn-unlock" id="unlockEntryBtn">🔓 Unlock</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Entry Modal -->
+    <div class="modal" id="viewModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content view-modal-content">
+            <div class="modal-header">
+                <h3 id="viewModalTitle">Entry Title</h3>
+                <button class="modal-close" id="closeViewModal">&times;</button>
+            </div>
+            <div class="modal-body" id="viewModalBody"></div>
+            <div class="modal-footer">
+                <button class="btn-delete-entry" id="deleteEntryBtn">🗑️ Delete</button>
+                <button class="btn-edit-entry" id="editEntryBtn">✏️ Edit</button>
+                <button class="btn-close-view" id="closeViewBtn">Close</button>
+            </div>
+        </div>
+    </div>
+<!-- Theme Loader - Must be loaded before page scripts -->
+<script src="./js/theme-loader.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    
+    <!-- Firebase Config & Auth -->
+    <script src="./js/firebase-config.js"></script>
+    <script src="./js/auth.js"></script>
+    
+    <!-- Diary Script -->
+    <script src="./js/diary.js"></script>
+</body>
+</html>

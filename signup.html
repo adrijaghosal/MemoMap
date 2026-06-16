@@ -22,8 +22,6 @@
         <div class="floating-icon icon-8">🎒</div>
         <div class="floating-icon icon-9">🏔️</div>
         <div class="floating-icon icon-10">🌊</div>
-        <div class="floating-icon icon-11">📖</div>
-        <div class="floating-icon icon-12">🎯</div>
         
         <div class="pulse-circle circle-1"></div>
         <div class="pulse-circle circle-2"></div>
@@ -59,6 +57,9 @@
                 <h1>Create Account</h1>
                 <p>Start your memory journey today</p>
             </div>
+
+            <!-- Message Container -->
+            <div id="authMessage" class="message" style="display: none;"></div>
 
             <div class="auth-form">
                 <div class="input-group">
@@ -119,6 +120,15 @@
         </div>
     </div>
 
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    
+    <!-- Firebase Config & Auth -->
+    <script src="./js/firebase-config.js"></script>
+    <script src="./js/auth.js"></script>
+    
+    <!-- Signup Page Script -->
     <script src="./js/signup.js"></script>
 </body>
 </html>

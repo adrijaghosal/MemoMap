@@ -10,6 +10,20 @@
 </head>
 <body>
 
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="floating-icon icon-1">📍</div>
+        <div class="floating-icon icon-2">🗺️</div>
+        <div class="floating-icon icon-3">📸</div>
+        <div class="floating-icon icon-4">✨</div>
+        <div class="floating-icon icon-5">❤️</div>
+        <div class="floating-icon icon-6">🌟</div>
+        <div class="pulse-circle circle-1"></div>
+        <div class="pulse-circle circle-2"></div>
+        <div class="floating-shape shape-1"></div>
+        <div class="floating-shape shape-2"></div>
+    </div>
+
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-logo">
@@ -48,9 +62,33 @@
                 <i class="ri-folder-line"></i>
                 <span>Collections</span>
             </a>
-            <a href="#" class="nav-item" id="profileNav">
+            <a href="nostalgia.html" class="nav-item">
+                <i class="ri-emotion-line"></i>
+                <span>Nostalgia</span>
+            </a>
+            <a href="diary.html" class="nav-item">
+                <i class="ri-book-open-line"></i>
+                <span>Digital Diary</span>
+            </a>
+            <a href="profile.html" class="nav-item">
                 <i class="ri-user-line"></i>
                 <span>Profile</span>
+            </a>
+            
+            <div class="nav-divider"></div>
+            
+            <a href="notifications.html" class="nav-item">
+                <i class="ri-notification-3-line"></i>
+                <span>Notifications</span>
+                <span class="nav-badge" id="sidebarNotificationBadge">0</span>
+            </a>
+            <a href="help.html" class="nav-item">
+                <i class="ri-question-line"></i>
+                <span>Help & Support</span>
+            </a>
+            <a href="settings.html" class="nav-item">
+                <i class="ri-settings-line"></i>
+                <span>Settings</span>
             </a>
         </nav>
         
@@ -77,15 +115,15 @@
                 <button class="create-collection-btn" id="createCollectionBtn">
                     <i class="ri-add-line"></i> New Collection
                 </button>
-                <div class="user-avatar" id="userAvatar">
+                <a href="profile.html" class="user-avatar" style="text-decoration: none;">
                     <span>🌍</span>
-                </div>
+                </a>
             </div>
         </header>
 
         <!-- Collections Grid -->
         <div class="collections-grid" id="collectionsGrid">
-            <!-- Collection cards will be injected here -->
+            <!-- Collections will be injected here -->
         </div>
 
         <!-- Create Collection Modal -->
@@ -155,7 +193,7 @@
             </div>
         </div>
 
-        <!-- Password Modal (for locked collections) -->
+        <!-- Password Modal -->
         <div class="modal" id="passwordModal">
             <div class="modal-overlay"></div>
             <div class="modal-content small">
@@ -180,7 +218,7 @@
             </div>
         </div>
 
-        <!-- Collection Detail Modal (View memories in collection) -->
+        <!-- Collection Detail Modal -->
         <div class="modal" id="collectionModal">
             <div class="modal-overlay"></div>
             <div class="modal-content large">
@@ -191,13 +229,12 @@
                 <div class="modal-body">
                     <div class="collection-info" id="collectionInfo"></div>
                     
-                    <!-- Lock Status Badge -->
                     <div class="lock-status" id="lockStatus" style="display: none;">
                         <i class="ri-lock-fill"></i> Password Protected
                     </div>
                     
                     <div class="collection-memories" id="collectionMemories">
-                        <!-- Memories in this collection will appear here -->
+                        <!-- Memories will appear here -->
                     </div>
                     <div class="add-to-collection-section">
                         <select id="memorySelector">
@@ -216,22 +253,25 @@
 
         <!-- Empty State -->
         <div class="empty-state" id="emptyState" style="display: none;">
-            <i class="ri-folder-line"></i>
-            <h3>No collections yet</h3>
-            <p>Create collections to organize your memories</p>
-            <button class="create-collection-btn" id="emptyStateCreateBtn">+ Create Your First Collection</button>
+            <div class="empty-content">
+                <i class="ri-folder-line"></i>
+                <h3>No collections yet</h3>
+                <p>Create collections to organize your memories beautifully</p>
+                <button class="create-collection-btn" id="emptyStateCreateBtn">+ Create Your First Collection</button>
+            </div>
         </div>
     </main>
-<script>
-    // Fix View All button
-    const viewAllBtn = document.querySelector('.view-all');
-    if (viewAllBtn) {
-        viewAllBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-    }
-</script>
+<!-- Theme Loader - Must be loaded before page scripts -->
+<script src="./js/theme-loader.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    
+    <!-- Firebase Config & Auth -->
+    <script src="./js/firebase-config.js"></script>
+    <script src="./js/auth.js"></script>
+    
+    <!-- Collections Script -->
     <script src="./js/collections.js"></script>
 </body>
 </html>

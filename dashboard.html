@@ -10,6 +10,22 @@
 </head>
 <body>
 
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="floating-icon icon-1">📍</div>
+        <div class="floating-icon icon-2">🗺️</div>
+        <div class="floating-icon icon-3">📸</div>
+        <div class="floating-icon icon-4">✨</div>
+        <div class="floating-icon icon-5">❤️</div>
+        <div class="floating-icon icon-6">🌟</div>
+        <div class="floating-icon icon-7">🎒</div>
+        <div class="floating-icon icon-8">🏔️</div>
+        <div class="pulse-circle circle-1"></div>
+        <div class="pulse-circle circle-2"></div>
+        <div class="floating-shape shape-1"></div>
+        <div class="floating-shape shape-2"></div>
+    </div>
+
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-logo">
@@ -32,39 +48,47 @@
                 <i class="ri-dashboard-line"></i>
                 <span>Dashboard</span>
             </a>
-            <a href="#" class="nav-item" id="mapNav">
+            <a href="map.html" class="nav-item" id="mapNav">
                 <i class="ri-map-pin-line"></i>
                 <span>Memory Map</span>
             </a>
-            <a href="#" class="nav-item" id="addMemoryNav">
+            <a href="add-memory.html" class="nav-item" id="addMemoryNav">
                 <i class="ri-add-line"></i>
                 <span>Add Memory</span>
             </a>
-            <a href="#" class="nav-item" id="timelineNav">
+            <a href="timeline.html" class="nav-item" id="timelineNav">
                 <i class="ri-timeline-line"></i>
                 <span>Timeline</span>
             </a>
-            <a href="#" class="nav-item" id="collectionsNav">
+            <a href="collections.html" class="nav-item" id="collectionsNav">
                 <i class="ri-folder-line"></i>
                 <span>Collections</span>
             </a>
-            <a href="#" class="nav-item" id="onThisDayNav">
-                <i class="ri-calendar-event-line"></i>
-                <span>On This Day</span>
-            </a>
-            <a href="#" class="nav-item" id="timeCapsuleNav">
-                <i class="ri-time-fill"></i>
-                <span>Time Capsule</span>
-            </a>
-            <a href="#" class="nav-item" id="nostalgiaNav">
+            <a href="nostalgia.html" class="nav-item" id="nostalgiaNav">
                 <i class="ri-emotion-line"></i>
                 <span>Nostalgia</span>
             </a>
-            <a href="#" class="nav-item" id="profileNav">
+            <a href="diary.html" class="nav-item" id="diaryNav">
+                <i class="ri-book-open-line"></i>
+                <span>Digital Diary</span>
+            </a>
+            <a href="profile.html" class="nav-item" id="profileNav">
                 <i class="ri-user-line"></i>
                 <span>Profile</span>
             </a>
-            <a href="#" class="nav-item" id="settingsNav">
+            
+            <div class="nav-divider"></div>
+            
+            <a href="notifications.html" class="nav-item" id="notificationsNav">
+                <i class="ri-notification-3-line"></i>
+                <span>Notifications</span>
+                <span class="nav-badge" id="sidebarNotificationBadge">0</span>
+            </a>
+            <a href="help.html" class="nav-item" id="helpNav">
+                <i class="ri-question-line"></i>
+                <span>Help & Support</span>
+            </a>
+            <a href="settings.html" class="nav-item" id="settingsNav">
                 <i class="ri-settings-line"></i>
                 <span>Settings</span>
             </a>
@@ -92,15 +116,15 @@
             <div class="header-right">
                 <div class="search-bar">
                     <i class="ri-search-line"></i>
-                    <input type="text" placeholder="Search memories...">
+                    <input type="text" id="searchInput" placeholder="Search memories...">
                 </div>
-                <div class="notification-icon">
+                <a href="notifications.html" class="notification-icon" style="text-decoration: none;">
                     <i class="ri-notification-3-line"></i>
-                    <span class="notification-badge">3</span>
-                </div>
-                <div class="user-avatar" id="userAvatar">
+                    <span class="notification-badge" id="notificationBadge">0</span>
+                </a>
+                <a href="profile.html" class="user-avatar" id="userAvatar" style="text-decoration: none;">
                     <span>🌍</span>
-                </div>
+                </a>
             </div>
         </header>
 
@@ -138,20 +162,20 @@
                     <i class="ri-heart-line"></i>
                 </div>
                 <div class="hero-stats-info">
-                    <h2 id="totalCountries">0</h2>
-                    <p>Countries Explored</p>
+                    <h2 id="totalMoods">0</h2>
+                    <p>Moods Captured</p>
                 </div>
             </div>
         </div>
 
-        <!-- Memory Gallery Popup Section -->
+        <!-- Memory Gallery Section -->
         <section class="memory-gallery">
             <div class="section-header">
                 <h3><i class="ri-gallery-line"></i> Memory Gallery</h3>
-                <a href="#" class="view-all">View all memories →</a>
+                <a href="timeline.html" class="view-all">View all →</a>
             </div>
             <div class="gallery-grid" id="galleryGrid">
-                <!-- Gallery items will be injected here -->
+                <div class="loading-skeleton">Loading your memories...</div>
             </div>
         </section>
 
@@ -189,22 +213,20 @@
 
         <!-- Recent Memories & On This Day Row -->
         <div class="two-columns">
-            <!-- Recent Memories -->
             <div class="recent-memories">
                 <div class="section-header">
                     <h3><i class="ri-time-line"></i> Recent Memories</h3>
-                    <a href="#" class="view-all">View all →</a>
+                    <a href="timeline.html" class="view-all">View all →</a>
                 </div>
                 <div class="memories-list" id="recentMemoriesList">
                     <div class="loading-skeleton">Loading memories...</div>
                 </div>
             </div>
 
-            <!-- On This Day -->
             <div class="on-this-day">
                 <div class="section-header">
                     <h3><i class="ri-calendar-event-line"></i> On This Day</h3>
-                    <a href="#" class="view-all">View all →</a>
+                    <a href="nostalgia.html" class="view-all">View all →</a>
                 </div>
                 <div class="memories-list" id="onThisDayList">
                     <div class="loading-skeleton">Loading memories...</div>
@@ -216,10 +238,10 @@
         <section class="top-cities">
             <div class="section-header">
                 <h3><i class="ri-star-fill"></i> Top Visited Cities</h3>
-                <a href="#" class="view-all">View all →</a>
+                <a href="map.html" class="view-all">View all →</a>
             </div>
             <div class="cities-grid" id="citiesGrid">
-                <!-- Cities will be injected here -->
+                <div class="loading-skeleton">Loading cities...</div>
             </div>
         </section>
 
@@ -227,10 +249,10 @@
         <section class="mood-tracker">
             <div class="section-header">
                 <h3><i class="ri-bar-chart-2-line"></i> Mood Journey</h3>
-                <a href="#" class="view-all">View insights →</a>
+                <a href="profile.html" class="view-all">View insights →</a>
             </div>
             <div class="mood-bars" id="moodBars">
-                <!-- Mood bars will be injected here -->
+                <div class="loading-skeleton">Loading mood data...</div>
             </div>
         </section>
 
@@ -239,11 +261,35 @@
             <i class="ri-add-line"></i>
         </button>
     </main>
-    <a href="notifications.html" class="notification-icon" style="text-decoration: none;">
-    <i class="ri-notification-3-line"></i>
-    <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
-</a>
 
+    <!-- Load Demo Data Modal (Optional - Only for first-time users) -->
+    <div id="demoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="ri-sparkling-line"></i> Welcome to MemoMap!</h3>
+                <button class="modal-close" id="closeDemoModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>You don't have any memories yet. Would you like to load some sample memories to see how MemoMap works?</p>
+                <p style="color: #888; font-size: 0.8rem; margin-top: 0.5rem;">You can always delete them later.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" id="skipDemoBtn">Skip, start fresh</button>
+                <button class="btn-primary" id="loadDemoBtn">Load Sample Memories</button>
+            </div>
+        </div>
+    </div>
+<!-- Theme Loader - Must be loaded before page scripts -->
+<script src="./js/theme-loader.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    
+    <!-- Firebase Config & Auth -->
+    <script src="./js/firebase-config.js"></script>
+    <script src="./js/auth.js"></script>
+    
+    <!-- Dashboard Script -->
     <script src="./js/dashboard.js"></script>
 </body>
 </html>

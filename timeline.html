@@ -10,6 +10,20 @@
 </head>
 <body>
 
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="floating-icon icon-1">📍</div>
+        <div class="floating-icon icon-2">🗺️</div>
+        <div class="floating-icon icon-3">📸</div>
+        <div class="floating-icon icon-4">✨</div>
+        <div class="floating-icon icon-5">❤️</div>
+        <div class="floating-icon icon-6">🌟</div>
+        <div class="pulse-circle circle-1"></div>
+        <div class="pulse-circle circle-2"></div>
+        <div class="floating-shape shape-1"></div>
+        <div class="floating-shape shape-2"></div>
+    </div>
+
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-logo">
@@ -44,13 +58,37 @@
                 <i class="ri-timeline-line"></i>
                 <span>Timeline</span>
             </a>
-            <a href="#" class="nav-item" id="collectionsNav">
+            <a href="collections.html" class="nav-item">
                 <i class="ri-folder-line"></i>
                 <span>Collections</span>
             </a>
-            <a href="#" class="nav-item" id="profileNav">
+            <a href="nostalgia.html" class="nav-item">
+                <i class="ri-emotion-line"></i>
+                <span>Nostalgia</span>
+            </a>
+            <a href="diary.html" class="nav-item">
+                <i class="ri-book-open-line"></i>
+                <span>Digital Diary</span>
+            </a>
+            <a href="profile.html" class="nav-item">
                 <i class="ri-user-line"></i>
                 <span>Profile</span>
+            </a>
+            
+            <div class="nav-divider"></div>
+            
+            <a href="notifications.html" class="nav-item">
+                <i class="ri-notification-3-line"></i>
+                <span>Notifications</span>
+                <span class="nav-badge" id="sidebarNotificationBadge">0</span>
+            </a>
+            <a href="help.html" class="nav-item">
+                <i class="ri-question-line"></i>
+                <span>Help & Support</span>
+            </a>
+            <a href="settings.html" class="nav-item">
+                <i class="ri-settings-line"></i>
+                <span>Settings</span>
             </a>
         </nav>
         
@@ -74,83 +112,53 @@
                 </div>
             </div>
             <div class="header-right">
-                <div class="user-avatar" id="userAvatar">
-                    <span>🌍</span>
+                <div class="year-filter-container">
+                    <select id="yearFilter" class="year-filter">
+                        <option value="all">All Years</option>
+                    </select>
                 </div>
+                <a href="profile.html" class="user-avatar" style="text-decoration: none;">
+                    <span>🌍</span>
+                </a>
             </div>
         </header>
 
-        <!-- Welcome Popup / Modal -->
-        <div class="welcome-popup" id="welcomePopup">
-            <div class="popup-overlay"></div>
-            <div class="popup-content">
-                <button class="popup-close" id="closePopup">&times;</button>
-                <div class="popup-icon">🎉</div>
-                <h3>Welcome to Your Timeline!</h3>
-                <p id="popupMessage">You have <strong>0 memories</strong> from the past years.</p>
-                <div class="popup-buttons">
-                    <button class="popup-btn primary" id="viewLatestBtn">📸 View Latest Memory</button>
-                    <button class="popup-btn secondary" id="exploreBtn">✨ Explore Timeline</button>
+        <!-- Timeline Stats -->
+        <div class="timeline-stats">
+            <div class="stat-card">
+                <div class="stat-icon">📅</div>
+                <div class="stat-info">
+                    <h3 id="totalYears">0</h3>
+                    <p>Years of Memories</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📍</div>
+                <div class="stat-info">
+                    <h3 id="totalMemories">0</h3>
+                    <p>Total Memories</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📸</div>
+                <div class="stat-info">
+                    <h3 id="totalPhotos">0</h3>
+                    <p>Photos Captured</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">✈️</div>
+                <div class="stat-info">
+                    <h3 id="totalCities">0</h3>
+                    <p>Cities Visited</p>
                 </div>
             </div>
         </div>
 
-        <!-- Year Selector -->
-        <div class="year-selector" id="yearSelector">
-            <button class="year-nav prev" id="prevYear"><i class="ri-arrow-left-s-line"></i></button>
-            <div class="years-container" id="yearsContainer">
-                <!-- Years will be injected here -->
-            </div>
-            <button class="year-nav next" id="nextYear"><i class="ri-arrow-right-s-line"></i></button>
-        </div>
-
-        <!-- Current Year Badge -->
-        <div class="current-year-badge" id="currentYearBadge">
-            <span class="year-label">Current Year</span>
-            <span class="year-value" id="currentYearValue">2024</span>
-        </div>
-
-        <!-- Horizontal Timeline Slider -->
-        <div class="timeline-slider-container">
+        <!-- Timeline Container -->
+        <div class="timeline-container" id="timelineContainer">
             <div class="timeline-track" id="timelineTrack">
-                <!-- Memory cards will be injected here -->
-            </div>
-        </div>
-
-        <!-- Memory Detail Modal (opens on click) -->
-        <div class="memory-modal" id="memoryModal">
-            <div class="modal-overlay"></div>
-            <div class="modal-content">
-                <button class="modal-close" id="closeModal">&times;</button>
-                <div class="modal-media" id="modalMedia">
-                    <img id="modalImage" src="" alt="Memory">
-                    <div class="modal-video-placeholder" id="modalVideoPlaceholder" style="display: none;">
-                        <i class="ri-video-line"></i>
-                        <span>Video Preview</span>
-                    </div>
-                </div>
-                <div class="modal-details">
-                    <h2 id="modalTitle">Memory Title</h2>
-                    <div class="modal-location">
-                        <i class="ri-map-pin-line"></i> <span id="modalLocation"></span>
-                    </div>
-                    <div class="modal-date">
-                        <i class="ri-calendar-line"></i> <span id="modalDate"></span>
-                    </div>
-                    <div class="modal-mood">
-                        <i class="ri-emotion-line"></i> <span id="modalMood"></span>
-                    </div>
-                    <div class="modal-story" id="modalStory"></div>
-                    <div class="modal-tags" id="modalTags"></div>
-                    <div class="modal-actions">
-                        <button class="action-btn edit-btn" id="editMemoryBtn">
-                            <i class="ri-edit-line"></i> Edit
-                        </button>
-                        <button class="action-btn delete-btn" id="deleteMemoryBtn">
-                            <i class="ri-delete-bin-line"></i> Delete
-                        </button>
-                    </div>
-                </div>
+                <!-- Timeline cards will be injected here -->
             </div>
         </div>
 
@@ -162,20 +170,36 @@
             <a href="add-memory.html" class="add-memory-link">+ Add Your First Memory</a>
         </div>
     </main>
-<script>
-    // Fix View All button
-    const viewAllBtn = document.querySelector('.view-all');
-    if (viewAllBtn) {
-        viewAllBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const yearFilter = document.getElementById('yearFilter');
-            if (yearFilter) {
-                yearFilter.value = 'all';
-                yearFilter.dispatchEvent(new Event('change'));
-            }
-        });
-    }
-</script>
+
+    <!-- Memory Quick View Modal -->
+    <div class="modal" id="memoryModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Memory Title</h3>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Memory details will be injected -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn-view-full" id="viewFullMemoryBtn">View Full Memory →</button>
+            </div>
+        </div>
+    </div>
+
+    
+    <!-- Theme Loader - Must be loaded before page scripts -->
+<script src="./js/theme-loader.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    
+    <!-- Firebase Config & Auth -->
+    <script src="./js/firebase-config.js"></script>
+    <script src="./js/auth.js"></script>
+    
+    <!-- Timeline Script -->
     <script src="./js/timeline.js"></script>
 </body>
 </html>

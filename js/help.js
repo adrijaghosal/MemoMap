@@ -16,23 +16,48 @@ const chatInput = document.getElementById('chatInput');
 const sendChatBtn = document.getElementById('sendChatBtn');
 const chatMessages = document.getElementById('chatMessages');
 
+// ===== Check Auth =====
+function checkAuth() {
+    const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+    const userName = sessionStorage.getItem('userName');
+    
+    if (!isLoggedIn || isLoggedIn !== 'true') {
+        window.location.href = 'login.html';
+        return false;
+    }
+    
+    if (userName) {
+        document.getElementById('sidebarUserName').textContent = userName;
+    }
+    
+    return true;
+}
+
 // ===== FAQ Accordion =====
 faqItems.forEach(item => {
     const question = item.querySelector('.faq-question');
-    question.addEventListener('click', () => {
-        item.classList.toggle('active');
-    });
+    if (question) {
+        question.addEventListener('click', function(e) {
+            e.stopPropagation();
+            faqItems.forEach(other => {
+                if (other !== item && other.classList.contains('active')) {
+                    other.classList.remove('active');
+                }
+            });
+            item.classList.toggle('active');
+        });
+    }
 });
 
 // ===== Search Functionality =====
 function searchFAQs() {
-    const searchTerm = searchInput.value.toLowerCase();
+    const searchTerm = searchInput.value.toLowerCase().trim();
     
     faqItems.forEach(item => {
-        const question = item.querySelector('.faq-question span').textContent.toLowerCase();
-        const answer = item.querySelector('.faq-answer').textContent.toLowerCase();
+        const question = item.querySelector('.faq-question span')?.textContent.toLowerCase() || '';
+        const answer = item.querySelector('.faq-answer')?.textContent.toLowerCase() || '';
         
-        if (question.includes(searchTerm) || answer.includes(searchTerm)) {
+        if (searchTerm === '' || question.includes(searchTerm) || answer.includes(searchTerm)) {
             item.style.display = 'block';
         } else {
             item.style.display = 'none';
@@ -45,7 +70,8 @@ searchInput.addEventListener('input', searchFAQs);
 // ===== Category Filter =====
 function filterByCategory(category) {
     faqItems.forEach(item => {
-        if (category === 'all' || item.dataset.category === category) {
+        const itemCategory = item.dataset.category;
+        if (category === 'all' || itemCategory === category) {
             item.style.display = 'block';
         } else {
             item.style.display = 'none';
@@ -54,10 +80,14 @@ function filterByCategory(category) {
 }
 
 categoryBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', function() {
         categoryBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        filterByCategory(btn.dataset.category);
+        this.classList.add('active');
+        const category = this.dataset.category;
+        filterByCategory(category);
+        if (searchInput) {
+            searchInput.value = '';
+        }
     });
 });
 
@@ -79,7 +109,6 @@ function sendChatMessage() {
     const message = chatInput.value.trim();
     if (!message) return;
     
-    // Add user message
     const userMsgDiv = document.createElement('div');
     userMsgDiv.className = 'chat-message user';
     userMsgDiv.innerHTML = `
@@ -91,7 +120,6 @@ function sendChatMessage() {
     chatInput.value = '';
     chatMessages.scrollTop = chatMessages.scrollHeight;
     
-    // Simulate bot response
     setTimeout(() => {
         const botMsgDiv = document.createElement('div');
         botMsgDiv.className = 'chat-message bot';
@@ -118,7 +146,6 @@ function sendFeedback(type) {
     const message = type === 'yes' ? 'Thank you for your feedback! 😊' : 'Sorry it wasn\'t helpful. We\'ll improve!';
     alert(message);
     
-    // Store feedback
     let feedback = JSON.parse(localStorage.getItem('memonap_feedback') || '[]');
     feedback.push({ type: type, date: new Date().toISOString() });
     localStorage.setItem('memonap_feedback', JSON.stringify(feedback));
@@ -129,6 +156,7 @@ emailSupportBtn.addEventListener('click', emailSupport);
 liveChatBtn.addEventListener('click', openLiveChat);
 closeChatModal.addEventListener('click', closeLiveChat);
 sendChatBtn.addEventListener('click', sendChatMessage);
+
 chatInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') sendChatMessage();
 });
@@ -139,7 +167,6 @@ feedbackBtns.forEach(btn => {
     });
 });
 
-// Close modal on overlay click
 document.querySelectorAll('.modal-overlay').forEach(overlay => {
     overlay.addEventListener('click', closeLiveChat);
 });
@@ -149,8 +176,13 @@ menuToggle.addEventListener('click', () => {
     sidebar.classList.toggle('open');
 });
 
-logoutBtn.addEventListener('click', () => {
+logoutBtn.addEventListener('click', async () => {
     sessionStorage.clear();
+    if (typeof firebase !== 'undefined' && firebase.auth) {
+        try {
+            await firebase.auth().signOut();
+        } catch(e) {}
+    }
     window.location.href = 'login.html';
 });
 
@@ -162,18 +194,7 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// ===== Check Auth =====
-function checkAuth() {
-    const isLoggedIn = sessionStorage.getItem('isLoggedIn');
-    if (!isLoggedIn || isLoggedIn !== 'true') {
-        window.location.href = 'login.html';
-    }
-    const userName = sessionStorage.getItem('userName');
-    if (userName) {
-        document.getElementById('sidebarUserName').textContent = userName;
-    }
-}
-
+// ===== Initialize =====
 checkAuth();
 
-console.log('%c❓ Help & Support Page Loaded', 'color: #ff6b8b; font-size: 14px; font-weight: bold;');
+console.log('%c❓ Help & Support Page Loaded', 'color: #ff6b8b; font-size: 14px; font-weight: bold');

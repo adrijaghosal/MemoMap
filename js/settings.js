@@ -23,6 +23,8 @@ const clearDataBtn = document.getElementById('clearDataBtn');
 const changePasswordBtn = document.getElementById('changePasswordBtn');
 const deleteAccountBtn = document.getElementById('deleteAccountBtn');
 const enable2faBtn = document.getElementById('enable2faBtn');
+const termsBtn = document.getElementById('termsBtn');
+const privacyBtn = document.getElementById('privacyBtn');
 
 // Modals
 const passwordModal = document.getElementById('passwordModal');
@@ -43,12 +45,78 @@ const closeClearDataModal = document.getElementById('closeClearDataModal');
 const cancelClearDataBtn = document.getElementById('cancelClearDataBtn');
 const confirmClearDataBtn = document.getElementById('confirmClearDataBtn');
 
-// ===== Load Settings from localStorage =====
+// ===== Check Auth =====
+function checkAuth() {
+    const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+    const userName = sessionStorage.getItem('userName');
+    
+    if (!isLoggedIn || isLoggedIn !== 'true') {
+        window.location.href = 'login.html';
+        return false;
+    }
+    
+    if (userName) {
+        document.getElementById('sidebarUserName').textContent = userName;
+    }
+    
+    return true;
+}
+
+// ===== Get System Theme =====
+function getSystemTheme() {
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
+// ===== Apply Theme to ALL Pages =====
+function applyTheme(theme) {
+    const body = document.body;
+    const root = document.documentElement;
+    
+    // If auto, use system preference
+    let actualTheme = theme;
+    if (theme === 'auto') {
+        actualTheme = getSystemTheme();
+    }
+    
+    // Remove existing theme classes
+    body.classList.remove('theme-light', 'theme-dark');
+    
+    // Add new theme class
+    if (actualTheme === 'dark') {
+        body.classList.add('theme-dark');
+    } else {
+        body.classList.add('theme-light');
+    }
+    
+    // Store theme preference for ALL pages
+    localStorage.setItem('memonap_theme', actualTheme);
+    localStorage.setItem('memonap_preferred_theme', theme);
+}
+
+// ===== Load Theme on Page Load =====
+function loadThemeFromStorage() {
+    const preferredTheme = localStorage.getItem('memonap_preferred_theme') || 'light';
+    const settings = JSON.parse(localStorage.getItem('memonap_settings') || '{}');
+    const savedTheme = settings.theme || preferredTheme || 'light';
+    
+    // Apply the saved theme
+    applyTheme(savedTheme);
+    
+    // Update button states if on settings page
+    themeBtns.forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.theme === savedTheme) {
+            btn.classList.add('active');
+        }
+    });
+}
+
+// ===== Load Settings =====
 function loadSettings() {
     const settings = JSON.parse(localStorage.getItem('memonap_settings') || '{}');
     
     // Theme
-    const savedTheme = settings.theme || 'light';
+    const savedTheme = settings.theme || localStorage.getItem('memonap_preferred_theme') || 'light';
     themeBtns.forEach(btn => {
         btn.classList.remove('active');
         if (btn.dataset.theme === savedTheme) {
@@ -71,8 +139,9 @@ function loadSettings() {
 
 // ===== Save Settings =====
 function saveSettings() {
+    const activeTheme = document.querySelector('.theme-btn.active')?.dataset.theme || 'light';
     const settings = {
-        theme: document.querySelector('.theme-btn.active')?.dataset.theme || 'light',
+        theme: activeTheme,
         pushNotifications: pushNotifications?.checked || false,
         emailDigest: emailDigest?.checked || false,
         onThisDayReminders: onThisDayReminders?.checked || false,
@@ -82,257 +151,56 @@ function saveSettings() {
         language: languageSelect?.value || 'en'
     };
     localStorage.setItem('memonap_settings', JSON.stringify(settings));
+    localStorage.setItem('memonap_preferred_theme', activeTheme);
+    applyTheme(activeTheme);
+    
+    // Show confirmation
+    showToast('Settings saved successfully!');
 }
 
-// ===== Apply Theme with Improved Dark Mode Colors =====
-function applyTheme(theme) {
-    const root = document.documentElement;
-    const body = document.body;
-    const sidebarElement = document.querySelector('.sidebar');
-    const topHeader = document.querySelector('.top-header');
-    const settingsCards = document.querySelectorAll('.settings-card');
-    const settingItems = document.querySelectorAll('.setting-item');
-    const modals = document.querySelectorAll('.modal-content');
-    
-    if (theme === 'dark') {
-        // Main background - Deep blackish blue
-        body.style.background = 'linear-gradient(145deg, #0a0e1a 0%, #0f1422 40%, #0b1020 100%)';
-        body.style.color = '#e8e8f0';
-        
-        // Sidebar - Dark blue with blur
-        if (sidebarElement) {
-            sidebarElement.style.background = 'rgba(10, 14, 26, 0.96)';
-            sidebarElement.style.borderRight = '1px solid rgba(255, 107, 139, 0.15)';
-            sidebarElement.style.backdropFilter = 'blur(20px)';
-        }
-        
-        // Top header - Dark glass
-        if (topHeader) {
-            topHeader.style.background = 'rgba(15, 20, 34, 0.75)';
-            topHeader.style.backdropFilter = 'blur(10px)';
-        }
-        
-        // Settings cards - Dark with subtle border
-        settingsCards.forEach(card => {
-            card.style.background = 'rgba(20, 28, 45, 0.8)';
-            card.style.backdropFilter = 'blur(10px)';
-            card.style.border = '1px solid rgba(255, 107, 139, 0.1)';
-        });
-        
-        // Setting items
-        settingItems.forEach(item => {
-            item.style.borderBottom = '1px solid rgba(255, 255, 255, 0.05)';
-        });
-        
-        // Text colors
-        document.querySelectorAll('.setting-label').forEach(el => {
-            el.style.color = '#f0f0ff';
-        });
-        
-        document.querySelectorAll('.setting-desc').forEach(el => {
-            el.style.color = '#9a9ac0';
-        });
-        
-        document.querySelectorAll('.settings-section h3').forEach(el => {
-            el.style.color = '#ffb8c6';
-        });
-        
-        document.querySelectorAll('.welcome-text h2').forEach(el => {
-            el.style.color = '#f0f0ff';
-        });
-        
-        document.querySelectorAll('.welcome-text p').forEach(el => {
-            el.style.color = '#9a9ac0';
-        });
-        
-        // Inputs and selects
-        document.querySelectorAll('.setting-select').forEach(el => {
-            el.style.background = '#1a1f35';
-            el.style.border = '1px solid rgba(255, 107, 139, 0.2)';
-            el.style.color = '#e8e8f0';
-        });
-        
-        // Buttons
-        document.querySelectorAll('.secondary-btn').forEach(el => {
-            el.style.background = 'transparent';
-            el.style.border = '1px solid rgba(255, 107, 139, 0.3)';
-            el.style.color = '#ffb8c6';
-        });
-        
-        document.querySelectorAll('.danger-btn').forEach(el => {
-            el.style.background = 'rgba(231, 76, 60, 0.15)';
-            el.style.color = '#ff6b8b';
-        });
-        
-        // Version badge
-        document.querySelectorAll('.version-badge').forEach(el => {
-            el.style.background = 'rgba(255, 107, 139, 0.15)';
-            el.style.color = '#ffb8c6';
-        });
-        
-        // Modal backgrounds
-        modals.forEach(modal => {
-            modal.style.background = '#1a1f35';
-            modal.style.border = '1px solid rgba(255, 107, 139, 0.15)';
-        });
-        
-        document.querySelectorAll('.modal-header').forEach(el => {
-            el.style.borderBottom = '1px solid rgba(255, 255, 255, 0.05)';
-        });
-        
-        document.querySelectorAll('.modal-footer').forEach(el => {
-            el.style.borderTop = '1px solid rgba(255, 255, 255, 0.05)';
-        });
-        
-        document.querySelectorAll('.modal-content .form-group input').forEach(el => {
-            el.style.background = '#0f1422';
-            el.style.border = '1px solid rgba(255, 107, 139, 0.2)';
-            el.style.color = '#e8e8f0';
-        });
-        
-        document.querySelectorAll('.modal-content label').forEach(el => {
-            el.style.color = '#ffb8c6';
-        });
-        
-        // Nav items in sidebar
-        document.querySelectorAll('.nav-item').forEach(el => {
-            if (!el.classList.contains('active')) {
-                el.style.color = '#9a9ac0';
-            }
-        });
-        
-        document.querySelectorAll('.nav-item.active').forEach(el => {
-            el.style.background = 'linear-gradient(135deg, #ff6b8b, #ffb347)';
-            el.style.color = 'white';
-        });
-        
-        // User profile mini
-        const userProfileMini = document.querySelector('.user-profile-mini');
-        if (userProfileMini) {
-            userProfileMini.style.background = 'rgba(255, 107, 139, 0.08)';
-        }
-        
-        const userInfoMini = document.querySelectorAll('.user-info-mini h4');
-        userInfoMini.forEach(el => {
-            el.style.color = '#f0f0ff';
-        });
-        
-        const userInfoMiniP = document.querySelectorAll('.user-info-mini p');
-        userInfoMiniP.forEach(el => {
-            el.style.color = '#9a9ac0';
-        });
-        
-        // Toggle switch background
-        document.querySelectorAll('.toggle-slider').forEach(el => {
-            el.style.backgroundColor = '#2a2f45';
-        });
-        
-    } else if (theme === 'light') {
-        // Reset to original light theme
-        body.style.background = 'linear-gradient(145deg, #fef5f7 0%, #fde8ed 40%, #eef2fa 100%)';
-        body.style.color = '#2d1b2e';
-        
-        if (sidebarElement) {
-            sidebarElement.style.background = 'rgba(255, 255, 255, 0.96)';
-            sidebarElement.style.borderRight = '1px solid rgba(255, 107, 139, 0.12)';
-        }
-        
-        if (topHeader) {
-            topHeader.style.background = 'rgba(255, 255, 255, 0.75)';
-        }
-        
-        settingsCards.forEach(card => {
-            card.style.background = 'rgba(255, 255, 255, 0.8)';
-            card.style.border = 'none';
-        });
-        
-        settingItems.forEach(item => {
-            item.style.borderBottom = '1px solid #f0e0e4';
-        });
-        
-        document.querySelectorAll('.setting-label').forEach(el => {
-            el.style.color = '#2d1b2e';
-        });
-        
-        document.querySelectorAll('.setting-desc').forEach(el => {
-            el.style.color = '#888';
-        });
-        
-        document.querySelectorAll('.settings-section h3').forEach(el => {
-            el.style.color = '#2d1b2e';
-        });
-        
-        document.querySelectorAll('.welcome-text h2').forEach(el => {
-            el.style.color = '#2d1b2e';
-        });
-        
-        document.querySelectorAll('.setting-select').forEach(el => {
-            el.style.background = 'white';
-            el.style.border = '1.5px solid #f0e0e4';
-            el.style.color = '#2d1b2e';
-        });
-        
-        document.querySelectorAll('.secondary-btn').forEach(el => {
-            el.style.background = 'transparent';
-            el.style.border = '1.5px solid #f0e0e4';
-            el.style.color = '#666';
-        });
-        
-        document.querySelectorAll('.danger-btn').forEach(el => {
-            el.style.background = 'rgba(231, 76, 60, 0.1)';
-            el.style.color = '#e74c3c';
-        });
-        
-        document.querySelectorAll('.version-badge').forEach(el => {
-            el.style.background = 'rgba(255, 107, 139, 0.1)';
-            el.style.color = '#ff6b8b';
-        });
-        
-        modals.forEach(modal => {
-            modal.style.background = 'white';
-        });
-        
-        document.querySelectorAll('.modal-header').forEach(el => {
-            el.style.borderBottom = '1px solid #f0e0e4';
-        });
-        
-        document.querySelectorAll('.modal-footer').forEach(el => {
-            el.style.borderTop = '1px solid #f0e0e4';
-        });
-        
-        document.querySelectorAll('.modal-content .form-group input').forEach(el => {
-            el.style.background = 'white';
-            el.style.border = '1.5px solid #f0e0e4';
-            el.style.color = '#2d1b2e';
-        });
-        
-        document.querySelectorAll('.nav-item').forEach(el => {
-            if (!el.classList.contains('active')) {
-                el.style.color = '#666';
-            }
-        });
-        
-        document.querySelectorAll('.nav-item.active').forEach(el => {
-            el.style.background = 'linear-gradient(135deg, #ff6b8b, #ffb347)';
-            el.style.color = 'white';
-        });
-        
-        if (userProfileMini) {
-            userProfileMini.style.background = 'rgba(255, 107, 139, 0.06)';
-        }
-        
-        userInfoMini.forEach(el => {
-            el.style.color = '#2d1b2e';
-        });
-        
-        userInfoMiniP.forEach(el => {
-            el.style.color = '#888';
-        });
-        
-        document.querySelectorAll('.toggle-slider').forEach(el => {
-            el.style.backgroundColor = '#ddd';
-        });
+// ===== Show Toast Message =====
+function showToast(message, isError = false) {
+    let toast = document.getElementById('settingsToast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'settingsToast';
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: ${isError ? '#e74c3c' : '#27ae60'};
+            color: white;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            pointer-events: none;
+        `;
+        document.body.appendChild(toast);
     }
+    
+    toast.textContent = message;
+    toast.style.opacity = '1';
+    
+    setTimeout(() => {
+        toast.style.opacity = '0';
+    }, 3000);
+}
+
+// ===== Listen for System Theme Changes (Auto Mode) =====
+function listenForSystemThemeChanges() {
+    const systemThemeListener = window.matchMedia('(prefers-color-scheme: dark)');
+    systemThemeListener.addEventListener('change', (e) => {
+        const currentTheme = document.querySelector('.theme-btn.active')?.dataset.theme;
+        if (currentTheme === 'auto') {
+            applyTheme('auto');
+        }
+    });
 }
 
 // ===== Theme Change =====
@@ -340,7 +208,6 @@ themeBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         themeBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        applyTheme(btn.dataset.theme);
         saveSettings();
     });
 });
@@ -351,30 +218,170 @@ changeListeners.forEach(el => {
     if (el) el.addEventListener('change', saveSettings);
 });
 
-// ===== Export Data =====
+// ===== Export Data as HTML =====
 function exportData() {
-    const memories = localStorage.getItem('memonap_memories');
-    const collections = localStorage.getItem('memonap_collections');
-    const profile = localStorage.getItem('memonap_profile');
-    const settings = localStorage.getItem('memonap_settings');
+    const userEmail = sessionStorage.getItem('userEmail');
+    const userId = userEmail || 'guest';
     
-    const exportData = {
-        memories: memories ? JSON.parse(memories) : [],
-        collections: collections ? JSON.parse(collections) : [],
-        profile: profile ? JSON.parse(profile) : {},
-        settings: settings ? JSON.parse(settings) : {},
-        exportDate: new Date().toISOString()
-    };
+    const memories = JSON.parse(localStorage.getItem(`memonap_memories_${userId}`) || '[]');
+    const collections = JSON.parse(localStorage.getItem(`memonap_collections_${userId}`) || '[]');
+    const profile = JSON.parse(localStorage.getItem(`memonap_profile_${userId}`) || '{}');
+    const diary = JSON.parse(localStorage.getItem(`memonap_diary_${userId}`) || '[]');
     
-    const dataStr = JSON.stringify(exportData, null, 2);
-    const blob = new Blob([dataStr], { type: 'application/json' });
+    // Build HTML for export
+    let html = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MemoMap Export - ${new Date().toLocaleDateString()}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #fdf6f0; padding: 2rem; color: #2d1b2e; max-width: 1200px; margin: 0 auto; }
+        h1 { font-size: 2.5rem; color: #5c3d2e; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 10px; }
+        .header { text-align: center; padding: 2rem 0; border-bottom: 2px solid #f0e0e4; margin-bottom: 2rem; }
+        .header p { color: #888; font-size: 1.1rem; }
+        .section { margin-bottom: 2rem; }
+        .section h2 { background: linear-gradient(135deg, #ff6b8b, #ffb347); color: white; padding: 0.8rem 1.5rem; border-radius: 40px; display: inline-block; margin-bottom: 1rem; }
+        .memory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
+        .memory-card { background: white; border-radius: 20px; padding: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #f0e0e4; }
+        .memory-card h3 { color: #2d1b2e; margin-bottom: 0.3rem; }
+        .memory-card .location { color: #ff6b8b; font-size: 0.9rem; }
+        .memory-card .date { color: #888; font-size: 0.8rem; margin: 0.3rem 0; }
+        .memory-card .mood { display: inline-block; padding: 0.2rem 0.8rem; background: rgba(255,107,139,0.1); border-radius: 20px; font-size: 0.8rem; }
+        .memory-card .story { color: #666; margin-top: 0.5rem; font-size: 0.9rem; line-height: 1.6; }
+        .profile-info { background: white; border-radius: 20px; padding: 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
+        .profile-info .avatar { font-size: 4rem; }
+        .profile-info .name { font-size: 1.5rem; font-weight: 600; }
+        .profile-info .email { color: #888; }
+        .diary-entry { background: white; border-radius: 20px; padding: 1.5rem; margin-bottom: 1rem; border: 1px solid #f0e0e4; }
+        .diary-entry h3 { color: #2d1b2e; }
+        .diary-entry .diary-date { color: #888; font-size: 0.8rem; }
+        .diary-entry .diary-content { margin-top: 0.5rem; color: #666; line-height: 1.6; }
+        .footer { text-align: center; padding: 2rem; color: #888; border-top: 2px solid #f0e0e4; margin-top: 2rem; }
+        .tag { display: inline-block; padding: 0.2rem 0.6rem; background: rgba(255,107,139,0.08); border-radius: 20px; font-size: 0.7rem; color: #ff6b8b; margin: 0.2rem; }
+        @media print {
+            body { background: white; padding: 1rem; }
+            .memory-card { break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🗺️ MemoMap</h1>
+        <p>Every Place Has a Story</p>
+        <p style="font-size: 0.8rem;">Exported on ${new Date().toLocaleString()}</p>
+    </div>
+`;
+
+    // Profile Section
+    if (profile.name) {
+        html += `
+    <div class="section">
+        <h2>👤 Profile</h2>
+        <div class="profile-info">
+            <div class="avatar">${profile.avatar || '🌍'}</div>
+            <div>
+                <div class="name">${profile.name}</div>
+                <div class="email">${profile.email}</div>
+                ${profile.bio ? `<div style="color:#888; font-size:0.9rem;">${profile.bio}</div>` : ''}
+                ${profile.quote ? `<div style="color:#ff6b8b; font-style:italic;">"${profile.quote}"</div>` : ''}
+            </div>
+        </div>
+    </div>
+`;
+    }
+
+    // Memories Section
+    if (memories.length > 0) {
+        html += `
+    <div class="section">
+        <h2>📸 Memories (${memories.length})</h2>
+        <div class="memory-grid">
+`;
+        memories.forEach(m => {
+            const moodEmojis = { happy: '😊', peaceful: '😌', loved: '❤️', excited: '😎', nostalgic: '📸', sad: '😢' };
+            html += `
+            <div class="memory-card">
+                <h3>${m.title}</h3>
+                <div class="location">📍 ${m.location}</div>
+                <div class="date">📅 ${new Date(m.date).toLocaleDateString()}</div>
+                <div class="mood">${moodEmojis[m.mood] || '📝'} ${m.mood}</div>
+                ${m.tags && m.tags.length > 0 ? `<div>${m.tags.map(t => `<span class="tag">#${t}</span>`).join('')}</div>` : ''}
+                ${m.story ? `<div class="story">${m.story}</div>` : ''}
+                ${m.photos && m.photos.length > 0 ? `<div style="margin-top:0.5rem; color:#888; font-size:0.8rem;">📷 ${m.photos.length} photo(s)</div>` : ''}
+                ${m.voiceNote ? `<div style="margin-top:0.3rem; color:#888; font-size:0.8rem;">🎙️ Voice note recorded</div>` : ''}
+                ${m.timeCapsule ? `<div style="margin-top:0.3rem; color:#fbbf24; font-size:0.8rem;">🔒 Time Capsule (${m.capsuleTime} years)</div>` : ''}
+            </div>
+`;
+        });
+        html += `
+        </div>
+    </div>
+`;
+    }
+
+    // Diary Section
+    if (diary.length > 0) {
+        html += `
+    <div class="section">
+        <h2>📖 Digital Diary (${diary.length} entries)</h2>
+`;
+        diary.forEach(entry => {
+            html += `
+            <div class="diary-entry">
+                <h3>${entry.title}</h3>
+                <div class="diary-date">${new Date(entry.createdAt).toLocaleString()}</div>
+                <div class="diary-content">${entry.content}</div>
+                ${entry.isLocked ? `<div style="color:#fbbf24; font-size:0.8rem;">🔒 Locked entry</div>` : ''}
+                ${entry.photos && entry.photos.length > 0 ? `<div style="color:#888; font-size:0.8rem;">📷 ${entry.photos.length} photo(s)</div>` : ''}
+            </div>
+`;
+        });
+        html += `
+    </div>
+`;
+    }
+
+    // Collections Section
+    if (collections.length > 0) {
+        html += `
+    <div class="section">
+        <h2>📁 Collections (${collections.length})</h2>
+`;
+        collections.forEach(c => {
+            html += `
+            <div style="background:white; border-radius:20px; padding:1rem; margin-bottom:0.8rem; border:1px solid #f0e0e4;">
+                <h3>${c.icon || '📁'} ${c.name}</h3>
+                <div style="color:#888; font-size:0.8rem;">${c.description || 'No description'}</div>
+                <div style="color:#888; font-size:0.8rem;">${c.memoryIds ? c.memoryIds.length : 0} memories</div>
+                ${c.isLocked ? `<div style="color:#fbbf24; font-size:0.8rem;">🔒 Password protected</div>` : ''}
+            </div>
+`;
+        });
+        html += `
+    </div>
+`;
+    }
+
+    html += `
+    <div class="footer">
+        <p>🗺️ MemoMap - Every Place Has a Story</p>
+        <p style="font-size: 0.8rem; margin-top: 0.5rem;">Exported from MemoMap on ${new Date().toLocaleString()}</p>
+    </div>
+</body>
+</html>`;
+
+    // Create download
+    const blob = new Blob([html], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `memonap_backup_${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `memonap_export_${new Date().toISOString().split('T')[0]}.html`;
     a.click();
     URL.revokeObjectURL(url);
-    alert('✅ Data exported successfully!');
+    showToast('✅ Data exported successfully!');
 }
 
 // ===== Change Password =====
@@ -424,6 +431,19 @@ function closeDeleteAccountModalFunc() {
 function confirmDeleteAccount() {
     if (deleteConfirmInput.value === 'DELETE') {
         if (confirm('⚠️ This will permanently delete ALL your data. Are you absolutely sure?')) {
+            const userEmail = sessionStorage.getItem('userEmail');
+            const userId = userEmail || 'guest';
+            
+            localStorage.removeItem(`memonap_memories_${userId}`);
+            localStorage.removeItem(`memonap_collections_${userId}`);
+            localStorage.removeItem(`memonap_profile_${userId}`);
+            localStorage.removeItem(`memonap_diary_${userId}`);
+            localStorage.removeItem(`memonap_notifications_${userId}`);
+            
+            if (typeof firebase !== 'undefined' && firebase.auth) {
+                firebase.auth().signOut().catch(console.error);
+            }
+            
             localStorage.clear();
             sessionStorage.clear();
             alert('Account deleted. Redirecting to home...');
@@ -444,8 +464,14 @@ function closeClearDataModalFunc() {
 }
 
 function confirmClearData() {
-    localStorage.removeItem('memonap_memories');
-    localStorage.removeItem('memonap_collections');
+    const userEmail = sessionStorage.getItem('userEmail');
+    const userId = userEmail || 'guest';
+    
+    localStorage.removeItem(`memonap_memories_${userId}`);
+    localStorage.removeItem(`memonap_collections_${userId}`);
+    localStorage.removeItem(`memonap_diary_${userId}`);
+    localStorage.removeItem(`memonap_notifications_${userId}`);
+    
     alert('All data cleared! Redirecting to dashboard...');
     window.location.href = 'dashboard.html';
 }
@@ -455,12 +481,245 @@ function enable2FA() {
     alert('🔐 Two-Factor Authentication coming soon!');
 }
 
+// ===== Terms of Service (Beautiful Page) =====
+function openTerms() {
+    const termsWindow = window.open('', '_blank', 'width=900,height=700,scrollbars=yes');
+    termsWindow.document.write(`
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service | MemoMap</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(145deg, #fef5f7 0%, #fde8ed 40%, #eef2fa 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            color: #2d1b2e;
+        }
+        .container { max-width: 900px; margin: 0 auto; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); border-radius: 40px; padding: 3rem; box-shadow: 0 20px 40px rgba(0,0,0,0.05); border: 1px solid rgba(255,255,255,0.5); }
+        .header { text-align: center; padding-bottom: 2rem; border-bottom: 2px solid #f0e0e4; margin-bottom: 2rem; }
+        .header h1 { font-size: 2.5rem; color: #2d1b2e; display: flex; align-items: center; justify-content: center; gap: 12px; }
+        .header h1 i { color: #ff6b8b; }
+        .header p { color: #888; margin-top: 0.5rem; }
+        .date-badge { display: inline-block; background: rgba(255,107,139,0.1); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; color: #ff6b8b; margin-top: 0.5rem; }
+        .section { margin-bottom: 2rem; }
+        .section h2 { color: #ff6b8b; font-size: 1.2rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 8px; }
+        .section p { color: #666; line-height: 1.8; font-size: 0.95rem; }
+        .section ul { color: #666; line-height: 1.8; padding-left: 1.5rem; }
+        .section ul li { margin-bottom: 0.3rem; }
+        .footer { text-align: center; padding-top: 2rem; border-top: 2px solid #f0e0e4; color: #888; font-size: 0.85rem; }
+        .footer .logo { font-size: 1.2rem; font-weight: 600; color: #2d1b2e; }
+        .back-btn { display: inline-block; margin-top: 1rem; padding: 0.5rem 1.5rem; background: linear-gradient(135deg, #ff6b8b, #ffb347); color: white; border: none; border-radius: 40px; font-family: 'Poppins', sans-serif; cursor: pointer; font-size: 0.9rem; }
+        @media (max-width: 550px) { .container { padding: 1.5rem; } .header h1 { font-size: 1.8rem; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="ri-file-text-line"></i> Terms of Service</h1>
+            <p>Last Updated: ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+            <span class="date-badge">📋 Effective Immediately</span>
+        </div>
+        
+        <div class="section">
+            <h2>1. Acceptance of Terms</h2>
+            <p>By using MemoMap, you agree to these Terms of Service. If you don't agree, please don't use the service. These terms form a legally binding agreement between you and MemoMap.</p>
+        </div>
+        
+        <div class="section">
+            <h2>2. User Accounts</h2>
+            <p>You are responsible for maintaining the security of your account and password. MemoMap cannot and will not be liable for any loss or damage from your failure to comply with this security obligation.</p>
+            <ul>
+                <li>You must be at least 13 years old to use MemoMap</li>
+                <li>You are responsible for all activity on your account</li>
+                <li>You must not share your password with anyone</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>3. User Content</h2>
+            <p>You retain all rights to your content (memories, photos, diary entries, voice notes). By posting content to MemoMap, you grant MemoMap the right to display and store your content as part of the service.</p>
+            <ul>
+                <li>You own your memories and content</li>
+                <li>We don't claim ownership of your content</li>
+                <li>You can delete your content at any time</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>4. Privacy</h2>
+            <p>Your privacy matters to us. We collect only the data you provide and use it solely to provide the service. We don't sell your data to third parties. Read our full Privacy Policy for details.</p>
+        </div>
+        
+        <div class="section">
+            <h2>5. Prohibited Uses</h2>
+            <p>You may not use MemoMap for illegal activities, harassment, or to store illegal content. We reserve the right to suspend accounts that violate these terms.</p>
+            <ul>
+                <li>No illegal content</li>
+                <li>No harassment or bullying</li>
+                <li>No spam or malicious activity</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>6. Termination</h2>
+            <p>You can delete your account at any time from Settings. We reserve the right to terminate accounts for violations of these terms.</p>
+        </div>
+        
+        <div class="section">
+            <h2>7. Changes to Terms</h2>
+            <p>We may update these terms occasionally. Continued use of MemoMap after changes constitutes acceptance of the new terms. We will notify you of significant changes.</p>
+        </div>
+        
+        <div class="section">
+            <h2>8. Contact</h2>
+            <p>For questions about these terms, contact us at: <strong style="color: #ff6b8b;">support@memonap.com</strong></p>
+        </div>
+        
+        <div class="footer">
+            <div class="logo">🗺️ MemoMap</div>
+            <p>Every Place Has a Story</p>
+            <p style="margin-top: 0.5rem; font-size: 0.75rem;">© ${new Date().getFullYear()} MemoMap. All Rights Reserved.</p>
+        </div>
+    </div>
+    <script>document.title = "Terms of Service | MemoMap";</script>
+</body>
+</html>
+    `);
+    termsWindow.document.close();
+}
+
+// ===== Privacy Policy (Beautiful Page) =====
+function openPrivacy() {
+    const privacyWindow = window.open('', '_blank', 'width=900,height=700,scrollbars=yes');
+    privacyWindow.document.write(`
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy | MemoMap</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(145deg, #fef5f7 0%, #fde8ed 40%, #eef2fa 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            color: #2d1b2e;
+        }
+        .container { max-width: 900px; margin: 0 auto; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); border-radius: 40px; padding: 3rem; box-shadow: 0 20px 40px rgba(0,0,0,0.05); border: 1px solid rgba(255,255,255,0.5); }
+        .header { text-align: center; padding-bottom: 2rem; border-bottom: 2px solid #f0e0e4; margin-bottom: 2rem; }
+        .header h1 { font-size: 2.5rem; color: #2d1b2e; display: flex; align-items: center; justify-content: center; gap: 12px; }
+        .header h1 i { color: #ff6b8b; }
+        .header p { color: #888; margin-top: 0.5rem; }
+        .date-badge { display: inline-block; background: rgba(255,107,139,0.1); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; color: #ff6b8b; margin-top: 0.5rem; }
+        .section { margin-bottom: 2rem; }
+        .section h2 { color: #ff6b8b; font-size: 1.2rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 8px; }
+        .section p { color: #666; line-height: 1.8; font-size: 0.95rem; }
+        .section ul { color: #666; line-height: 1.8; padding-left: 1.5rem; }
+        .section ul li { margin-bottom: 0.3rem; }
+        .footer { text-align: center; padding-top: 2rem; border-top: 2px solid #f0e0e4; color: #888; font-size: 0.85rem; }
+        .footer .logo { font-size: 1.2rem; font-weight: 600; color: #2d1b2e; }
+        @media (max-width: 550px) { .container { padding: 1.5rem; } .header h1 { font-size: 1.8rem; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="ri-lock-line"></i> Privacy Policy</h1>
+            <p>Last Updated: ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+            <span class="date-badge">🔒 Your Privacy Matters</span>
+        </div>
+        
+        <div class="section">
+            <h2>1. Information We Collect</h2>
+            <p>We collect the following types of information to provide and improve MemoMap:</p>
+            <ul>
+                <li><strong>Account Information:</strong> Name, email address, and profile picture</li>
+                <li><strong>Content:</strong> Memories, photos, diary entries, voice notes</li>
+                <li><strong>Usage Data:</strong> How you interact with MemoMap features</li>
+                <li><strong>Location:</strong> Places you add to your memories</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>2. How We Use Your Data</h2>
+            <ul>
+                <li><strong>Provide Service:</strong> To display your memories on maps and timelines</li>
+                <li><strong>Improve Features:</strong> To understand how users interact with MemoMap</li>
+                <li><strong>Security:</strong> To protect your account and data</li>
+                <li><strong>Personalization:</strong> To make your experience better</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>3. Data Storage & Security</h2>
+            <p>Your data is stored locally in your browser and synced with Firebase for authentication. We don't share your data with third parties.</p>
+            <ul>
+                <li>All data is encrypted in transit</li>
+                <li>We use industry-standard security practices</li>
+                <li>Your password is never stored in plain text</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>4. Your Rights</h2>
+            <ul>
+                <li><strong>Access:</strong> You can access all your data in the app</li>
+                <li><strong>Export:</strong> Export your data anytime from Settings</li>
+                <li><strong>Delete:</strong> Delete your account and data from Settings</li>
+                <li><strong>Correction:</strong> Edit your profile and memories anytime</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>5. Cookies</h2>
+            <p>We use cookies to keep you logged in and remember your preferences. You can disable cookies in your browser settings, but this may affect functionality.</p>
+        </div>
+        
+        <div class="section">
+            <h2>6. Third-Party Services</h2>
+            <p>MemoMap uses Firebase (Google) for authentication. Their privacy policy applies to authentication data. We don't share your data with any other third parties.</p>
+        </div>
+        
+        <div class="section">
+            <h2>7. Changes to This Policy</h2>
+            <p>We may update this privacy policy occasionally. We'll notify you of changes via the app. Continued use of MemoMap after changes constitutes acceptance.</p>
+        </div>
+        
+        <div class="section">
+            <h2>8. Contact Us</h2>
+            <p>If you have questions about this privacy policy, contact us at: <strong style="color: #ff6b8b;">support@memonap.com</strong></p>
+        </div>
+        
+        <div class="footer">
+            <div class="logo">🗺️ MemoMap</div>
+            <p>Every Place Has a Story</p>
+            <p style="margin-top: 0.5rem; font-size: 0.75rem;">© ${new Date().getFullYear()} MemoMap. All Rights Reserved.</p>
+        </div>
+    </div>
+    <script>document.title = "Privacy Policy | MemoMap";</script>
+</body>
+</html>
+    `);
+    privacyWindow.document.close();
+}
+
 // ===== Event Listeners =====
 if (exportDataBtn) exportDataBtn.addEventListener('click', exportData);
 if (clearDataBtn) clearDataBtn.addEventListener('click', openClearDataModal);
 if (changePasswordBtn) changePasswordBtn.addEventListener('click', openPasswordModal);
 if (deleteAccountBtn) deleteAccountBtn.addEventListener('click', openDeleteAccountModal);
 if (enable2faBtn) enable2faBtn.addEventListener('click', enable2FA);
+if (termsBtn) termsBtn.addEventListener('click', openTerms);
+if (privacyBtn) privacyBtn.addEventListener('click', openPrivacy);
 
 if (closePasswordModal) closePasswordModal.addEventListener('click', closePasswordModalFunc);
 if (cancelPasswordBtn) cancelPasswordBtn.addEventListener('click', closePasswordModalFunc);
@@ -490,8 +749,13 @@ if (menuToggle) {
 }
 
 if (logoutBtn) {
-    logoutBtn.addEventListener('click', () => {
+    logoutBtn.addEventListener('click', async () => {
         sessionStorage.clear();
+        if (typeof firebase !== 'undefined' && firebase.auth) {
+            try {
+                await firebase.auth().signOut();
+            } catch(e) {}
+        }
         window.location.href = 'login.html';
     });
 }
@@ -503,21 +767,38 @@ document.addEventListener('click', (e) => {
         }
     }
 });
-
-// ===== Check Auth =====
-function checkAuth() {
-    const isLoggedIn = sessionStorage.getItem('isLoggedIn');
-    if (!isLoggedIn || isLoggedIn !== 'true') {
-        window.location.href = 'login.html';
+// ===== Update Theme Across All Pages =====
+function updateThemeAcrossPages(theme) {
+    // Save to localStorage
+    localStorage.setItem('memonap_preferred_theme', theme);
+    
+    // Apply to current page
+    let actualTheme = theme;
+    if (theme === 'auto') {
+        actualTheme = getSystemTheme();
     }
-    const userName = sessionStorage.getItem('userName');
-    if (userName) {
-        document.getElementById('sidebarUserName').textContent = userName;
-    }
+    document.body.classList.remove('theme-light', 'theme-dark');
+    document.body.classList.add(actualTheme === 'dark' ? 'theme-dark' : 'theme-light');
+    
+    // Save settings
+    const settings = JSON.parse(localStorage.getItem('memonap_settings') || '{}');
+    settings.theme = theme;
+    localStorage.setItem('memonap_settings', JSON.stringify(settings));
 }
 
-// Initialize
+// In your theme button click handler:
+themeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        themeBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const theme = btn.dataset.theme;
+        updateThemeAcrossPages(theme);
+        showToast('Theme updated: ' + theme);
+    });
+});
+// ===== Initialize =====
 checkAuth();
 loadSettings();
+listenForSystemThemeChanges();
 
-console.log('%c⚙️ Settings Page Loaded', 'color: #ff6b8b; font-size: 14px; font-weight: bold;');
+console.log('%c⚙️ Settings Page Loaded - Theme applies to ALL pages', 'color: #ff6b8b; font-size: 14px; font-weight: bold');

@@ -10,6 +10,22 @@
 </head>
 <body>
 
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="floating-icon icon-1">📍</div>
+        <div class="floating-icon icon-2">🗺️</div>
+        <div class="floating-icon icon-3">📸</div>
+        <div class="floating-icon icon-4">🎞️</div>
+        <div class="floating-icon icon-5">❤️</div>
+        <div class="floating-icon icon-6">🌟</div>
+        <div class="floating-icon icon-7">🕰️</div>
+        <div class="floating-icon icon-8">📻</div>
+        <div class="pulse-circle circle-1"></div>
+        <div class="pulse-circle circle-2"></div>
+        <div class="floating-shape shape-1"></div>
+        <div class="floating-shape shape-2"></div>
+    </div>
+
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-logo">
@@ -48,13 +64,29 @@
                 <i class="ri-folder-line"></i>
                 <span>Collections</span>
             </a>
+            <a href="nostalgia.html" class="nav-item active">
+                <i class="ri-emotion-line"></i>
+                <span>Nostalgia</span>
+            </a>
+            <a href="diary.html" class="nav-item">
+                <i class="ri-book-open-line"></i>
+                <span>Digital Diary</span>
+            </a>
             <a href="profile.html" class="nav-item">
                 <i class="ri-user-line"></i>
                 <span>Profile</span>
             </a>
-            <a href="nostalgia.html" class="nav-item active">
-                <i class="ri-emotion-line"></i>
-                <span>Nostalgia</span>
+            
+            <div class="nav-divider"></div>
+            
+            <a href="notifications.html" class="nav-item">
+                <i class="ri-notification-3-line"></i>
+                <span>Notifications</span>
+                <span class="nav-badge" id="sidebarNotificationBadge">0</span>
+            </a>
+            <a href="help.html" class="nav-item">
+                <i class="ri-question-line"></i>
+                <span>Help & Support</span>
             </a>
             <a href="settings.html" class="nav-item">
                 <i class="ri-settings-line"></i>
@@ -82,7 +114,7 @@
                 </div>
             </div>
             <div class="header-right">
-                <div class="user-avatar">
+                <div class="user-avatar" id="userAvatar">
                     <span>🌍</span>
                 </div>
             </div>
@@ -176,20 +208,17 @@
             </div>
         </div>
     </div>
-<script>
-    // Fix View All buttons
-    document.querySelectorAll('.view-all-btn, .view-all').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const text = btn.innerText.toLowerCase();
-            if (text.includes('rediscovered')) {
-                window.location.href = 'timeline.html';
-            } else {
-                alert('✨ All items are shown above!');
-            }
-        });
-    });
-</script>
+<!-- Theme Loader - Must be loaded before page scripts -->
+<script src="./js/theme-loader.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    
+    <!-- Firebase Config & Auth -->
+    <script src="./js/firebase-config.js"></script>
+    <script src="./js/auth.js"></script>
+    
+    <!-- Nostalgia Script -->
     <script src="./js/nostalgia.js"></script>
 </body>
 </html>
