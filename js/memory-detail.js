@@ -1,5 +1,5 @@
 // ============================================
-// MEMORY DETAIL - FIXED IMAGE DISPLAY
+// MEMORY DETAIL - COMPLETE WORKING VERSION
 // ============================================
 
 (function() {
@@ -18,7 +18,11 @@
     
     const memoryId = getMemoryId();
     console.log('📌 Memory ID:', memoryId);
-    console.log('📌 Memory ID Type:', typeof memoryId);
+    
+    // Audio player variables
+    let audioPlayer = null;
+    let isPlaying = false;
+    let audioProgressInterval = null;
     
     // ============================================
     // SHOW FUNCTIONS
@@ -52,67 +56,146 @@
     }
     
     // ============================================
-    // EXTRACT PHOTO URLS - FIXED
+    // VOICE PLAYER FUNCTIONS
+    // ============================================
+    
+    function createVoicePlayer(audioData, voiceName = 'Voice Note') {
+        const playerId = 'voicePlayer_' + Date.now();
+        
+        return `
+            <div class="voice-player" id="${playerId}">
+                <button class="play-btn" id="playBtn_${playerId}" onclick="window.toggleVoicePlay('${playerId}', '${audioData}')">
+                    <i class="ri-play-fill"></i>
+                </button>
+                <div class="voice-info">
+                    <div class="voice-label">🎙️ Voice Note</div>
+                    <div class="voice-name">${voiceName}</div>
+                    <div class="voice-progress-bar">
+                        <div class="voice-progress" id="progress_${playerId}" style="width: 0%;"></div>
+                    </div>
+                </div>
+                <span style="font-size: 0.7rem; color: #888;" id="timeDisplay_${playerId}">0:00</span>
+            </div>
+        `;
+    }
+    
+    // Global function for voice toggle
+    window.toggleVoicePlay = function(playerId, audioData) {
+        const playBtn = document.getElementById('playBtn_' + playerId);
+        const progressBar = document.getElementById('progress_' + playerId);
+        const timeDisplay = document.getElementById('timeDisplay_' + playerId);
+        
+        if (isPlaying && audioPlayer) {
+            // Pause
+            audioPlayer.pause();
+            isPlaying = false;
+            playBtn.innerHTML = '<i class="ri-play-fill"></i>';
+            playBtn.classList.remove('playing');
+            clearInterval(audioProgressInterval);
+            return;
+        }
+        
+        // Stop any existing audio
+        if (audioPlayer) {
+            audioPlayer.pause();
+            audioPlayer = null;
+            clearInterval(audioProgressInterval);
+        }
+        
+        try {
+            audioPlayer = new Audio(audioData);
+            
+            audioPlayer.onplay = function() {
+                isPlaying = true;
+                playBtn.innerHTML = '<i class="ri-pause-fill"></i>';
+                playBtn.classList.add('playing');
+            };
+            
+            audioPlayer.onpause = function() {
+                isPlaying = false;
+                playBtn.innerHTML = '<i class="ri-play-fill"></i>';
+                playBtn.classList.remove('playing');
+            };
+            
+            audioPlayer.onended = function() {
+                isPlaying = false;
+                playBtn.innerHTML = '<i class="ri-play-fill"></i>';
+                playBtn.classList.remove('playing');
+                progressBar.style.width = '100%';
+                timeDisplay.textContent = formatTime(audioPlayer.duration);
+                clearInterval(audioProgressInterval);
+            };
+            
+            audioPlayer.onerror = function() {
+                isPlaying = false;
+                playBtn.innerHTML = '<i class="ri-play-fill"></i>';
+                playBtn.classList.remove('playing');
+                clearInterval(audioProgressInterval);
+                alert('Error playing voice note.');
+            };
+            
+            audioPlayer.play();
+            
+            // Update progress
+            audioProgressInterval = setInterval(function() {
+                if (audioPlayer && audioPlayer.currentTime) {
+                    const progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+                    progressBar.style.width = progress + '%';
+                    timeDisplay.textContent = formatTime(audioPlayer.currentTime);
+                }
+            }, 100);
+            
+        } catch (err) {
+            console.error('Playback error:', err);
+            alert('Error playing voice note.');
+        }
+    };
+    
+    function formatTime(seconds) {
+        if (!seconds || isNaN(seconds)) return '0:00';
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return mins + ':' + (secs < 10 ? '0' : '') + secs;
+    }
+    
+    // ============================================
+    // EXTRACT PHOTO URLS
     // ============================================
     
     function getPhotoUrls(memory) {
         let photoUrls = [];
         
-        console.log('📸 Getting photos from memory:', memory);
-        
-        // Case 1: photos array
         if (memory.photos && Array.isArray(memory.photos) && memory.photos.length > 0) {
-            console.log('📸 Found photos array with length:', memory.photos.length);
-            console.log('📸 First photo:', memory.photos[0]);
-            
-            // Check each photo
-            memory.photos.forEach((photo, index) => {
-                // If photo is object with 'data' property (base64)
+            memory.photos.forEach((photo) => {
                 if (typeof photo === 'object' && photo.data) {
-                    console.log('📸 Photo ' + index + ' has data property');
                     photoUrls.push(photo.data);
-                }
-                // If photo is object with 'url' property
-                else if (typeof photo === 'object' && photo.url) {
-                    console.log('📸 Photo ' + index + ' has url property');
+                } else if (typeof photo === 'object' && photo.url) {
                     photoUrls.push(photo.url);
-                }
-                // If photo is string (URL or base64)
-                else if (typeof photo === 'string') {
-                    console.log('📸 Photo ' + index + ' is string');
+                } else if (typeof photo === 'string') {
                     photoUrls.push(photo);
-                }
-                // If photo has 'data' as a property
-                else if (photo && photo.data) {
-                    console.log('📸 Photo ' + index + ' has data');
+                } else if (photo && photo.data) {
                     photoUrls.push(photo.data);
                 }
             });
         }
         
-        // Case 2: imageUrl field
         if (memory.imageUrl) {
-            console.log('📸 Found imageUrl:', memory.imageUrl);
             photoUrls.push(memory.imageUrl);
         }
         
-        // Case 3: single photo (legacy)
         if (memory.photo) {
-            console.log('📸 Found photo:', memory.photo);
             photoUrls.push(memory.photo);
         }
         
-        console.log('📸 Final photo URLs:', photoUrls.length);
         return photoUrls;
     }
     
     // ============================================
-    // SHOW MEMORY - FIXED IMAGE
+    // SHOW MEMORY - BEAUTIFUL UI
     // ============================================
     
     function showMemory(memory) {
         console.log('📌 Displaying memory:', memory);
-        console.log('📸 Photos in memory:', memory.photos);
         
         // Mood emojis
         const moodEmojis = {
@@ -140,9 +223,7 @@
                         day: 'numeric'
                     });
                 }
-            } catch(e) {
-                console.log('Date formatting error:', e);
-            }
+            } catch(e) {}
         } else if (memory.date) {
             try {
                 const date = new Date(memory.date);
@@ -158,7 +239,7 @@
         
         // Mood
         const moodEmoji = memory.mood ? (moodEmojis[memory.mood] || '📝') : '📝';
-        const moodName = memory.mood ? memory.mood.charAt(0).toUpperCase() + memory.mood.slice(1) : 'No mood';
+        const moodName = memory.mood ? memory.mood.charAt(0).toUpperCase() + memory.mood.slice(1) : '';
         
         // Tags
         let tagsHtml = '';
@@ -167,58 +248,102 @@
             tagsHtml = `<div class="memory-tags">${tags.map(t => `<span class="tag">#${t}</span>`).join('')}</div>`;
         }
         
-        // ============================================
-        // GET PHOTO URLS - FIXED
-        // ============================================
+        // Photos
         const photoUrls = getPhotoUrls(memory);
-        
-        // Build image HTML
         let imageHtml = '';
         if (photoUrls.length > 0) {
             const imgSrc = photoUrls[0];
-            console.log('📸 Using image src:', imgSrc ? imgSrc.substring(0, 50) + '...' : 'null');
-            
             if (imgSrc && typeof imgSrc === 'string' && (imgSrc.startsWith('data:image') || imgSrc.startsWith('http'))) {
                 imageHtml = `
                     <div class="memory-image-container">
                         <img src="${imgSrc}" alt="${memory.title || 'Memory'}" class="memory-image" 
-                             onerror="this.parentElement.innerHTML='<div style=\\'padding: 2rem; text-align: center; color: #888;\\'><i class=\\'ri-image-line\\' style=\\'font-size: 3rem; display: block; margin-bottom: 0.5rem;\\'></i>Image not available</div>'">
+                             onerror="this.parentElement.innerHTML='<div class=\\'image-placeholder\\'><i class=\\'ri-image-line\\'></i><span>Image not available</span></div>'">
                     </div>
                 `;
             } else {
                 imageHtml = `
-                    <div class="memory-image-container" style="padding: 2rem; text-align: center; background: rgba(0,0,0,0.03); border-radius: 16px;">
-                        <i class="ri-image-line" style="font-size: 3rem; color: #ccc; display: block; margin-bottom: 0.5rem;"></i>
-                        <span style="color: #888; font-size: 0.9rem;">Image format not supported</span>
+                    <div class="image-placeholder">
+                        <i class="ri-image-line"></i>
+                        <span>No image available</span>
                     </div>
                 `;
             }
         } else {
             imageHtml = `
-                <div class="memory-image-container" style="padding: 2rem; text-align: center; background: rgba(0,0,0,0.03); border-radius: 16px;">
-                    <i class="ri-image-line" style="font-size: 3rem; color: #ccc; display: block; margin-bottom: 0.5rem;"></i>
-                    <span style="color: #888; font-size: 0.9rem;">No image available</span>
+                <div class="image-placeholder">
+                    <i class="ri-image-line"></i>
+                    <span>No image available</span>
                 </div>
             `;
         }
         
+        // Voice Note
+        let voiceHtml = '';
+        if (memory.voiceNote) {
+            voiceHtml = createVoicePlayer(memory.voiceNote, 'Memory Voice Note');
+        }
+        
         // Story
-        const story = memory.content || memory.story || 'No content available for this memory.';
+        const story = memory.content || memory.story || '';
+        const storyHtml = story ? `
+            <div class="memory-story-section">
+                <div class="story-label"><i class="ri-book-open-line"></i> Story</div>
+                <div class="memory-story">${escapeHtml(story)}</div>
+            </div>
+        ` : '';
         
         // Build HTML
         content.innerHTML = `
             <div class="memory-card">
-                <h1 class="memory-title">${memory.title || 'Untitled Memory'}</h1>
-                
-                <div class="memory-meta">
-                    <span>📅 ${dateStr}</span>
-                    ${memory.location ? `<span>📍 ${memory.location}</span>` : ''}
-                    <span>${moodEmoji} ${moodName}</span>
+                <div class="memory-header">
+                    <h1 class="memory-title">
+                        <span class="title-emoji">${moodEmoji}</span>
+                        ${escapeHtml(memory.title || 'Untitled Memory')}
+                    </h1>
+                    
+                    <div class="memory-meta">
+                        <span class="detail-badge">
+                            <i class="ri-calendar-line"></i> ${dateStr}
+                        </span>
+                        ${memory.location ? `<span class="detail-badge"><i class="ri-map-pin-line"></i> ${escapeHtml(memory.location)}</span>` : ''}
+                        <span class="detail-badge">
+                            <span class="mood-emoji">${moodEmoji}</span> ${escapeHtml(moodName)}
+                        </span>
+                    </div>
                 </div>
                 
                 ${imageHtml}
                 
-                <div class="memory-story">${story}</div>
+                <div class="memory-detail-grid">
+                    ${memory.date ? `
+                    <div class="detail-item">
+                        <div class="detail-icon"><i class="ri-calendar-line"></i></div>
+                        <div class="detail-text"><strong>Date:</strong> ${dateStr}</div>
+                    </div>
+                    ` : ''}
+                    ${memory.location ? `
+                    <div class="detail-item">
+                        <div class="detail-icon"><i class="ri-map-pin-line"></i></div>
+                        <div class="detail-text"><strong>Location:</strong> ${escapeHtml(memory.location)}</div>
+                    </div>
+                    ` : ''}
+                    ${memory.with ? `
+                    <div class="detail-item">
+                        <div class="detail-icon"><i class="ri-group-line"></i></div>
+                        <div class="detail-text"><strong>With:</strong> ${escapeHtml(memory.with)}</div>
+                    </div>
+                    ` : ''}
+                    ${memory.song ? `
+                    <div class="detail-item">
+                        <div class="detail-icon"><i class="ri-music-line"></i></div>
+                        <div class="detail-text"><strong>Song:</strong> 🎵 ${escapeHtml(memory.song)}</div>
+                    </div>
+                    ` : ''}
+                </div>
+                
+                ${storyHtml}
+                
+                ${voiceHtml}
                 
                 ${tagsHtml}
                 
@@ -243,6 +368,16 @@
         });
     }
     
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
     // ============================================
     // DELETE MEMORY
     // ============================================
@@ -253,7 +388,6 @@
         }
         
         try {
-            // Check if it's a localStorage memory
             const userEmail = sessionStorage.getItem('userEmail');
             const userId = userEmail || 'guest';
             const memoriesKey = `memonap_memories_${userId}`;
@@ -261,7 +395,6 @@
             const index = memories.findIndex(m => String(m.id) === String(id));
             
             if (index !== -1) {
-                // Delete from localStorage
                 memories.splice(index, 1);
                 localStorage.setItem(memoriesKey, JSON.stringify(memories));
                 console.log('✅ Memory deleted from localStorage');
@@ -269,7 +402,6 @@
                 return;
             }
             
-            // Try Firebase
             if (typeof firebase !== 'undefined') {
                 const user = firebase.auth().currentUser;
                 if (user) {
@@ -304,27 +436,10 @@
         const memoriesKey = `memonap_memories_${userId}`;
         const memories = JSON.parse(localStorage.getItem(memoriesKey) || '[]');
         
-        console.log('🔍 Searching localStorage:', memories.length, 'memories');
-        console.log('🔍 Looking for ID:', id, 'Type:', typeof id);
-        
-        // Find memory (convert both to string for comparison)
         const memory = memories.find(m => String(m.id) === String(id));
         
         if (memory) {
             console.log('✅ Found in localStorage:', memory);
-            console.log('📸 Photos in memory:', memory.photos);
-            if (memory.photos && memory.photos.length > 0) {
-                const firstPhoto = memory.photos[0];
-                console.log('📸 First photo type:', typeof firstPhoto);
-                if (typeof firstPhoto === 'object') {
-                    console.log('📸 First photo keys:', Object.keys(firstPhoto));
-                    if (firstPhoto.data) {
-                        console.log('📸 First photo data preview:', firstPhoto.data.substring(0, 50) + '...');
-                    }
-                } else if (typeof firstPhoto === 'string') {
-                    console.log('📸 First photo preview:', firstPhoto.substring(0, 50) + '...');
-                }
-            }
             return memory;
         }
         
@@ -333,11 +448,10 @@
     }
     
     // ============================================
-    // LOAD MEMORY - SEARCH BOTH SOURCES
+    // LOAD MEMORY
     // ============================================
     
     function loadMemory() {
-        // Check if we have a memory ID
         if (!memoryId) {
             showError(
                 'No Memory ID',
@@ -349,7 +463,6 @@
         
         showLoading();
         
-        // ===== STEP 1: Search localStorage first =====
         const localMemory = searchLocalStorage(memoryId);
         if (localMemory) {
             console.log('✅ Displaying from localStorage');
@@ -357,12 +470,11 @@
             return;
         }
         
-        // ===== STEP 2: Try Firebase =====
         if (typeof firebase === 'undefined') {
             showError(
                 'Memory Not Found',
                 'The memory you\'re looking for doesn\'t exist or has been deleted.',
-                `<strong>Memory ID:</strong> ${memoryId}<br><strong>Note:</strong> Checked localStorage and Firebase`
+                `<strong>Memory ID:</strong> ${memoryId}<br><strong>Note:</strong> Checked localStorage`
             );
             return;
         }
@@ -386,7 +498,6 @@
             console.log('👤 User ID:', user.uid);
             console.log('🔍 Fetching from Firebase:', memoryId);
             
-            // Get memory from Firestore
             db.collection('memories').doc(String(memoryId)).get()
                 .then(function(doc) {
                     console.log('📄 Document exists:', doc.exists);
@@ -395,7 +506,7 @@
                         showError(
                             '🔍 Memory Not Found',
                             'The memory you\'re looking for doesn\'t exist or has been deleted.',
-                            `<strong>Memory ID:</strong> ${memoryId}<br><strong>User ID:</strong> ${user.uid}<br><strong>Checked:</strong> localStorage and Firebase`
+                            `<strong>Memory ID:</strong> ${memoryId}<br><strong>User ID:</strong> ${user.uid}`
                         );
                         return;
                     }
@@ -422,7 +533,6 @@
                 .catch(function(error) {
                     console.error('❌ Firestore Error:', error);
                     
-                    // One more try - search localStorage again
                     const retryLocal = searchLocalStorage(memoryId);
                     if (retryLocal) {
                         console.log('✅ Found in localStorage on retry');
@@ -453,7 +563,6 @@
         }
     }
     
-    // Start when DOM is ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', waitForFirebase);
     } else {

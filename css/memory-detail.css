@@ -1,5 +1,5 @@
 /* ============================================
-   MEMORY DETAIL CSS
+   MEMORY DETAIL - BEAUTIFUL UI
    ============================================ */
 
 * {
@@ -81,6 +81,32 @@ body.dark-mode .loading .spinner {
     border-top: 4px solid #7c6cf0 !important;
 }
 
+body.dark-mode .detail-badge {
+    background: rgba(124, 108, 240, 0.08) !important;
+    color: #a29bfe !important;
+}
+
+body.dark-mode .detail-badge i {
+    color: #7c6cf0 !important;
+}
+
+body.dark-mode .voice-player {
+    background: rgba(124, 108, 240, 0.05) !important;
+    border-color: rgba(124, 108, 240, 0.08) !important;
+}
+
+body.dark-mode .voice-player .play-btn {
+    background: linear-gradient(135deg, #7c6cf0, #6c5ce7) !important;
+}
+
+body.dark-mode .voice-player .play-btn:hover {
+    box-shadow: 0 4px 20px rgba(124, 108, 240, 0.3) !important;
+}
+
+body.dark-mode .memory-detail-grid .detail-item {
+    border-bottom: 1px solid rgba(124, 108, 240, 0.05) !important;
+}
+
 /* ===== CONTAINER ===== */
 .container {
     max-width: 900px;
@@ -139,59 +165,200 @@ body.dark-mode .loading .spinner {
 /* ===== MEMORY CARD ===== */
 .memory-card {
     background: white;
-    border-radius: 24px;
+    border-radius: 28px;
     padding: 2.5rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
     animation: fadeIn 0.5s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.memory-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, #ff6b8b, #ffb347, #ff6b8b);
+    background-size: 200% 100%;
+    animation: gradientMove 3s ease infinite;
+}
+
+@keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
+    from { opacity: 0; transform: translateY(30px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-.memory-title {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: #2d1b2e;
-    margin-bottom: 0.5rem;
-}
-
-.memory-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.5rem;
-    color: #888;
-    font-size: 0.9rem;
+/* ===== MEMORY HEADER ===== */
+.memory-header {
     margin-bottom: 1.5rem;
 }
 
-.memory-meta span {
+.memory-title {
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: #2d1b2e;
+    margin-bottom: 0.8rem;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+}
+
+.memory-title .title-emoji {
+    margin-right: 0.5rem;
+}
+
+/* ===== MEMORY META BADGES ===== */
+.memory-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.detail-badge {
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    padding: 0.4rem 1rem;
+    background: rgba(255, 107, 139, 0.06);
+    border-radius: 40px;
+    font-size: 0.85rem;
+    color: #666;
+    font-weight: 500;
+}
+
+.detail-badge i {
+    color: #ff6b8b;
+    font-size: 1rem;
+}
+
+.detail-badge .mood-emoji {
+    font-size: 1rem;
+}
+
+/* ===== MEMORY DETAIL GRID ===== */
+.memory-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    background: rgba(255, 107, 139, 0.03);
+    border-radius: 16px;
+    padding: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.memory-detail-grid .detail-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid #f0e0e4;
+}
+
+.memory-detail-grid .detail-item:last-child,
+.memory-detail-grid .detail-item:nth-last-child(2) {
+    border-bottom: none;
+}
+
+.memory-detail-grid .detail-item .detail-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255, 107, 139, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ff6b8b;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.memory-detail-grid .detail-item .detail-text {
+    font-size: 0.85rem;
+    color: #555;
+    font-weight: 500;
+}
+
+.memory-detail-grid .detail-item .detail-text strong {
+    color: #2d1b2e;
+}
+
+/* ===== MEMORY IMAGE ===== */
+.memory-image-container {
+    margin: 1.5rem 0;
+    border-radius: 20px;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.03);
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
 .memory-image {
     width: 100%;
-    max-height: 450px;
+    max-height: 500px;
     object-fit: cover;
-    border-radius: 16px;
-    margin-bottom: 1.5rem;
+    display: block;
+    transition: transform 0.5s ease;
+}
+
+.memory-image:hover {
+    transform: scale(1.02);
+}
+
+.image-placeholder {
+    padding: 3rem 2rem;
+    text-align: center;
+    color: #aaa;
+}
+
+.image-placeholder i {
+    font-size: 3.5rem;
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #ddd;
+}
+
+/* ===== STORY SECTION ===== */
+.memory-story-section {
+    margin: 1.5rem 0;
+}
+
+.memory-story-section .story-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #ff6b8b;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .memory-story {
     font-size: 1.1rem;
-    line-height: 1.8;
+    line-height: 1.9;
     color: #444;
     white-space: pre-wrap;
+    padding: 1rem 1.5rem;
+    background: rgba(255, 107, 139, 0.03);
+    border-radius: 16px;
+    border-left: 3px solid #ff6b8b;
 }
 
+/* ===== TAGS ===== */
 .memory-tags {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
-    margin-top: 1.5rem;
+    margin: 1.5rem 0;
 }
 
 .tag {
@@ -201,6 +368,83 @@ body.dark-mode .loading .spinner {
     border-radius: 20px;
     font-size: 0.8rem;
     font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.tag:hover {
+    background: rgba(255, 107, 139, 0.15);
+    transform: translateY(-2px);
+}
+
+/* ===== VOICE PLAYER ===== */
+.voice-player {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.8rem 1.2rem;
+    background: rgba(255, 107, 139, 0.05);
+    border-radius: 60px;
+    border: 1px solid rgba(255, 107, 139, 0.1);
+    margin: 1rem 0;
+    max-width: 400px;
+}
+
+.voice-player .play-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, #ff6b8b, #ffb347);
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.voice-player .play-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 20px rgba(255, 107, 139, 0.3);
+}
+
+.voice-player .play-btn.playing {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+}
+
+.voice-player .voice-info {
+    flex: 1;
+}
+
+.voice-player .voice-info .voice-label {
+    font-size: 0.7rem;
+    color: #aaa;
+    font-weight: 500;
+}
+
+.voice-player .voice-info .voice-name {
+    font-size: 0.85rem;
+    color: #333;
+    font-weight: 500;
+}
+
+.voice-player .voice-progress-bar {
+    width: 100%;
+    height: 4px;
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 4px;
+    margin-top: 4px;
+    overflow: hidden;
+}
+
+.voice-player .voice-progress-bar .voice-progress {
+    height: 100%;
+    background: linear-gradient(90deg, #ff6b8b, #ffb347);
+    border-radius: 4px;
+    width: 0%;
+    transition: width 0.1s linear;
 }
 
 /* ===== MEMORY ACTIONS ===== */
@@ -220,7 +464,7 @@ body.dark-mode .memory-actions {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 0.6rem 1.5rem;
+    padding: 0.7rem 1.8rem;
     background: rgba(255, 107, 139, 0.08);
     color: #ff6b8b;
     border: 2px solid rgba(255, 107, 139, 0.15);
@@ -235,6 +479,7 @@ body.dark-mode .memory-actions {
 .btn-edit:hover {
     background: rgba(255, 107, 139, 0.15);
     transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 107, 139, 0.15);
 }
 
 body.dark-mode .btn-edit {
@@ -245,13 +490,14 @@ body.dark-mode .btn-edit {
 
 body.dark-mode .btn-edit:hover {
     background: rgba(124, 108, 240, 0.15);
+    box-shadow: 0 4px 15px rgba(124, 108, 240, 0.15);
 }
 
 .btn-delete {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 0.6rem 1.5rem;
+    padding: 0.7rem 1.8rem;
     background: rgba(231, 76, 60, 0.08);
     color: #e74c3c;
     border: 2px solid rgba(231, 76, 60, 0.15);
@@ -282,7 +528,7 @@ body.dark-mode .btn-delete:hover {
 .error-box {
     background: white;
     border: 2px solid #ff6b6b;
-    border-radius: 16px;
+    border-radius: 20px;
     padding: 2.5rem;
     text-align: center;
 }
@@ -314,34 +560,7 @@ body.dark-mode .btn-delete:hover {
 .debug-box strong {
     color: #ff6b8b;
 }
-/* ===== IMAGE CONTAINER ===== */
-.memory-image-container {
-    margin: 1.5rem 0;
-    border-radius: 16px;
-    overflow: hidden;
-    background: rgba(0, 0, 0, 0.03);
-    position: relative;
-}
 
-.memory-image {
-    width: 100%;
-    max-height: 450px;
-    object-fit: cover;
-    display: block;
-    border-radius: 16px;
-}
-
-body.dark-mode .memory-image-container {
-    background: rgba(255, 255, 255, 0.03);
-}
-
-body.dark-mode .memory-image-container i {
-    color: #4a4a6a;
-}
-
-body.dark-mode .memory-image-container span {
-    color: #7a7a9a;
-}
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
     body {
@@ -353,16 +572,33 @@ body.dark-mode .memory-image-container span {
     }
     
     .memory-title {
-        font-size: 1.8rem;
+        font-size: 2rem;
     }
     
     .memory-meta {
-        gap: 1rem;
-        font-size: 0.8rem;
+        gap: 0.8rem;
+    }
+    
+    .detail-badge {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.8rem;
+    }
+    
+    .memory-detail-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .memory-detail-grid .detail-item {
+        border-bottom: 1px solid #f0e0e4 !important;
+    }
+    
+    .memory-detail-grid .detail-item:last-child {
+        border-bottom: none !important;
     }
     
     .memory-story {
         font-size: 1rem;
+        padding: 0.8rem 1rem;
     }
     
     .memory-actions {
@@ -374,15 +610,23 @@ body.dark-mode .memory-image-container span {
         justify-content: center;
         width: 100%;
     }
+    
+    .voice-player {
+        max-width: 100%;
+    }
 }
 
 @media (max-width: 480px) {
     .memory-title {
-        font-size: 1.4rem;
+        font-size: 1.6rem;
     }
     
     .back-btn {
         font-size: 0.85rem;
         padding: 0.5rem 1rem;
+    }
+    
+    .memory-card {
+        padding: 1rem;
     }
 }

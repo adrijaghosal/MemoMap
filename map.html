@@ -210,14 +210,27 @@
         <i class="ri-error-warning-line"></i>
         <span id="toastMessage">Location not found!</span>
     </div>
-        <!-- Theme Manager - MUST be loaded first -->
-<script src="./js/theme-loader.js"></script>
+
+    <!-- Theme Loader -->
+    <script>
+        (function() {
+            const theme = localStorage.getItem('memonap_theme') || 'light';
+            const body = document.body;
+            if (theme === 'dark') {
+                body.classList.add('dark-mode');
+            } else if (theme === 'auto') {
+                const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (isDark) body.classList.add('dark-mode');
+            }
+        })();
+    </script>
+
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
     <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     
     <!-- Firebase Config & Auth -->
     <script src="./js/firebase-config.js"></script>
