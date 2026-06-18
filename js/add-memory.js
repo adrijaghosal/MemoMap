@@ -49,13 +49,14 @@ let photos = [];
 let currentStep = 1;
 let selectedMood = 'happy';
 let voiceNote = null;
+let voiceNoteBlob = null;
 let isRecording = false;
 let isPlaying = false;
 let mediaRecorder = null;
 let audioChunks = [];
 let searchTimeout = null;
-let currentUserId = null;
 let audioPlayer = null;
+let editMemoryId = null;
 
 // ===== Helper Functions =====
 function escapeHtml(str) {
@@ -75,6 +76,44 @@ function updateCharCount(input, counter, max) {
         input.value = input.value.substring(0, max);
         counter.textContent = max;
     }
+}
+
+// ===== COMPRESS IMAGE BEFORE SAVING =====
+function compressImage(dataUrl, maxWidth = 800, maxHeight = 800, quality = 0.7) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = function() {
+            let width = img.width;
+            let height = img.height;
+            
+            // Calculate new dimensions
+            if (width > maxWidth) {
+                height = (height * maxWidth) / width;
+                width = maxWidth;
+            }
+            if (height > maxHeight) {
+                width = (width * maxHeight) / height;
+                height = maxHeight;
+            }
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            // Determine format
+            const isVideo = dataUrl.startsWith('data:video');
+            if (isVideo) {
+                resolve(dataUrl); // Can't compress video with canvas
+                return;
+            }
+            
+            const compressed = canvas.toDataURL('image/jpeg', quality);
+            resolve(compressed);
+        };
+        img.src = dataUrl;
+    });
 }
 
 // ===== GET ACCURATE ADDRESS FROM NOMINATIM RESPONSE =====
@@ -166,7 +205,6 @@ function getShortName(item) {
 function getLocationEmoji(item) {
     const type = item.type || '';
     const category = item.category || '';
-    const classes = item.class || '';
     
     if (item.name && ['Taj Mahal', 'Eiffel Tower', 'Burj Khalifa', 'Statue of Liberty', 'Big Ben', 'Colosseum'].some(name => 
         item.name.includes(name) || item.display_name.includes(name)
@@ -205,7 +243,27 @@ function getLocationEmoji(item) {
     return '📍';
 }
 
-// ===== LOCATION AUTOCOMPLETE USING NOMINATIM API =====
+// ===== GET COORDINATES =====
+async function getCoordinates(address) {
+    try {
+        const response = await fetch(
+            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`
+        );
+        const data = await response.json();
+        if (data.length > 0) {
+            return {
+                lat: parseFloat(data[0].lat),
+                lng: parseFloat(data[0].lon)
+            };
+        }
+        return null;
+    } catch (error) {
+        console.error('Geocoding error:', error);
+        return null;
+    }
+}
+
+// ===== LOCATION AUTOCOMPLETE =====
 async function fetchLocationSuggestions(query) {
     if (!query || query.length < 2) {
         locationSuggestions.style.display = 'none';
@@ -230,7 +288,7 @@ async function fetchLocationSuggestions(query) {
             const country = item.address?.country || '';
             
             return `
-                <div class="suggestion-item" data-name="${escapeHtml(fullAddress)}" data-display="${escapeHtml(shortName)}">
+                <div class="suggestion-item" data-name="${escapeHtml(fullAddress)}" data-lat="${item.lat}" data-lon="${item.lon}" data-display="${escapeHtml(shortName)}">
                     <div class="suggestion-emoji">${emoji}</div>
                     <div class="suggestion-name">${escapeHtml(shortName)}</div>
                     <div class="suggestion-country">${escapeHtml(country)}</div>
@@ -243,6 +301,8 @@ async function fetchLocationSuggestions(query) {
         document.querySelectorAll('#locationSuggestions .suggestion-item').forEach(item => {
             item.addEventListener('click', () => {
                 locationInput.value = item.dataset.name;
+                locationInput.dataset.lat = item.dataset.lat;
+                locationInput.dataset.lon = item.dataset.lon;
                 locationSuggestions.style.display = 'none';
             });
         });
@@ -253,7 +313,6 @@ async function fetchLocationSuggestions(query) {
     }
 }
 
-// ===== UPDATE LOCATION SUGGESTIONS (Debounced) =====
 function updateLocationSuggestions() {
     const query = locationInput.value.trim();
     
@@ -381,7 +440,7 @@ function updateReview() {
     `;
 }
 
-// ===== Tags Functionality =====
+// ===== Tags =====
 function addTag(tag) {
     tag = tag.trim().toLowerCase();
     if (tag && !tags.includes(tag) && tags.length < 10) {
@@ -409,28 +468,51 @@ function renderTags() {
     });
 }
 
-// ===== Photo Upload =====
-function handlePhotoUpload(files) {
-    Array.from(files).forEach(file => {
-        if (photos.length >= 10) {
-            alert('Maximum 10 photos allowed');
+// ===== Media Upload with Compression =====
+async function handleMediaUpload(files) {
+    const maxFiles = 5; // Reduced to save space
+    
+    for (const file of Array.from(files)) {
+        if (photos.length >= maxFiles) {
+            alert(`Maximum ${maxFiles} files allowed`);
             return;
         }
-        if (file.size > 5 * 1024 * 1024) {
-            alert('Photo too large. Max 5MB');
+        if (file.size > 10 * 1024 * 1024) {
+            alert('File too large. Max 10MB');
             return;
         }
         
         const reader = new FileReader();
-        reader.onload = (e) => {
-            photos.push({
-                data: e.target.result,
-                name: file.name
-            });
-            renderPhotos();
+        reader.onload = async (e) => {
+            try {
+                let dataUrl = e.target.result;
+                
+                // Compress images (but not videos)
+                if (file.type.startsWith('image/')) {
+                    dataUrl = await compressImage(dataUrl, 800, 800, 0.7);
+                }
+                
+                photos.push({
+                    data: dataUrl,
+                    name: file.name,
+                    type: file.type,
+                    size: file.size
+                });
+                renderPhotos();
+            } catch (err) {
+                console.error('Compression error:', err);
+                // Fallback: save uncompressed
+                photos.push({
+                    data: e.target.result,
+                    name: file.name,
+                    type: file.type,
+                    size: file.size
+                });
+                renderPhotos();
+            }
         };
         reader.readAsDataURL(file);
-    });
+    }
 }
 
 function removePhoto(index) {
@@ -439,14 +521,23 @@ function removePhoto(index) {
 }
 
 function renderPhotos() {
-    photoPreviewGrid.innerHTML = photos.map((photo, index) => `
-        <div class="photo-preview">
-            <img src="${photo.data}" alt="Preview">
-            <div class="remove-photo" data-index="${index}">
-                <i class="ri-close-line"></i>
+    photoPreviewGrid.innerHTML = photos.map((media, index) => {
+        const isVideo = media.type && media.type.startsWith('video/');
+        return `
+            <div class="photo-preview">
+                ${isVideo ? `
+                    <video src="${media.data}" muted style="width: 100%; height: 100%; object-fit: cover;"></video>
+                    <div class="video-badge">🎬</div>
+                ` : `
+                    <img src="${media.data}" alt="Preview">
+                `}
+                <div class="remove-photo" data-index="${index}">
+                    <i class="ri-close-line"></i>
+                </div>
+                <div class="media-type-badge">${isVideo ? 'VIDEO' : 'PHOTO'}</div>
             </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
     
     document.querySelectorAll('.remove-photo').forEach(el => {
         el.addEventListener('click', () => removePhoto(parseInt(el.dataset.index)));
@@ -454,7 +545,7 @@ function renderPhotos() {
 }
 
 // ============================================
-// VOICE RECORDING WITH PLAYBACK
+// VOICE RECORDING
 // ============================================
 
 async function startRecording() {
@@ -469,12 +560,12 @@ async function startRecording() {
         
         mediaRecorder.onstop = () => {
             const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+            voiceNoteBlob = audioBlob;
+            
             const reader = new FileReader();
             reader.onload = () => {
                 voiceNote = reader.result;
                 updateVoiceUI();
-                // Auto-play the recorded voice
-                playVoiceNote(voiceNote);
             };
             reader.readAsDataURL(audioBlob);
             stream.getTracks().forEach(track => track.stop());
@@ -517,13 +608,14 @@ function playVoiceNote(audioData) {
         return;
     }
     
-    if (!audioData) {
+    if (!audioData && !voiceNoteBlob) {
         alert('No voice note to play. Please record first.');
         return;
     }
     
     try {
-        audioPlayer = new Audio(audioData);
+        const audioSrc = voiceNoteBlob ? URL.createObjectURL(voiceNoteBlob) : audioData;
+        audioPlayer = new Audio(audioSrc);
         
         audioPlayer.onplay = () => {
             isPlaying = true;
@@ -533,12 +625,15 @@ function playVoiceNote(audioData) {
         audioPlayer.onended = () => {
             isPlaying = false;
             updateVoiceUI();
+            if (voiceNoteBlob) {
+                URL.revokeObjectURL(audioSrc);
+            }
         };
         
         audioPlayer.onerror = () => {
             isPlaying = false;
             updateVoiceUI();
-            alert('Error playing voice note. Please try recording again.');
+            alert('Error playing voice note.');
         };
         
         audioPlayer.play();
@@ -592,7 +687,6 @@ function updateVoiceUI() {
     }
 }
 
-// ===== CREATE VOICE CONTROLS UI =====
 function createVoiceControls() {
     const voiceRecorder = document.querySelector('.voice-recorder');
     if (!voiceRecorder) return;
@@ -669,6 +763,7 @@ function createVoiceControls() {
         deleteBtn.addEventListener('click', () => {
             if (confirm('Delete this voice note?')) {
                 voiceNote = null;
+                voiceNoteBlob = null;
                 updateVoiceUI();
                 if (progressBar) progressBar.style.width = '0%';
                 if (playBtn) playBtn.innerHTML = '<i class="ri-play-fill"></i>';
@@ -692,8 +787,32 @@ function updateCustomYearDisplay() {
     if (customYearDisplay) customYearDisplay.textContent = years;
 }
 
-// ===== Save Memory =====
-function saveMemory() {
+// ============================================
+// SAVE MEMORY - WITH STORAGE CHECK
+// ============================================
+
+function getStorageSize() {
+    let total = 0;
+    for (let key in localStorage) {
+        if (localStorage.hasOwnProperty(key)) {
+            total += localStorage[key].length * 2; // UTF-16
+        }
+    }
+    return total / (1024 * 1024); // MB
+}
+
+function checkStorageSpace() {
+    const used = getStorageSize();
+    const limit = 5; // 5MB safe limit
+    if (used > limit) {
+        alert(`⚠️ Storage is ${used.toFixed(1)}MB. Please clear some old memories or export and delete them.`);
+        return false;
+    }
+    return true;
+}
+
+async function saveMemory() {
+    // Validate
     if (!titleInput.value.trim()) {
         alert('Please enter a title');
         updateStep(1);
@@ -710,58 +829,208 @@ function saveMemory() {
         return;
     }
     
-    let capsuleTimeValue = null;
-    if (timeCapsuleCheckbox.checked) {
-        const selectedRadio = document.querySelector('input[name="capsuleTime"]:checked');
-        if (selectedRadio) {
-            if (selectedRadio.value === 'custom') {
-                capsuleTimeValue = parseInt(customYearInput?.value) || 1;
-                if (capsuleTimeValue < 1) capsuleTimeValue = 1;
-                if (capsuleTimeValue > 50) capsuleTimeValue = 50;
-            } else {
-                capsuleTimeValue = parseInt(selectedRadio.value);
-            }
-        } else {
-            capsuleTimeValue = 1;
-        }
+    // Check storage space
+    if (!checkStorageSpace()) {
+        return;
     }
     
-    const userEmail = sessionStorage.getItem('userEmail');
-    const userId = userEmail || 'guest';
-    const memoriesKey = `memonap_memories_${userId}`;
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Saving...';
     
-    const memory = {
-        id: Date.now(),
-        title: titleInput.value.trim(),
-        location: locationInput.value.trim(),
-        date: dateInput.value,
-        mood: selectedMood,
-        story: storyTextarea.value.trim(),
-        with: withInput.value.trim(),
-        song: songInput.value.trim(),
-        tags: tags,
-        photos: photos,
-        voiceNote: voiceNote,
-        timeCapsule: timeCapsuleCheckbox.checked,
-        capsuleTime: capsuleTimeValue,
-        isPublic: document.getElementById('publicCheckbox')?.checked || false,
-        createdAt: new Date().toISOString()
-    };
-    
-    const existingMemories = JSON.parse(localStorage.getItem(memoriesKey) || '[]');
-    existingMemories.unshift(memory);
-    localStorage.setItem(memoriesKey, JSON.stringify(existingMemories));
-    
-    alert(`✨ Memory saved successfully!${memory.timeCapsule ? ` It will unlock after ${memory.capsuleTime} year(s).` : ''}`);
-    window.location.href = 'dashboard.html';
+    try {
+        // Get user ID
+        const userEmail = sessionStorage.getItem('userEmail') || 'guest';
+        const userId = userEmail;
+        const memoriesKey = `memonap_memories_${userId}`;
+        
+        // Get existing memories
+        let existingMemories = [];
+        try {
+            existingMemories = JSON.parse(localStorage.getItem(memoriesKey) || '[]');
+        } catch (e) {
+            existingMemories = [];
+        }
+        
+        // Limit total memories to prevent storage issues
+        if (existingMemories.length >= 50) {
+            alert('⚠️ You have 50+ memories. Please export and delete some old ones to free up space.');
+            saveBtn.disabled = false;
+            saveBtn.textContent = editMemoryId ? 'Update Memory' : 'Save Memory';
+            return;
+        }
+        
+        // Get coordinates
+        let coordinates = null;
+        if (locationInput.dataset.lat && locationInput.dataset.lon) {
+            coordinates = {
+                lat: parseFloat(locationInput.dataset.lat),
+                lng: parseFloat(locationInput.dataset.lon)
+            };
+        } else {
+            coordinates = await getCoordinates(locationInput.value.trim());
+        }
+        
+        // Get capsule time
+        let capsuleTimeValue = null;
+        if (timeCapsuleCheckbox.checked) {
+            const selectedRadio = document.querySelector('input[name="capsuleTime"]:checked');
+            if (selectedRadio) {
+                if (selectedRadio.value === 'custom') {
+                    capsuleTimeValue = parseInt(customYearInput?.value) || 1;
+                    if (capsuleTimeValue < 1) capsuleTimeValue = 1;
+                    if (capsuleTimeValue > 50) capsuleTimeValue = 50;
+                } else {
+                    capsuleTimeValue = parseInt(selectedRadio.value);
+                }
+            } else {
+                capsuleTimeValue = 1;
+            }
+        }
+        
+        // Prepare memory data
+        const memory = {
+            id: Date.now(),
+            title: titleInput.value.trim(),
+            location: locationInput.value.trim(),
+            date: dateInput.value,
+            mood: selectedMood,
+            content: storyTextarea.value.trim(),
+            with: withInput.value.trim(),
+            song: songInput.value.trim(),
+            tags: tags,
+            photos: photos,
+            voiceNote: voiceNote,
+            timeCapsule: timeCapsuleCheckbox.checked,
+            capsuleTime: capsuleTimeValue,
+            isPublic: document.getElementById('publicCheckbox')?.checked || false,
+            userId: userId,
+            userEmail: userEmail,
+            createdAt: new Date().toISOString(),
+            coordinates: coordinates,
+            lat: coordinates?.lat || null,
+            lng: coordinates?.lng || null
+        };
+        
+        if (editMemoryId) {
+            const index = existingMemories.findIndex(m => String(m.id) === String(editMemoryId));
+            if (index !== -1) {
+                memory.id = parseInt(editMemoryId);
+                existingMemories[index] = memory;
+            }
+        } else {
+            existingMemories.unshift(memory);
+        }
+        
+        localStorage.setItem(memoriesKey, JSON.stringify(existingMemories));
+        
+        alert(`✨ Memory saved successfully!${memory.timeCapsule ? ` It will unlock after ${memory.capsuleTime} year(s).` : ''}`);
+        window.location.href = 'dashboard.html';
+        
+    } catch (error) {
+        console.error('❌ Save error:', error);
+        
+        if (error.name === 'QuotaExceededError') {
+            alert('⚠️ Storage full! Please clear some old memories.\n\nSuggestions:\n1. Delete old memories\n2. Export memories and clear localStorage\n3. Use smaller images');
+        } else {
+            alert('Error saving memory: ' + error.message);
+        }
+        
+        saveBtn.disabled = false;
+        saveBtn.textContent = editMemoryId ? 'Update Memory' : 'Save Memory';
+    }
 }
 
-// ===== Check Auth and Load User =====
+// ============================================
+// LOAD MEMORY FOR EDITING
+// ============================================
+
+function loadMemoryForEdit() {
+    const params = new URLSearchParams(window.location.search);
+    editMemoryId = params.get('edit');
+    
+    if (!editMemoryId) return;
+    
+    try {
+        const userEmail = sessionStorage.getItem('userEmail') || 'guest';
+        const userId = userEmail;
+        const memoriesKey = `memonap_memories_${userId}`;
+        const memories = JSON.parse(localStorage.getItem(memoriesKey) || '[]');
+        const memory = memories.find(m => String(m.id) === String(editMemoryId));
+        
+        if (!memory) {
+            alert('Memory not found.');
+            window.location.href = 'dashboard.html';
+            return;
+        }
+        
+        // Fill form
+        titleInput.value = memory.title || '';
+        locationInput.value = memory.location || '';
+        if (memory.lat && memory.lng) {
+            locationInput.dataset.lat = memory.lat;
+            locationInput.dataset.lon = memory.lng;
+        }
+        dateInput.value = memory.date || '';
+        selectedMood = memory.mood || 'happy';
+        storyTextarea.value = memory.content || '';
+        withInput.value = memory.with || '';
+        songInput.value = memory.song || '';
+        
+        moodOptions.forEach(opt => {
+            opt.classList.remove('selected');
+            if (opt.dataset.mood === selectedMood) {
+                opt.classList.add('selected');
+            }
+        });
+        document.getElementById('memoryMood').value = selectedMood;
+        
+        tags = memory.tags || [];
+        renderTags();
+        
+        if (memory.timeCapsule) {
+            timeCapsuleCheckbox.checked = true;
+            timeCapsuleOptions.style.display = 'block';
+            if (memory.capsuleTime) {
+                const radio = document.querySelector(`input[name="capsuleTime"][value="${memory.capsuleTime}"]`);
+                if (radio) {
+                    radio.checked = true;
+                } else {
+                    customYearRadio.checked = true;
+                    customYearInput.value = memory.capsuleTime;
+                    customYearInput.disabled = false;
+                    customYearMessage.style.display = 'block';
+                    updateCustomYearDisplay();
+                }
+            }
+        }
+        
+        if (memory.photos && memory.photos.length > 0) {
+            photos = memory.photos;
+            renderPhotos();
+        }
+        
+        if (memory.voiceNote) {
+            voiceNote = memory.voiceNote;
+            updateVoiceUI();
+        }
+        
+        saveBtn.textContent = 'Update Memory';
+        document.querySelector('h2').textContent = '✏️ Edit Memory';
+        
+        console.log('✅ Memory loaded for edit:', editMemoryId);
+        
+    } catch (error) {
+        console.error('❌ Load error:', error);
+        alert('Error loading memory: ' + error.message);
+    }
+}
+
+// ===== Check Auth =====
 function checkAuth() {
-    const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+    const userEmail = sessionStorage.getItem('userEmail');
     const userName = sessionStorage.getItem('userName');
     
-    if (!isLoggedIn || isLoggedIn !== 'true') {
+    if (!sessionStorage.getItem('isLoggedIn') || sessionStorage.getItem('isLoggedIn') !== 'true') {
         window.location.href = 'login.html';
         return false;
     }
@@ -773,7 +1042,7 @@ function checkAuth() {
     return true;
 }
 
-// ===== Time Capsule Custom Year Event Listeners =====
+// ===== Time Capsule Custom Year =====
 function setupTimeCapsuleCustomYear() {
     if (!customYearRadio) return;
     
@@ -861,7 +1130,7 @@ document.addEventListener('click', (e) => {
 });
 
 photoUploadArea.addEventListener('click', () => photoInput.click());
-photoInput.addEventListener('change', (e) => handlePhotoUpload(e.target.files));
+photoInput.addEventListener('change', (e) => handleMediaUpload(e.target.files));
 
 photoUploadArea.addEventListener('dragover', (e) => {
     e.preventDefault();
@@ -873,16 +1142,13 @@ photoUploadArea.addEventListener('dragleave', () => {
 photoUploadArea.addEventListener('drop', (e) => {
     e.preventDefault();
     photoUploadArea.style.borderColor = '#f0e0e4';
-    handlePhotoUpload(e.dataTransfer.files);
+    handleMediaUpload(e.dataTransfer.files);
 });
 
-// Voice Recording - Updated with playback
 recordBtn.addEventListener('click', toggleRecording);
 
-// Create voice controls after DOM load
 setTimeout(createVoiceControls, 100);
 
-// Update voice progress when playing
 setInterval(() => {
     if (audioPlayer && isPlaying && !audioPlayer.paused) {
         const progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
@@ -892,14 +1158,12 @@ setInterval(() => {
 
 saveBtn.addEventListener('click', saveMemory);
 
-// Set default date
 if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
 
-// Set default mood
 const defaultMood = document.querySelector('.mood-option[data-mood="happy"]');
 if (defaultMood) defaultMood.classList.add('selected');
 
-// ===== Sidebar Functions =====
+// ===== Sidebar =====
 if (menuToggle) {
     menuToggle.addEventListener('click', () => {
         sidebar.classList.toggle('open');
@@ -909,9 +1173,6 @@ if (menuToggle) {
 if (logoutBtn) {
     logoutBtn.addEventListener('click', async () => {
         sessionStorage.clear();
-        if (typeof firebase !== 'undefined' && firebase.auth) {
-            await firebase.auth().signOut();
-        }
         window.location.href = 'login.html';
     });
 }
@@ -924,12 +1185,31 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// ===== Initialize =====
+// ============================================
+// INITIALIZE
+// ============================================
+
 function init() {
-    checkAuth();
+    console.log('📝 Add Memory Page Initializing...');
+    
+    const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+    const userName = sessionStorage.getItem('userName');
+    
+    if (!isLoggedIn || isLoggedIn !== 'true') {
+        window.location.href = 'login.html';
+        return;
+    }
+    
+    if (userName) {
+        document.getElementById('sidebarUserName').textContent = userName;
+    }
+    
+    loadMemoryForEdit();
     setupTimeCapsuleCustomYear();
+    
+    console.log('✅ Add Memory Page Ready');
 }
 
 init();
 
-console.log('%c📝 Add Memory Page Loaded with Voice Playback Feature', 'color: #ff6b8b; font-size: 14px; font-weight: bold');
+console.log('%c📝 Add Memory Page Loaded (Optimized)', 'color: #ff6b8b; font-size: 14px; font-weight: bold');

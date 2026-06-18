@@ -6,6 +6,7 @@
     <title>Add Memory | MemoMap</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/global.css">
     <link rel="stylesheet" href="./css/add-memory.css">
 </head>
 <body>
@@ -193,12 +194,12 @@
                 <!-- Step 2: Media & Story -->
                 <div class="form-step" id="step2">
                     <div class="form-group">
-                        <label><i class="ri-image-line"></i> Photos</label>
+                        <label><i class="ri-image-line"></i> Photos & Videos</label>
                         <div class="photo-upload-area" id="photoUploadArea">
                             <i class="ri-upload-cloud-2-line"></i>
-                            <p>Click or drag photos here</p>
-                            <span>Up to 10 photos (JPEG, PNG)</span>
-                            <input type="file" id="photoInput" accept="image/*" multiple style="display: none;">
+                            <p>Click or drag photos/videos here</p>
+                            <span>Up to 10 files (JPEG, PNG, GIF, MP4, MOV)</span>
+                            <input type="file" id="photoInput" accept="image/*, video/*" multiple style="display: none;">
                         </div>
                         <div class="photo-preview-grid" id="photoPreviewGrid"></div>
                     </div>
@@ -235,7 +236,7 @@
                     </div>
                 </div>
 
-                <!-- Step 3: Review & Save (Public Option moved here) -->
+                <!-- Step 3: Review & Save -->
                 <div class="form-step" id="step3">
                     <div class="review-section">
                         <h4><i class="ri-eye-line"></i> Review Your Memory</h4>
@@ -267,7 +268,6 @@
                         </div>
                     </div>
 
-                    <!-- PUBLIC OPTION - ONLY ON STEP 3 -->
                     <div class="form-group">
                         <label class="checkbox">
                             <input type="checkbox" id="publicCheckbox">
@@ -286,17 +286,36 @@
             </div>
         </div>
     </main>
-<!-- Theme Loader - Must be loaded before page scripts -->
-<script src="./js/theme-loader.js"></script>
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-    
-    <!-- Firebase Config & Auth -->
+
+    <!-- ============================================ -->
+    <!-- SCRIPTS - CORRECT ORDER -->
+    <!-- ============================================ -->
+
+    <!-- 1. Theme Loader (runs immediately) -->
+    <script>
+        (function() {
+            const theme = localStorage.getItem('memonap_theme') || 'light';
+            const body = document.body;
+            if (theme === 'dark') {
+                body.classList.add('dark-mode');
+            } else if (theme === 'auto') {
+                const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (isDark) body.classList.add('dark-mode');
+            }
+        })();
+    </script>
+
+    <!-- 2. Firebase SDK - Version 9.22.0 -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+
+    <!-- 3. Firebase Config -->
     <script src="./js/firebase-config.js"></script>
-    <script src="./js/auth.js"></script>
-    
-    <!-- Add Memory Script -->
+
+    <!-- 4. Add Memory JS -->
     <script src="./js/add-memory.js"></script>
+
 </body>
 </html>

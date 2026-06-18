@@ -392,6 +392,22 @@ function setupNavigation() {
         }
     }
 }
+// In dashboard.js - When displaying memory cards
+function displayMemories(memories) {
+    const container = document.getElementById('memories-container');
+    container.innerHTML = memories.map(memory => `
+        <div class="memory-card" onclick="navigateToMemory('${memory.id}')">
+            <h3>${memory.title}</h3>
+            <p>${memory.content.substring(0, 100)}...</p>
+            <small>${new Date(memory.createdAt).toLocaleDateString()}</small>
+        </div>
+    `).join('');
+}
+
+// Navigate to memory detail with ID
+function navigateToMemory(memoryId) {
+    window.location.href = `memory-detail.html?id=${memoryId}`;
+}
 
 function setupClickOutside() {
     if (!sidebar || !menuToggle) return;

@@ -1,3 +1,5 @@
+// settings.js - FIXED VERSION
+
 // ===== DOM Elements =====
 const menuToggle = document.getElementById('menuToggle');
 const sidebar = document.getElementById('sidebar');
@@ -70,7 +72,6 @@ function getSystemTheme() {
 // ===== Apply Theme to ALL Pages =====
 function applyTheme(theme) {
     const body = document.body;
-    const root = document.documentElement;
     
     // If auto, use system preference
     let actualTheme = theme;
@@ -79,18 +80,44 @@ function applyTheme(theme) {
     }
     
     // Remove existing theme classes
-    body.classList.remove('theme-light', 'theme-dark');
+    body.classList.remove('light-mode', 'dark-mode', 'theme-light', 'theme-dark');
     
-    // Add new theme class
+    // Add new theme class - USING 'dark-mode' to match CSS
     if (actualTheme === 'dark') {
-        body.classList.add('theme-dark');
+        body.classList.add('dark-mode');
+        console.log('🌙 Dark mode applied');
     } else {
-        body.classList.add('theme-light');
+        body.classList.add('light-mode');
+        console.log('☀️ Light mode applied');
     }
     
     // Store theme preference for ALL pages
     localStorage.setItem('memonap_theme', actualTheme);
     localStorage.setItem('memonap_preferred_theme', theme);
+    
+    // Update UI display
+    updateThemeDisplay(actualTheme, theme);
+}
+
+// ===== Update Theme Display =====
+function updateThemeDisplay(actualTheme, preferredTheme) {
+    const display = document.getElementById('currentThemeDisplay');
+    const indicator = document.getElementById('themeIndicator');
+    
+    if (display) {
+        display.textContent = actualTheme.charAt(0).toUpperCase() + actualTheme.slice(1);
+    }
+    if (indicator) {
+        indicator.textContent = actualTheme === 'dark' ? '🌙' : '☀️';
+    }
+    
+    // Update theme buttons
+    themeBtns.forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.theme === preferredTheme) {
+            btn.classList.add('active');
+        }
+    });
 }
 
 // ===== Load Theme on Page Load =====
@@ -101,14 +128,6 @@ function loadThemeFromStorage() {
     
     // Apply the saved theme
     applyTheme(savedTheme);
-    
-    // Update button states if on settings page
-    themeBtns.forEach(btn => {
-        btn.classList.remove('active');
-        if (btn.dataset.theme === savedTheme) {
-            btn.classList.add('active');
-        }
-    });
 }
 
 // ===== Load Settings =====
@@ -154,7 +173,6 @@ function saveSettings() {
     localStorage.setItem('memonap_preferred_theme', activeTheme);
     applyTheme(activeTheme);
     
-    // Show confirmation
     showToast('Settings saved successfully!');
 }
 
@@ -196,19 +214,33 @@ function showToast(message, isError = false) {
 function listenForSystemThemeChanges() {
     const systemThemeListener = window.matchMedia('(prefers-color-scheme: dark)');
     systemThemeListener.addEventListener('change', (e) => {
-        const currentTheme = document.querySelector('.theme-btn.active')?.dataset.theme;
+        const currentTheme = localStorage.getItem('memonap_preferred_theme');
         if (currentTheme === 'auto') {
             applyTheme('auto');
         }
     });
 }
 
-// ===== Theme Change =====
+// ===== Theme Button Click =====
 themeBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', function() {
+        const theme = this.dataset.theme;
+        console.log('🔄 Theme button clicked:', theme);
+        
+        // Update button states
         themeBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        saveSettings();
+        this.classList.add('active');
+        
+        // Apply theme
+        applyTheme(theme);
+        
+        // Save settings
+        const settings = JSON.parse(localStorage.getItem('memonap_settings') || '{}');
+        settings.theme = theme;
+        localStorage.setItem('memonap_settings', JSON.stringify(settings));
+        localStorage.setItem('memonap_preferred_theme', theme);
+        
+        showToast('Theme updated: ' + theme);
     });
 });
 
@@ -261,10 +293,7 @@ function exportData() {
         .diary-entry .diary-content { margin-top: 0.5rem; color: #666; line-height: 1.6; }
         .footer { text-align: center; padding: 2rem; color: #888; border-top: 2px solid #f0e0e4; margin-top: 2rem; }
         .tag { display: inline-block; padding: 0.2rem 0.6rem; background: rgba(255,107,139,0.08); border-radius: 20px; font-size: 0.7rem; color: #ff6b8b; margin: 0.2rem; }
-        @media print {
-            body { background: white; padding: 1rem; }
-            .memory-card { break-inside: avoid; }
-        }
+        @media print { body { background: white; padding: 1rem; } .memory-card { break-inside: avoid; } }
     </style>
 </head>
 <body>
@@ -295,24 +324,22 @@ function exportData() {
 
     // Memories Section
     if (memories.length > 0) {
+        const moodEmojis = { happy: '😊', peaceful: '😌', loved: '❤️', excited: '😎', nostalgic: '📸', sad: '😢' };
         html += `
     <div class="section">
         <h2>📸 Memories (${memories.length})</h2>
         <div class="memory-grid">
 `;
         memories.forEach(m => {
-            const moodEmojis = { happy: '😊', peaceful: '😌', loved: '❤️', excited: '😎', nostalgic: '📸', sad: '😢' };
             html += `
             <div class="memory-card">
-                <h3>${m.title}</h3>
-                <div class="location">📍 ${m.location}</div>
-                <div class="date">📅 ${new Date(m.date).toLocaleDateString()}</div>
-                <div class="mood">${moodEmojis[m.mood] || '📝'} ${m.mood}</div>
+                <h3>${m.title || 'Untitled'}</h3>
+                <div class="location">📍 ${m.location || 'Unknown'}</div>
+                <div class="date">📅 ${m.date ? new Date(m.date).toLocaleDateString() : 'Unknown'}</div>
+                <div class="mood">${moodEmojis[m.mood] || '📝'} ${m.mood || 'No mood'}</div>
                 ${m.tags && m.tags.length > 0 ? `<div>${m.tags.map(t => `<span class="tag">#${t}</span>`).join('')}</div>` : ''}
                 ${m.story ? `<div class="story">${m.story}</div>` : ''}
                 ${m.photos && m.photos.length > 0 ? `<div style="margin-top:0.5rem; color:#888; font-size:0.8rem;">📷 ${m.photos.length} photo(s)</div>` : ''}
-                ${m.voiceNote ? `<div style="margin-top:0.3rem; color:#888; font-size:0.8rem;">🎙️ Voice note recorded</div>` : ''}
-                ${m.timeCapsule ? `<div style="margin-top:0.3rem; color:#fbbf24; font-size:0.8rem;">🔒 Time Capsule (${m.capsuleTime} years)</div>` : ''}
             </div>
 `;
         });
@@ -331,32 +358,9 @@ function exportData() {
         diary.forEach(entry => {
             html += `
             <div class="diary-entry">
-                <h3>${entry.title}</h3>
-                <div class="diary-date">${new Date(entry.createdAt).toLocaleString()}</div>
-                <div class="diary-content">${entry.content}</div>
-                ${entry.isLocked ? `<div style="color:#fbbf24; font-size:0.8rem;">🔒 Locked entry</div>` : ''}
-                ${entry.photos && entry.photos.length > 0 ? `<div style="color:#888; font-size:0.8rem;">📷 ${entry.photos.length} photo(s)</div>` : ''}
-            </div>
-`;
-        });
-        html += `
-    </div>
-`;
-    }
-
-    // Collections Section
-    if (collections.length > 0) {
-        html += `
-    <div class="section">
-        <h2>📁 Collections (${collections.length})</h2>
-`;
-        collections.forEach(c => {
-            html += `
-            <div style="background:white; border-radius:20px; padding:1rem; margin-bottom:0.8rem; border:1px solid #f0e0e4;">
-                <h3>${c.icon || '📁'} ${c.name}</h3>
-                <div style="color:#888; font-size:0.8rem;">${c.description || 'No description'}</div>
-                <div style="color:#888; font-size:0.8rem;">${c.memoryIds ? c.memoryIds.length : 0} memories</div>
-                ${c.isLocked ? `<div style="color:#fbbf24; font-size:0.8rem;">🔒 Password protected</div>` : ''}
+                <h3>${entry.title || 'Untitled'}</h3>
+                <div class="diary-date">${entry.createdAt ? new Date(entry.createdAt).toLocaleString() : 'Unknown'}</div>
+                <div class="diary-content">${entry.content || 'No content'}</div>
             </div>
 `;
         });
@@ -368,7 +372,7 @@ function exportData() {
     html += `
     <div class="footer">
         <p>🗺️ MemoMap - Every Place Has a Story</p>
-        <p style="font-size: 0.8rem; margin-top: 0.5rem;">Exported from MemoMap on ${new Date().toLocaleString()}</p>
+        <p style="font-size: 0.8rem; margin-top: 0.5rem;">Exported on ${new Date().toLocaleString()}</p>
     </div>
 </body>
 </html>`;
@@ -402,19 +406,19 @@ function savePassword() {
     const confirm = document.getElementById('confirmPassword').value;
     
     if (!current || !newPass || !confirm) {
-        alert('Please fill all fields');
+        showToast('Please fill all fields', true);
         return;
     }
     if (newPass !== confirm) {
-        alert('New passwords do not match');
+        showToast('New passwords do not match', true);
         return;
     }
     if (newPass.length < 6) {
-        alert('Password must be at least 6 characters');
+        showToast('Password must be at least 6 characters', true);
         return;
     }
     
-    alert('✅ Password changed successfully!');
+    showToast('✅ Password changed successfully!');
     closePasswordModalFunc();
 }
 
@@ -446,11 +450,11 @@ function confirmDeleteAccount() {
             
             localStorage.clear();
             sessionStorage.clear();
-            alert('Account deleted. Redirecting to home...');
-            window.location.href = 'index.html';
+            showToast('Account deleted. Redirecting...');
+            setTimeout(() => window.location.href = 'index.html', 1500);
         }
     } else {
-        alert('Type "DELETE" to confirm account deletion');
+        showToast('Type "DELETE" to confirm', true);
     }
 }
 
@@ -472,18 +476,22 @@ function confirmClearData() {
     localStorage.removeItem(`memonap_diary_${userId}`);
     localStorage.removeItem(`memonap_notifications_${userId}`);
     
-    alert('All data cleared! Redirecting to dashboard...');
-    window.location.href = 'dashboard.html';
+    showToast('All data cleared!');
+    setTimeout(() => window.location.href = 'dashboard.html', 1000);
 }
 
 // ===== Enable 2FA =====
 function enable2FA() {
-    alert('🔐 Two-Factor Authentication coming soon!');
+    showToast('🔐 Two-Factor Authentication coming soon!');
 }
 
-// ===== Terms of Service (Beautiful Page) =====
+// ===== Terms of Service =====
 function openTerms() {
     const termsWindow = window.open('', '_blank', 'width=900,height=700,scrollbars=yes');
+    if (!termsWindow) {
+        showToast('Please allow popups', true);
+        return;
+    }
     termsWindow.document.write(`
 <!DOCTYPE html>
 <html>
@@ -494,109 +502,49 @@ function openTerms() {
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(145deg, #fef5f7 0%, #fde8ed 40%, #eef2fa 100%);
-            min-height: 100vh;
-            padding: 2rem;
-            color: #2d1b2e;
-        }
+        body { font-family: 'Poppins', sans-serif; background: linear-gradient(145deg, #fef5f7 0%, #fde8ed 40%, #eef2fa 100%); min-height: 100vh; padding: 2rem; color: #2d1b2e; }
         .container { max-width: 900px; margin: 0 auto; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); border-radius: 40px; padding: 3rem; box-shadow: 0 20px 40px rgba(0,0,0,0.05); border: 1px solid rgba(255,255,255,0.5); }
         .header { text-align: center; padding-bottom: 2rem; border-bottom: 2px solid #f0e0e4; margin-bottom: 2rem; }
         .header h1 { font-size: 2.5rem; color: #2d1b2e; display: flex; align-items: center; justify-content: center; gap: 12px; }
-        .header h1 i { color: #ff6b8b; }
         .header p { color: #888; margin-top: 0.5rem; }
         .date-badge { display: inline-block; background: rgba(255,107,139,0.1); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; color: #ff6b8b; margin-top: 0.5rem; }
         .section { margin-bottom: 2rem; }
-        .section h2 { color: #ff6b8b; font-size: 1.2rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 8px; }
+        .section h2 { color: #ff6b8b; font-size: 1.2rem; margin-bottom: 0.5rem; }
         .section p { color: #666; line-height: 1.8; font-size: 0.95rem; }
         .section ul { color: #666; line-height: 1.8; padding-left: 1.5rem; }
         .section ul li { margin-bottom: 0.3rem; }
         .footer { text-align: center; padding-top: 2rem; border-top: 2px solid #f0e0e4; color: #888; font-size: 0.85rem; }
         .footer .logo { font-size: 1.2rem; font-weight: 600; color: #2d1b2e; }
-        .back-btn { display: inline-block; margin-top: 1rem; padding: 0.5rem 1.5rem; background: linear-gradient(135deg, #ff6b8b, #ffb347); color: white; border: none; border-radius: 40px; font-family: 'Poppins', sans-serif; cursor: pointer; font-size: 0.9rem; }
         @media (max-width: 550px) { .container { padding: 1.5rem; } .header h1 { font-size: 1.8rem; } }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1><i class="ri-file-text-line"></i> Terms of Service</h1>
+            <h1>📋 Terms of Service</h1>
             <p>Last Updated: ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
             <span class="date-badge">📋 Effective Immediately</span>
         </div>
-        
-        <div class="section">
-            <h2>1. Acceptance of Terms</h2>
-            <p>By using MemoMap, you agree to these Terms of Service. If you don't agree, please don't use the service. These terms form a legally binding agreement between you and MemoMap.</p>
-        </div>
-        
-        <div class="section">
-            <h2>2. User Accounts</h2>
-            <p>You are responsible for maintaining the security of your account and password. MemoMap cannot and will not be liable for any loss or damage from your failure to comply with this security obligation.</p>
-            <ul>
-                <li>You must be at least 13 years old to use MemoMap</li>
-                <li>You are responsible for all activity on your account</li>
-                <li>You must not share your password with anyone</li>
-            </ul>
-        </div>
-        
-        <div class="section">
-            <h2>3. User Content</h2>
-            <p>You retain all rights to your content (memories, photos, diary entries, voice notes). By posting content to MemoMap, you grant MemoMap the right to display and store your content as part of the service.</p>
-            <ul>
-                <li>You own your memories and content</li>
-                <li>We don't claim ownership of your content</li>
-                <li>You can delete your content at any time</li>
-            </ul>
-        </div>
-        
-        <div class="section">
-            <h2>4. Privacy</h2>
-            <p>Your privacy matters to us. We collect only the data you provide and use it solely to provide the service. We don't sell your data to third parties. Read our full Privacy Policy for details.</p>
-        </div>
-        
-        <div class="section">
-            <h2>5. Prohibited Uses</h2>
-            <p>You may not use MemoMap for illegal activities, harassment, or to store illegal content. We reserve the right to suspend accounts that violate these terms.</p>
-            <ul>
-                <li>No illegal content</li>
-                <li>No harassment or bullying</li>
-                <li>No spam or malicious activity</li>
-            </ul>
-        </div>
-        
-        <div class="section">
-            <h2>6. Termination</h2>
-            <p>You can delete your account at any time from Settings. We reserve the right to terminate accounts for violations of these terms.</p>
-        </div>
-        
-        <div class="section">
-            <h2>7. Changes to Terms</h2>
-            <p>We may update these terms occasionally. Continued use of MemoMap after changes constitutes acceptance of the new terms. We will notify you of significant changes.</p>
-        </div>
-        
-        <div class="section">
-            <h2>8. Contact</h2>
-            <p>For questions about these terms, contact us at: <strong style="color: #ff6b8b;">support@memonap.com</strong></p>
-        </div>
-        
-        <div class="footer">
-            <div class="logo">🗺️ MemoMap</div>
-            <p>Every Place Has a Story</p>
-            <p style="margin-top: 0.5rem; font-size: 0.75rem;">© ${new Date().getFullYear()} MemoMap. All Rights Reserved.</p>
-        </div>
+        <div class="section"><h2>1. Acceptance of Terms</h2><p>By using MemoMap, you agree to these Terms of Service.</p></div>
+        <div class="section"><h2>2. User Accounts</h2><p>You are responsible for maintaining the security of your account.</p><ul><li>You must be at least 13 years old</li><li>You are responsible for all activity on your account</li></ul></div>
+        <div class="section"><h2>3. User Content</h2><p>You retain all rights to your content. You can delete your content at any time.</p></div>
+        <div class="section"><h2>4. Privacy</h2><p>Your privacy matters to us. We don't sell your data to third parties.</p></div>
+        <div class="section"><h2>5. Contact</h2><p>Contact us at: <strong style="color:#ff6b8b;">support@memonap.com</strong></p></div>
+        <div class="footer"><div class="logo">🗺️ MemoMap</div><p>Every Place Has a Story</p><p style="margin-top:0.5rem;font-size:0.75rem;">© ${new Date().getFullYear()} MemoMap. All Rights Reserved.</p></div>
     </div>
-    <script>document.title = "Terms of Service | MemoMap";</script>
 </body>
 </html>
     `);
     termsWindow.document.close();
 }
 
-// ===== Privacy Policy (Beautiful Page) =====
+// ===== Privacy Policy =====
 function openPrivacy() {
     const privacyWindow = window.open('', '_blank', 'width=900,height=700,scrollbars=yes');
+    if (!privacyWindow) {
+        showToast('Please allow popups', true);
+        return;
+    }
     privacyWindow.document.write(`
 <!DOCTYPE html>
 <html>
@@ -607,21 +555,14 @@ function openPrivacy() {
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(145deg, #fef5f7 0%, #fde8ed 40%, #eef2fa 100%);
-            min-height: 100vh;
-            padding: 2rem;
-            color: #2d1b2e;
-        }
+        body { font-family: 'Poppins', sans-serif; background: linear-gradient(145deg, #fef5f7 0%, #fde8ed 40%, #eef2fa 100%); min-height: 100vh; padding: 2rem; color: #2d1b2e; }
         .container { max-width: 900px; margin: 0 auto; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); border-radius: 40px; padding: 3rem; box-shadow: 0 20px 40px rgba(0,0,0,0.05); border: 1px solid rgba(255,255,255,0.5); }
         .header { text-align: center; padding-bottom: 2rem; border-bottom: 2px solid #f0e0e4; margin-bottom: 2rem; }
         .header h1 { font-size: 2.5rem; color: #2d1b2e; display: flex; align-items: center; justify-content: center; gap: 12px; }
-        .header h1 i { color: #ff6b8b; }
         .header p { color: #888; margin-top: 0.5rem; }
         .date-badge { display: inline-block; background: rgba(255,107,139,0.1); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; color: #ff6b8b; margin-top: 0.5rem; }
         .section { margin-bottom: 2rem; }
-        .section h2 { color: #ff6b8b; font-size: 1.2rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 8px; }
+        .section h2 { color: #ff6b8b; font-size: 1.2rem; margin-bottom: 0.5rem; }
         .section p { color: #666; line-height: 1.8; font-size: 0.95rem; }
         .section ul { color: #666; line-height: 1.8; padding-left: 1.5rem; }
         .section ul li { margin-bottom: 0.3rem; }
@@ -633,79 +574,17 @@ function openPrivacy() {
 <body>
     <div class="container">
         <div class="header">
-            <h1><i class="ri-lock-line"></i> Privacy Policy</h1>
+            <h1>🔒 Privacy Policy</h1>
             <p>Last Updated: ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
             <span class="date-badge">🔒 Your Privacy Matters</span>
         </div>
-        
-        <div class="section">
-            <h2>1. Information We Collect</h2>
-            <p>We collect the following types of information to provide and improve MemoMap:</p>
-            <ul>
-                <li><strong>Account Information:</strong> Name, email address, and profile picture</li>
-                <li><strong>Content:</strong> Memories, photos, diary entries, voice notes</li>
-                <li><strong>Usage Data:</strong> How you interact with MemoMap features</li>
-                <li><strong>Location:</strong> Places you add to your memories</li>
-            </ul>
-        </div>
-        
-        <div class="section">
-            <h2>2. How We Use Your Data</h2>
-            <ul>
-                <li><strong>Provide Service:</strong> To display your memories on maps and timelines</li>
-                <li><strong>Improve Features:</strong> To understand how users interact with MemoMap</li>
-                <li><strong>Security:</strong> To protect your account and data</li>
-                <li><strong>Personalization:</strong> To make your experience better</li>
-            </ul>
-        </div>
-        
-        <div class="section">
-            <h2>3. Data Storage & Security</h2>
-            <p>Your data is stored locally in your browser and synced with Firebase for authentication. We don't share your data with third parties.</p>
-            <ul>
-                <li>All data is encrypted in transit</li>
-                <li>We use industry-standard security practices</li>
-                <li>Your password is never stored in plain text</li>
-            </ul>
-        </div>
-        
-        <div class="section">
-            <h2>4. Your Rights</h2>
-            <ul>
-                <li><strong>Access:</strong> You can access all your data in the app</li>
-                <li><strong>Export:</strong> Export your data anytime from Settings</li>
-                <li><strong>Delete:</strong> Delete your account and data from Settings</li>
-                <li><strong>Correction:</strong> Edit your profile and memories anytime</li>
-            </ul>
-        </div>
-        
-        <div class="section">
-            <h2>5. Cookies</h2>
-            <p>We use cookies to keep you logged in and remember your preferences. You can disable cookies in your browser settings, but this may affect functionality.</p>
-        </div>
-        
-        <div class="section">
-            <h2>6. Third-Party Services</h2>
-            <p>MemoMap uses Firebase (Google) for authentication. Their privacy policy applies to authentication data. We don't share your data with any other third parties.</p>
-        </div>
-        
-        <div class="section">
-            <h2>7. Changes to This Policy</h2>
-            <p>We may update this privacy policy occasionally. We'll notify you of changes via the app. Continued use of MemoMap after changes constitutes acceptance.</p>
-        </div>
-        
-        <div class="section">
-            <h2>8. Contact Us</h2>
-            <p>If you have questions about this privacy policy, contact us at: <strong style="color: #ff6b8b;">support@memonap.com</strong></p>
-        </div>
-        
-        <div class="footer">
-            <div class="logo">🗺️ MemoMap</div>
-            <p>Every Place Has a Story</p>
-            <p style="margin-top: 0.5rem; font-size: 0.75rem;">© ${new Date().getFullYear()} MemoMap. All Rights Reserved.</p>
-        </div>
+        <div class="section"><h2>1. Information We Collect</h2><p>We collect account information, content, usage data, and location data.</p></div>
+        <div class="section"><h2>2. How We Use Your Data</h2><p>To provide service, improve features, and protect your account.</p></div>
+        <div class="section"><h2>3. Data Storage</h2><p>Your data is stored locally and synced with Firebase. We don't share your data.</p></div>
+        <div class="section"><h2>4. Your Rights</h2><p>You can access, export, and delete your data anytime.</p></div>
+        <div class="section"><h2>5. Contact</h2><p>Contact us at: <strong style="color:#ff6b8b;">support@memonap.com</strong></p></div>
+        <div class="footer"><div class="logo">🗺️ MemoMap</div><p>Every Place Has a Story</p><p style="margin-top:0.5rem;font-size:0.75rem;">© ${new Date().getFullYear()} MemoMap. All Rights Reserved.</p></div>
     </div>
-    <script>document.title = "Privacy Policy | MemoMap";</script>
 </body>
 </html>
     `);
@@ -767,35 +646,7 @@ document.addEventListener('click', (e) => {
         }
     }
 });
-// ===== Update Theme Across All Pages =====
-function updateThemeAcrossPages(theme) {
-    // Save to localStorage
-    localStorage.setItem('memonap_preferred_theme', theme);
-    
-    // Apply to current page
-    let actualTheme = theme;
-    if (theme === 'auto') {
-        actualTheme = getSystemTheme();
-    }
-    document.body.classList.remove('theme-light', 'theme-dark');
-    document.body.classList.add(actualTheme === 'dark' ? 'theme-dark' : 'theme-light');
-    
-    // Save settings
-    const settings = JSON.parse(localStorage.getItem('memonap_settings') || '{}');
-    settings.theme = theme;
-    localStorage.setItem('memonap_settings', JSON.stringify(settings));
-}
 
-// In your theme button click handler:
-themeBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        themeBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const theme = btn.dataset.theme;
-        updateThemeAcrossPages(theme);
-        showToast('Theme updated: ' + theme);
-    });
-});
 // ===== Initialize =====
 checkAuth();
 loadSettings();

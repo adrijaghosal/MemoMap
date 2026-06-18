@@ -10,6 +10,7 @@ body {
     color: #2d1b2e;
     min-height: 100vh;
     overflow-x: hidden;
+    transition: background 0.4s ease, color 0.4s ease;
 }
 
 /* ===== ANIMATED BACKGROUND ===== */
@@ -237,6 +238,7 @@ body {
     padding: 1.5rem 2rem;
     position: relative;
     z-index: 10;
+    transition: all 0.3s ease;
 }
 
 /* ===== TOP HEADER ===== */
@@ -249,6 +251,7 @@ body {
     backdrop-filter: blur(10px);
     padding: 0.8rem 1.5rem;
     border-radius: 60px;
+    transition: all 0.3s ease;
 }
 
 .header-left {
@@ -269,11 +272,13 @@ body {
 .welcome-text h2 {
     font-size: 1.2rem;
     color: #2d1b2e;
+    transition: color 0.3s ease;
 }
 
 .welcome-text p {
     font-size: 0.75rem;
     color: #888;
+    transition: color 0.3s ease;
 }
 
 .user-avatar {
@@ -307,6 +312,7 @@ body {
     border-radius: 32px;
     padding: 2rem;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
 }
 
 /* Progress Steps */
@@ -406,6 +412,8 @@ body {
     font-family: 'Poppins', sans-serif;
     font-size: 0.9rem;
     transition: all 0.3s;
+    background: #ffffff;
+    color: #2d1b2e;
 }
 
 .form-group input:focus, .form-group textarea:focus {
@@ -521,6 +529,7 @@ body {
     border: none;
     padding: 0.5rem;
     width: 100%;
+    background: transparent;
 }
 
 .tags-list {
@@ -585,16 +594,44 @@ body {
 
 .photo-preview {
     position: relative;
-    width: 80px;
-    height: 80px;
+    width: 100px;
+    height: 100px;
     border-radius: 12px;
     overflow: hidden;
+    border: 2px solid #f0e0e4;
 }
 
-.photo-preview img {
+.photo-preview img,
+.photo-preview video {
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+.photo-preview .video-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.6rem;
+    font-weight: 600;
+    z-index: 2;
+}
+
+.photo-preview .media-type-badge {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.6rem;
+    font-weight: 500;
+    z-index: 2;
 }
 
 .photo-preview .remove-photo {
@@ -604,13 +641,14 @@ body {
     background: #e74c3c;
     color: white;
     border-radius: 50%;
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 0.7rem;
     cursor: pointer;
+    z-index: 3;
 }
 
 /* Voice Recorder */
@@ -629,6 +667,12 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 8px;
+    transition: all 0.3s;
+}
+
+.record-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 107, 139, 0.3);
 }
 
 .recording-status {
@@ -723,6 +767,12 @@ body {
     border-bottom: 1px solid #f0e0e4;
 }
 
+.review-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
 .review-label {
     font-weight: 600;
     font-size: 0.75rem;
@@ -746,10 +796,12 @@ body {
 .time-capsule-options p {
     font-size: 0.8rem;
     margin-bottom: 0.5rem;
+    color: #888;
 }
 
 .capsule-options {
     display: flex;
+    flex-wrap: wrap;
     gap: 1rem;
 }
 
@@ -759,7 +811,13 @@ body {
     gap: 6px;
     font-size: 0.8rem;
     font-weight: normal;
+    cursor: pointer;
 }
+
+.capsule-options input[type="radio"] {
+    width: auto;
+}
+
 /* Custom Year Label Styles */
 .custom-year-label {
     display: flex;
@@ -788,6 +846,7 @@ body {
     border-radius: 12px;
     margin-top: 10px;
 }
+
 /* Checkbox */
 .checkbox {
     display: flex;
@@ -800,125 +859,326 @@ body {
     width: auto;
 }
 
-/* ===== DARK MODE - Applies to ALL Pages ===== */
-body.theme-dark {
-    background: linear-gradient(145deg, #0a0e1a 0%, #0f1a2e 40%, #0b1020 100%) !important;
-    color: #e8e8f0 !important;
+/* ============================================
+   DARK MODE - COMPLETE
+   ============================================ */
+
+/* Dark Mode Body */
+body.dark-mode {
+    background: linear-gradient(145deg, #0d0d1a 0%, #13132a 30%, #0a0a16 100%) !important;
+    color: #f0eef8 !important;
 }
 
-body.theme-dark .sidebar {
-    background: rgba(10, 14, 26, 0.96) !important;
-    border-right: 1px solid rgba(255, 107, 139, 0.15) !important;
+/* Dark Mode - Sidebar */
+body.dark-mode .sidebar {
+    background: rgba(10, 10, 22, 0.97) !important;
+    border-right: 1px solid rgba(124, 108, 240, 0.12) !important;
 }
 
-body.theme-dark .top-header {
-    background: rgba(15, 20, 34, 0.8) !important;
+body.dark-mode .sidebar-logo {
+    border-bottom: 1px solid rgba(124, 108, 240, 0.08) !important;
 }
 
-body.theme-dark .card,
-body.theme-dark .settings-card,
-body.theme-dark .stat-card,
-body.theme-dark .info-card {
-    background: rgba(20, 28, 45, 0.85) !important;
-    border: 1px solid rgba(255, 107, 139, 0.08) !important;
+body.dark-mode .sidebar-logo span {
+    color: #f0eef8 !important;
 }
 
-body.theme-dark .welcome-text h2,
-body.theme-dark .section-header h2,
-body.theme-dark h1, 
-body.theme-dark h2, 
-body.theme-dark h3 {
-    color: #f0f0ff !important;
+body.dark-mode .user-profile-mini {
+    background: rgba(124, 108, 240, 0.08) !important;
 }
 
-body.theme-dark p,
-body.theme-dark .text-muted,
-body.theme-dark .memory-title,
-body.theme-dark .diary-card-title {
-    color: #e8e8f0 !important;
+body.dark-mode .user-info-mini h4 {
+    color: #f0eef8 !important;
 }
 
-body.theme-dark .welcome-text p,
-body.theme-dark .text-secondary,
-body.theme-dark .memory-location {
-    color: #9a9ac0 !important;
+body.dark-mode .user-info-mini p {
+    color: #7a7a9a !important;
 }
 
-body.theme-dark .nav-item {
-    color: #9a9ac0 !important;
+body.dark-mode .nav-item {
+    color: #8a8aaa !important;
 }
 
-body.theme-dark .nav-item:hover {
-    color: #ffb8c6 !important;
+body.dark-mode .nav-item:hover {
+    color: #b8b4d4 !important;
+    background: rgba(124, 108, 240, 0.08) !important;
 }
 
-body.theme-dark .nav-item.active {
-    background: linear-gradient(135deg, #ff6b8b, #ffb347) !important;
+body.dark-mode .nav-item.active {
+    background: linear-gradient(135deg, #7c6cf0, #6c5ce7) !important;
     color: white !important;
 }
 
-body.theme-dark .logout-btn {
-    background: rgba(231, 76, 60, 0.15) !important;
-    color: #ff6b8b !important;
+body.dark-mode .nav-divider {
+    background: rgba(124, 108, 240, 0.08) !important;
 }
 
-body.theme-dark .logout-btn:hover {
-    background: #e74c3c !important;
+body.dark-mode .logout-btn {
+    background: rgba(255, 107, 107, 0.08) !important;
+    color: #8a8aaa !important;
+}
+
+body.dark-mode .logout-btn:hover {
+    background: rgba(255, 107, 107, 0.15) !important;
+    color: #ff6b6b !important;
+}
+
+/* Dark Mode - Header */
+body.dark-mode .top-header {
+    background: rgba(22, 22, 46, 0.85) !important;
+    border: 1px solid rgba(124, 108, 240, 0.06) !important;
+}
+
+body.dark-mode .welcome-text h2 {
+    color: #f0eef8 !important;
+}
+
+body.dark-mode .welcome-text p {
+    color: #7a7a9a !important;
+}
+
+body.dark-mode .user-avatar {
+    background: linear-gradient(135deg, #7c6cf0, #ff6b8b) !important;
+}
+
+/* Dark Mode - Form Card */
+body.dark-mode .form-card {
+    background: rgba(28, 28, 58, 0.85) !important;
+    border: 1px solid rgba(124, 108, 240, 0.06) !important;
+}
+
+body.dark-mode .form-group label {
+    color: #f0eef8 !important;
+}
+
+body.dark-mode .form-group input,
+body.dark-mode .form-group textarea {
+    background: rgba(22, 22, 46, 0.8) !important;
+    border: 1px solid rgba(124, 108, 240, 0.08) !important;
+    color: #f0eef8 !important;
+}
+
+body.dark-mode .form-group input::placeholder,
+body.dark-mode .form-group textarea::placeholder {
+    color: #5a5a7a !important;
+}
+
+body.dark-mode .form-group input:focus,
+body.dark-mode .form-group textarea:focus {
+    border-color: #7c6cf0 !important;
+    box-shadow: 0 0 0 3px rgba(124, 108, 240, 0.1) !important;
+}
+
+body.dark-mode .char-count {
+    color: #5a5a7a !important;
+}
+
+/* Dark Mode - Tags */
+body.dark-mode .tags-input-container {
+    border-color: rgba(124, 108, 240, 0.08) !important;
+}
+
+body.dark-mode .tag {
+    background: rgba(124, 108, 240, 0.15) !important;
+    color: #a29bfe !important;
+}
+
+body.dark-mode .tag .remove-tag {
+    color: #ff6b6b !important;
+}
+
+/* Dark Mode - Location Suggestions */
+body.dark-mode .location-suggestions-dropdown {
+    background: #1a1a3a !important;
+    border-color: rgba(124, 108, 240, 0.08) !important;
+}
+
+body.dark-mode .location-suggestions-dropdown .suggestion-item {
+    border-color: rgba(124, 108, 240, 0.05) !important;
+}
+
+body.dark-mode .location-suggestions-dropdown .suggestion-item:hover {
+    background: rgba(124, 108, 240, 0.08) !important;
+}
+
+body.dark-mode .suggestion-name {
+    color: #f0eef8 !important;
+}
+
+body.dark-mode .suggestion-country {
+    color: #7a7a9a !important;
+}
+
+/* Dark Mode - Mood Selector */
+body.dark-mode .mood-option {
+    background: rgba(124, 108, 240, 0.05) !important;
+    color: #b8b4d4 !important;
+}
+
+body.dark-mode .mood-option:hover {
+    background: rgba(124, 108, 240, 0.1) !important;
+}
+
+body.dark-mode .mood-option.selected {
+    background: linear-gradient(135deg, #7c6cf0, #6c5ce7) !important;
     color: white !important;
 }
 
-body.theme-dark .memory-card {
-    background: rgba(20, 28, 45, 0.85) !important;
-    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+/* Dark Mode - Photo Upload */
+body.dark-mode .photo-upload-area {
+    border-color: rgba(124, 108, 240, 0.08) !important;
 }
 
-body.theme-dark .memory-card h4 {
-    color: #f0f0ff !important;
+body.dark-mode .photo-upload-area:hover {
+    border-color: #7c6cf0 !important;
 }
 
-body.theme-dark .memory-card p {
-    color: #9a9ac0 !important;
+body.dark-mode .photo-upload-area p {
+    color: #7a7a9a !important;
 }
 
-body.theme-dark .gallery-item .gallery-overlay {
-    background: linear-gradient(transparent, rgba(0,0,0,0.7)) !important;
+body.dark-mode .photo-upload-area span {
+    color: #5a5a7a !important;
 }
 
-body.theme-dark .search-bar {
-    background: rgba(20, 28, 45, 0.6) !important;
+body.dark-mode .photo-preview {
+    border-color: rgba(124, 108, 240, 0.08) !important;
 }
 
-body.theme-dark .search-bar input {
-    color: #e8e8f0 !important;
+/* Dark Mode - Voice Recorder */
+body.dark-mode .record-btn {
+    background: linear-gradient(135deg, #7c6cf0, #6c5ce7) !important;
 }
 
-body.theme-dark .search-bar input::placeholder {
-    color: #6a6a8a !important;
+body.dark-mode .recording-wave span {
+    background: #7c6cf0 !important;
 }
 
-body.theme-dark .notification-icon {
-    background: rgba(20, 28, 45, 0.6) !important;
+/* Dark Mode - Review Card */
+body.dark-mode .review-card {
+    background: rgba(22, 22, 46, 0.6) !important;
 }
 
-body.theme-dark .notification-icon i {
-    color: #9a9ac0 !important;
+body.dark-mode .review-item {
+    border-color: rgba(124, 108, 240, 0.05) !important;
 }
 
-body.theme-dark .fab {
-    background: linear-gradient(135deg, #ff6b8b, #ffb347) !important;
+body.dark-mode .review-label {
+    color: #7c6cf0 !important;
 }
 
-body.theme-dark .floating-icon {
-    opacity: 0.15 !important;
+body.dark-mode .review-value {
+    color: #f0eef8 !important;
 }
 
-body.theme-dark .pulse-circle {
-    background: rgba(255, 107, 139, 0.04) !important;
+/* Dark Mode - Time Capsule */
+body.dark-mode .time-capsule-options {
+    background: rgba(124, 108, 240, 0.05) !important;
 }
 
-body.theme-dark .bg-animation .floating-icon {
-    opacity: 0.1 !important;
+body.dark-mode .time-capsule-options p {
+    color: #7a7a9a !important;
 }
+
+body.dark-mode .capsule-options label {
+    color: #b8b4d4 !important;
+}
+
+body.dark-mode .custom-year-label input[type="number"] {
+    background: rgba(22, 22, 46, 0.8) !important;
+    border-color: rgba(124, 108, 240, 0.08) !important;
+    color: #f0eef8 !important;
+}
+
+body.dark-mode .custom-year-message {
+    background: rgba(124, 108, 240, 0.08) !important;
+    color: #a29bfe !important;
+}
+
+/* Dark Mode - Navigation */
+body.dark-mode .form-navigation {
+    border-color: rgba(124, 108, 240, 0.05) !important;
+}
+
+body.dark-mode .btn-prev {
+    border-color: rgba(124, 108, 240, 0.08) !important;
+    color: #8a8aaa !important;
+}
+
+body.dark-mode .btn-prev:hover {
+    border-color: #7c6cf0 !important;
+    color: #a29bfe !important;
+}
+
+body.dark-mode .btn-next,
+body.dark-mode .btn-save {
+    background: linear-gradient(135deg, #7c6cf0, #6c5ce7) !important;
+}
+
+body.dark-mode .btn-next:hover,
+body.dark-mode .btn-save:hover {
+    box-shadow: 0 5px 15px rgba(124, 108, 240, 0.3) !important;
+}
+
+/* Dark Mode - Progress Steps */
+body.dark-mode .progress-steps::before {
+    background: rgba(124, 108, 240, 0.08) !important;
+}
+
+body.dark-mode .step-number {
+    background: rgba(124, 108, 240, 0.08) !important;
+    color: #5a5a7a !important;
+}
+
+body.dark-mode .step.active .step-number {
+    background: linear-gradient(135deg, #7c6cf0, #6c5ce7) !important;
+    color: white !important;
+}
+
+body.dark-mode .step-label {
+    color: #5a5a7a !important;
+}
+
+body.dark-mode .step.active .step-label {
+    color: #7c6cf0 !important;
+}
+
+/* Dark Mode - Checkbox */
+body.dark-mode .checkbox {
+    color: #b8b4d4 !important;
+}
+
+/* Dark Mode - Background Animations */
+body.dark-mode .bg-animation .floating-icon {
+    opacity: 0.08 !important;
+}
+
+body.dark-mode .pulse-circle {
+    background: rgba(124, 108, 240, 0.02) !important;
+}
+
+body.dark-mode .floating-shape {
+    background: linear-gradient(135deg, rgba(124, 108, 240, 0.02), rgba(255, 107, 139, 0.01)) !important;
+}
+
+/* Dark Mode - Scrollbar */
+body.dark-mode::-webkit-scrollbar {
+    width: 8px;
+}
+
+body.dark-mode::-webkit-scrollbar-track {
+    background: rgba(13, 13, 26, 0.5);
+}
+
+body.dark-mode::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #7c6cf0, #6c5ce7);
+    border-radius: 10px;
+}
+
+body.dark-mode::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #a29bfe, #7c6cf0);
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 900px) {
     .sidebar { left: -280px; }
@@ -926,6 +1186,7 @@ body.theme-dark .bg-animation .floating-icon {
     .main-content { margin-left: 0; }
     .menu-toggle { display: block; }
     .form-row { flex-direction: column; }
+    .capsule-options { flex-direction: column; gap: 0.5rem; }
 }
 
 @media (max-width: 550px) {
@@ -935,4 +1196,7 @@ body.theme-dark .bg-animation .floating-icon {
     .step-label { display: none; }
     .mood-selector { gap: 0.5rem; }
     .mood-option { font-size: 0.7rem; padding: 0.3rem 0.8rem; }
+    .photo-preview { width: 70px; height: 70px; }
+    .form-navigation { flex-direction: column; gap: 0.8rem; }
+    .btn-prev, .btn-next, .btn-save { width: 100%; justify-content: center; }
 }
